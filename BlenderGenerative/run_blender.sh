@@ -1,0 +1,1 @@
+/Applications/Blender.app/Contents/MacOS/blender '--python', '/Users/kylestew/.vscode/extensions/jacqueslucke.blender-development-0.0.19/pythonFiles/launch.py'
