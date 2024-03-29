@@ -10,4 +10,5 @@ npx canvas-sketch-cli sketches/sketch.js --new --open
 
 ## Making a new PROJECT
 
-???
+    $ cd projects
+    $ npm create vite@latest

@@ -1,0 +1,22 @@
+{
+  "name": "olivetti-glyphs",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "typescript": "^5.2.2",
+    "vite": "^5.2.0"
+  },
+  "dependencies": {
+    "@thi.ng/geom": "^6.1.4",
+    "@thi.ng/geom-accel": "^3.5.67",
+    "@thi.ng/math": "^5.10.8",
+    "@thi.ng/poisson": "^3.1.82",
+    "@thi.ng/vectors": "^7.10.25"
+  }
+}
