@@ -64,16 +64,16 @@ const ctx = setupCanvas()
 
 const params = {
     // boids simulation
-    count: 400,
-    perception_radius: ctx.canvas.width * 0.1,
+    count: 300,
+    perception_radius: ctx.canvas.width * 0.05,
     max_speed: 1.2,
-    max_force: 2.0,
+    max_force: 0.5,
     gravity: 0.01,
 
     // drawing
     size: 5,
     color: '#ffffff',
-    debug: false,
+    debug: true,
 }
 
 const pane = new Pane()
@@ -92,9 +92,9 @@ boidCount.on('change', (e) => {
         }
     }
 })
-boidFolder.addBinding(params, 'perception_radius', { min: 10, max: 1000, step: 1, label: 'perception' })
+boidFolder.addBinding(params, 'perception_radius', { min: 10, max: 500, step: 1, label: 'perception' })
 boidFolder.addBinding(params, 'max_speed', { min: 0, max: 10, step: 0.01 })
-boidFolder.addBinding(params, 'max_force', { min: 0, max: 10, step: 0.01 })
+boidFolder.addBinding(params, 'max_force', { min: 0, max: 1.0, step: 0.0001 })
 boidFolder.addBinding(params, 'gravity', { min: 0, max: 1, step: 0.0001 })
 
 const drawingFolder = pane.addFolder({ title: 'Drawing' })

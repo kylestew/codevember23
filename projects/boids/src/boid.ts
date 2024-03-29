@@ -10,7 +10,8 @@ interface IBoid {
         bounds: IVector,
         perceptionRadius: number,
         maxSpeed: number,
-        maxForce: number
+        maxForce: number,
+        gravity: number
     ): void
     draw(ctx: CanvasRenderingContext2D, size: number, color: string, debug: boolean): void
 }
@@ -31,30 +32,34 @@ export default class Boid implements IBoid {
         this.acceleration = Vector.zero()
     }
 
-    calculateSeperation(boids: IBoidInfo[]) {
-        // let steering = boids.reduce((acc, { otherBoid, distance, wrapBoundaries }) => {
-        //     let diff = this.position.toroidalSubtraction(
-        //         otherBoid.position,
-        //         wrapBoundaries.x,
-        //         wrapBoundaries.y
-        //     )
-        //     diff = diff.divide(distance) // weight by distance
-        //     return acc.add(diff)
-        // }, Vector.zero())
-        // let total = boids.length
-        // if (total > 0) {
-        //     steering = steering.divide(total)
-        //     // do it at max speed
-        //     steering = steering.setMagnitude(this.maxSpeed)
-        //     // move my velocity towards goal
-        //     steering = steering.subtract(this.velocity)
-        //     // limit
-        //     steering = steering.limit(this.maxForce)
-        // }
-        // return steering
+    calculateSeperation(boids: IBoidInfo[], maxSpeed: number, maxForce: number) {
+        let steering = boids.reduce((acc, { otherBoid, distance }) => {
+            let diff = this.position.subtract(otherBoid.position)
+            diff = diff.divide(distance) // weight by distance
+            return acc.add(diff)
+        }, Vector.zero())
+        let total = boids.length
+        if (total > 0) {
+            // average force value
+            steering = steering.divide(total)
+
+            // move towards goal as quickly as you can
+            // Instead of directly setting to maxSpeed, scale the steering based on maxSpeed
+            let magnitude = steering.magnitude()
+            if (magnitude > 0) {
+                steering = steering.normalize().scale(Math.min(maxSpeed, magnitude))
+            }
+
+            // move my velocity towards goal
+            steering = steering.subtract(this.velocity)
+
+            // apply maximum force limit - boids can only respond so quickly
+            steering = steering.limit(maxForce)
+        }
+        return steering
     }
 
-    calculateAlignment(boids: IBoidInfo[], maxSpeed) {
+    calculateAlignment(boids: IBoidInfo[], maxForce: number) {
         // sum all the velocities of the other boids
         let avgVelocity = boids.reduce((acc, { otherBoid }) => {
             return acc.add(otherBoid.velocity)
@@ -63,33 +68,34 @@ export default class Boid implements IBoid {
         if (total > 0) {
             // average direction
             avgVelocity = avgVelocity.divide(total)
-            // steer towards neighbords average at max speed
-            avgVelocity = avgVelocity.setMagnitude(maxSpeed)
+
+            // apply maximum force limit - boids can only respond so quickly
+            avgVelocity = avgVelocity.limit(maxForce)
+
             // steer towards average
             avgVelocity = avgVelocity.subtract(this.velocity)
         }
         return avgVelocity
     }
 
-    calculateCohesion(boids: IBoidInfo[]) {
-        // let centerOfMass = boids.reduce((acc, { otherBoid }) => {
-        //     return acc.add(otherBoid.position)
-        // }, Vector.zero())
-        // let total = boids.length
-        // if (total > 0) {
-        //     // average location
-        //     centerOfMass = centerOfMass.divide(total)
-        //     // steer towards center of mass
-        //     centerOfMass = centerOfMass.subtract(this.position)
-        //     // do it at max speed
-        //     centerOfMass = centerOfMass.setMagnitude(this.maxSpeed)
-        //     // move my velocity towards goal
-        //     centerOfMass = centerOfMass.subtract(this.velocity)
-        //     // limit
-        //     centerOfMass = centerOfMass.limit(this.maxForce)
-        //     return centerOfMass
-        // }
-        // return Vector.zero()
+    calculateCohesion(boids: IBoidInfo[], maxForce: number) {
+        let centerOfMass = boids.reduce((acc, { otherBoid }) => {
+            return acc.add(otherBoid.position)
+        }, Vector.zero())
+        let total = boids.length
+        if (total > 0) {
+            // average location
+            centerOfMass = centerOfMass.divide(total)
+
+            // steer towards center of mass
+            centerOfMass = centerOfMass.subtract(this.position)
+
+            // apply maximum force limit - boids can only respond so quickly
+            centerOfMass = centerOfMass.limit(maxForce)
+
+            return centerOfMass
+        }
+        return Vector.zero()
     }
 
     calculateGravity(center: Vector, gravity: number) {
@@ -119,16 +125,17 @@ export default class Boid implements IBoid {
         // central gravity
         const center = new Vector(bounds.x / 2, bounds.y / 2)
         this.acceleration = this.calculateGravity(center, gravity) // clear and replace acceleration
-        console.log(gravity)
 
-        // this.acceleration = Vector.zero() // clear and replace acceleration
+        // this.acceleration = Vector.zero()
 
         // Get all boids within perception radius
         const inPerceptionRadius = this.boidsInPerceptionRadius(flock, perceptionRadius)
 
-        // this.acceleration = this.acceleration.add(this.calculateSeperation(inPerceptionRadius))
-        this.acceleration = this.acceleration.add(this.calculateAlignment(inPerceptionRadius, maxSpeed))
-        // this.acceleration = this.acceleration.add(this.calculateCohesion(inPerceptionRadius))
+        this.acceleration = this.acceleration.add(
+            this.calculateSeperation(inPerceptionRadius, maxSpeed, maxForce)
+        )
+        this.acceleration = this.acceleration.add(this.calculateAlignment(inPerceptionRadius, maxForce))
+        this.acceleration = this.acceleration.add(this.calculateCohesion(inPerceptionRadius, maxForce))
 
         // physics update
         this.acceleration = this.acceleration.limit(maxForce)
