@@ -1,22 +1,43 @@
-import { asSvg, circle, svgDoc } from '@thi.ng/geom'
-import { KdTreeSet } from '@thi.ng/geom-accel'
-import { fit01 } from '@thi.ng/math'
-import { samplePoisson } from '@thi.ng/poisson'
-import { dist, randMinMax2 } from '@thi.ng/vectors'
+import { parse as parseFont } from 'opentype.js'
+import { parse as parseXML, Type } from '@thi.ng/sax'
+import { pathFromSvg, asPolygon, vertices, circle, Circle, asSvg, svgDoc } from '@thi.ng/geom'
+import { comp, mapcat, transduce, map, filter, push } from '@thi.ng/transducers'
 
-const index = new KdTreeSet(2)
+import fontFileURL from './assets/FiraSansOT-Medium.otf?url'
 
-const pts = samplePoisson({
-    index,
-    points: () => randMinMax2(null, [0, 0], [500, 500]),
-    density: (p) => fit01(Math.pow(dist(p, [250, 250]) / 250, 2), 2, 10),
-    iter: 5,
-    max: 8000,
-    quality: 500,
-})
+async function loadFont() {
+    const response = await fetch(fontFileURL)
+    const buffer = await response.arrayBuffer()
+    const font = parseFont(buffer)
+    return font
+}
 
-// use thi.ng/geom to visualize results
-// each circle's radius is set to distance to its nearest neighbor
-const circles = pts.map((p) => circle(p, dist(p, index.queryKeys(p, 40, 2)[1]) / 2))
+const font = await loadFont()
 
-document.body.innerHTML = asSvg(svgDoc({ fill: 'none', stroke: 'blue' }, ...circles))
+const circleRad = 5
+
+// one letter to circles
+function circlesFromLetter(letter: string, fontSize: number): Circle[] {
+    return transduce(
+        comp(
+            // opentype to SVG string
+            mapcat((letter) => font.getPath(letter, 0, 0, 256).toSVG()),
+            // svg string to SAX events
+            parseXML(), //
+            // filter for path elements
+            filter((ev) => ev.type === Type.ELEM_END && ev.tag === 'path'),
+            // convert path strings to geom.Path objects
+            mapcat((ev) => pathFromSvg(ev.attribs!.d)),
+            // convert paths to vertices
+            mapcat((path) => vertices(asPolygon(path), { dist: circleRad * 2 })),
+            // convert vertices to circles
+            map((p) => circle(p, circleRad))
+        ),
+        push<Circle>(),
+        [letter]
+    )
+}
+
+const circles = circlesFromLetter('A', 256)
+console.log(circles)
+document.body.innerHTML = asSvg(svgDoc({ stroke: 'blue' }, ...circles))
