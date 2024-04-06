@@ -1,107 +1,133 @@
-import { parse as parseFont } from 'opentype.js'
-import { parse as parseXML, Type } from '@thi.ng/sax'
-import { Circle, circle, asPolygon, pathFromSvg, vertices, svgDoc, asSvg, intersects } from '@thi.ng/geom'
-import { comp, mapcat, transduce, map, flatten, filter, push, range, pluck } from '@thi.ng/transducers'
+import { BoundingBox, Font } from 'opentype.js'
+import { Rect } from '@thi.ng/geom'
+import { transduce, map, push } from '@thi.ng/transducers'
 import { pickRandom } from '@thi.ng/random'
-import { Vec, dist } from '@thi.ng/vectors'
+import { Vec } from '@thi.ng/vectors'
 
-import fontFileURL from './assets/FiraSansOT-Medium.otf?url'
-async function loadFont() {
-    const response = await fetch(fontFileURL)
-    const buffer = await response.arrayBuffer()
-    const font = parseFont(buffer)
-    return font
-}
-const font = await loadFont()
+import { alphaNumericCharacterSet } from './alphanumeric'
+import { loadFontSet } from './font-set'
+import { ShapePacker } from './ShapePacker'
 
-type GlyphPlacement = { letter: string; pos: Vec; fontSize: number; circles: Circle[] }
+type GlyphPlacement = { font: Font; letter: string; pos: Vec; fontSize: number }
 
-function createGlyphPlacement(letter: string, x: number, y: number, fontSize: number): GlyphPlacement {
-    const circleRad = 5.0
-    const circles = transduce(
-        comp(
-            // opentype to SVG string
-            mapcat((letter) => font.getPath(letter, x, y, fontSize).toSVG()),
-            // svg string to SAX events
-            parseXML(), //
-            // filter for path elements
-            filter((ev) => ev.type === Type.ELEM_END && ev.tag === 'path'),
-            // convert path strings to geom.Path objects
-            mapcat((ev) => pathFromSvg(ev.attribs!.d)),
-            // convert paths to polygons to vertices
-            mapcat((path) => vertices(asPolygon(path), { dist: circleRad * 2 })),
-            // convert vertices to circles
-            map((p) => circle(p, circleRad))
-        ),
-        push<Circle>(),
-        [letter]
-    )
-    return {
-        letter,
-        pos: [x, y],
-        fontSize,
-        circles,
-    }
-}
+const fonts = await loadFontSet()
+// const characterSet = 'Speak softly and carry a big stick'.split('')
+// array containing 61-73 ascii characters
+const characterSet = alphaNumericCharacterSet
 
-const ATTEMPTS = 2000
-const MIN_FONT_SIZE = 12
+const ATTEMPTS = 50000
+const MIN_FONT_SIZE = 10
 const MAX_FONT_SIZE = 256
 const FONT_SIZE_STEP = 4
-const CANVAS_WIDTH = 1200
-const CANVAS_HEIGHT = 1200
-// array containing 61-73 ascii characters
-const characterSet = transduce(
-    comp(
-        flatten(),
-        mapcat((char) => String.fromCharCode(char)) //
-    ),
-    push<string>(),
-    // numbers, capital letters, lowercase letters
-    [range(48, 57 + 1), range(65, 90 + 1), range(97, 122 + 1)]
-)
+const CANVAS_WIDTH = 1200 / 2 // It's an SVG, you can work at smaller sizes and scale up
+const CANVAS_HEIGHT = 1900 / 2
+const STROKE_PADDING = 2
 
-const circleField: Circle[] = []
-const placedGlyphs: GlyphPlacement[] = []
-function canAddGlyph(glyph: GlyphPlacement): boolean {
-    return glyph.circles.every((circle) => {
-        return circleField.every((placed) => dist(circle.pos, placed.pos) > circle.r + placed.r)
-    })
+const packer = new ShapePacker(CANVAS_WIDTH, CANVAS_HEIGHT, 2)
+
+function asRect(bounds: BoundingBox): Rect {
+    return new Rect([bounds.x1, bounds.y1], [bounds.x1 + bounds.x2, bounds.y1 + bounds.y2])
 }
 
 // pack them!
+const placedGlyphs: GlyphPlacement[] = []
 for (let i = 0; i < ATTEMPTS; i++) {
     // try to place one glyph
+    const font = pickRandom(fonts)
     const letter = pickRandom(characterSet)
-    let x = Math.random() * CANVAS_WIDTH
-    let y = Math.random() * CANVAS_HEIGHT
+    // TODO: gaussian distribution centered aroudn the middle of the canvas
+    let x = Math.random() * CANVAS_WIDTH * 1.2 - CANVAS_WIDTH * 0.1
+    let y = Math.random() * CANVAS_HEIGHT * 1.2
     let fontSize = MIN_FONT_SIZE
 
-    let glyphPlacement: GlyphPlacement | undefined
-
-    let glyphAttempt = createGlyphPlacement(letter, x, y, fontSize)
-    while (canAddGlyph(glyphAttempt) && fontSize <= MAX_FONT_SIZE) {
-        glyphPlacement = glyphAttempt
+    let path = font.getPath(letter, x, y, fontSize)
+    let placedGlyph: GlyphPlacement | undefined
+    while (
+        fontSize <= MAX_FONT_SIZE &&
+        packer.canPlaceShape(asRect(path.getBoundingBox()), (ctx: OffscreenCanvasRenderingContext2D) => {
+            ctx.lineWidth = STROKE_PADDING
+            path.draw(ctx)
+            if (STROKE_PADDING > 0) ctx.stroke() // adds a stroke to space out glyphs
+        })
+    ) {
+        placedGlyph = {
+            font,
+            letter,
+            pos: [x, y],
+            fontSize,
+        }
 
         // attempt to step it up
         fontSize += FONT_SIZE_STEP
-        glyphAttempt = createGlyphPlacement(letter, x, y, fontSize)
+        path = font.getPath(letter, x, y, fontSize)
     }
 
     // we're we able to place the glyph?
-    if (glyphPlacement) {
-        placedGlyphs.push(glyphPlacement)
-        circleField.push(...glyphPlacement.circles)
+    if (placedGlyph) {
+        placedGlyphs.push(placedGlyph)
+
+        // draw to packed canvas buffer
+        packer.commitShape((ctx: OffscreenCanvasRenderingContext2D) => {
+            const path = placedGlyph.font.getPath(
+                placedGlyph.letter,
+                placedGlyph.pos[0],
+                placedGlyph.pos[1],
+                placedGlyph.fontSize
+            )
+            ctx.lineWidth = STROKE_PADDING
+            path.draw(ctx)
+            if (STROKE_PADDING > 0) ctx.stroke() // adds a stroke to space out glyphs
+        })
     }
 }
+console.log('placed', placedGlyphs.length)
 
-console.log('placed glyphs:', placedGlyphs.length)
+/*
+let path = fonts[0].getPath('A', 20, 160, 200)
+// console.log(path.getBoundingBox())
+let result = packer.canPlaceShape(asRect(path.getBoundingBox()), (ctx: OffscreenCanvasRenderingContext2D) => {
+    ctx.lineWidth = STROKE_PADDING
+    path.draw(ctx)
+    if (STROKE_PADDING > 0) ctx.stroke() // adds a stroke to space out glyphs
+})
+if (result) {
+    packer.commitShape((ctx: OffscreenCanvasRenderingContext2D) => {
+        ctx.lineWidth = STROKE_PADDING
+        path.draw(ctx)
+        if (STROKE_PADDING > 0) ctx.stroke() // adds a stroke to space out glyphs
+    })
+}
+path = fonts[0].getPath('A', 30, 170, 210)
+// console.log(path.getBoundingBox())
+result = packer.canPlaceShape(asRect(path.getBoundingBox()), (ctx: OffscreenCanvasRenderingContext2D) => {
+    ctx.lineWidth = STROKE_PADDING
+    path.draw(ctx)
+    if (STROKE_PADDING > 0) ctx.stroke() // adds a stroke to space out glyphs
+})
+console.log(result)
+path = fonts[0].getPath('A', 40, 180, 220)
+// console.log(path.getBoundingBox())
+result = packer.canPlaceShape(asRect(path.getBoundingBox()), (ctx: OffscreenCanvasRenderingContext2D) => {
+    ctx.lineWidth = STROKE_PADDING
+    path.draw(ctx)
+    if (STROKE_PADDING > 0) ctx.stroke() // adds a stroke to space out glyphs
+})
+console.log(result)
+*/
+
+// const canvas = document.createElement('canvas')
+// document.body.appendChild(canvas)
+// packer.dumpToCanvas(canvas, 'glyph')
+// packer.dumpToCanvas(canvas, 'packed')
+// packer.dumpToCanvas(canvas, 'compare')
 
 // display them!
+console.log('placed glyphs:', placedGlyphs.length)
 let svgContent = `<svg width="${CANVAS_WIDTH}" height="${CANVAS_HEIGHT}" xmlns="http://www.w3.org/2000/svg">`
 svgContent += `<g fill="black">`
+// svgContent += `<g fill="none" stroke="red" stroke-width="1">`
 svgContent += transduce(
-    map(({ letter, pos, fontSize }) => font.getPath(letter, pos[0], pos[1], fontSize).toSVG()),
+    map(({ font, letter, pos, fontSize }) => font.getPath(letter, pos[0], pos[1], fontSize).toSVG()),
     push(),
     placedGlyphs
 ).join('\n')
