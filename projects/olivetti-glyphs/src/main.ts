@@ -15,7 +15,7 @@ const fonts = await loadFontSet()
 // array containing 61-73 ascii characters
 const characterSet = alphaNumericCharacterSet
 
-const ATTEMPTS = 50000
+const ATTEMPTS = 1
 const MIN_FONT_SIZE = 10
 const MAX_FONT_SIZE = 256
 const FONT_SIZE_STEP = 4
@@ -30,6 +30,7 @@ function asRect(bounds: BoundingBox): Rect {
 }
 
 // pack them!
+/*
 const placedGlyphs: GlyphPlacement[] = []
 for (let i = 0; i < ATTEMPTS; i++) {
     // try to place one glyph
@@ -81,6 +82,7 @@ for (let i = 0; i < ATTEMPTS; i++) {
     }
 }
 console.log('placed', placedGlyphs.length)
+*/
 
 /*
 let path = fonts[0].getPath('A', 20, 160, 200)
@@ -97,30 +99,32 @@ if (result) {
         if (STROKE_PADDING > 0) ctx.stroke() // adds a stroke to space out glyphs
     })
 }
-path = fonts[0].getPath('A', 30, 170, 210)
-// console.log(path.getBoundingBox())
-result = packer.canPlaceShape(asRect(path.getBoundingBox()), (ctx: OffscreenCanvasRenderingContext2D) => {
-    ctx.lineWidth = STROKE_PADDING
-    path.draw(ctx)
-    if (STROKE_PADDING > 0) ctx.stroke() // adds a stroke to space out glyphs
-})
-console.log(result)
-path = fonts[0].getPath('A', 40, 180, 220)
-// console.log(path.getBoundingBox())
-result = packer.canPlaceShape(asRect(path.getBoundingBox()), (ctx: OffscreenCanvasRenderingContext2D) => {
-    ctx.lineWidth = STROKE_PADDING
-    path.draw(ctx)
-    if (STROKE_PADDING > 0) ctx.stroke() // adds a stroke to space out glyphs
-})
-console.log(result)
+// path = fonts[0].getPath('A', 30, 170, 210)
+// // console.log(path.getBoundingBox())
+// result = packer.canPlaceShape(asRect(path.getBoundingBox()), (ctx: OffscreenCanvasRenderingContext2D) => {
+//     ctx.lineWidth = STROKE_PADDING
+//     path.draw(ctx)
+//     if (STROKE_PADDING > 0) ctx.stroke() // adds a stroke to space out glyphs
+// })
+// console.log(result)
+// path = fonts[0].getPath('A', 40, 180, 220)
+// // console.log(path.getBoundingBox())
+// result = packer.canPlaceShape(asRect(path.getBoundingBox()), (ctx: OffscreenCanvasRenderingContext2D) => {
+//     ctx.lineWidth = STROKE_PADDING
+//     path.draw(ctx)
+//     if (STROKE_PADDING > 0) ctx.stroke() // adds a stroke to space out glyphs
+// })
+// console.log(result)
 */
 
-// const canvas = document.createElement('canvas')
-// document.body.appendChild(canvas)
+const canvas = document.createElement('canvas')
+document.body.appendChild(canvas)
+packer.test()
 // packer.dumpToCanvas(canvas, 'glyph')
 // packer.dumpToCanvas(canvas, 'packed')
-// packer.dumpToCanvas(canvas, 'compare')
+packer.dumpToCanvas(canvas, 'compare')
 
+/*
 // display them!
 console.log('placed glyphs:', placedGlyphs.length)
 let svgContent = `<svg width="${CANVAS_WIDTH}" height="${CANVAS_HEIGHT}" xmlns="http://www.w3.org/2000/svg">`
@@ -146,3 +150,4 @@ svgContent += `</g>`
 svgContent += `</svg>`
 
 document.body.innerHTML = svgContent
+*/
