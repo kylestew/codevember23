@@ -1,13 +1,41 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + TS</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
-  </body>
+    <head>
+        <meta charset="UTF-8" />
+        <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Vite + TS</title>
+    </head>
+    <body>
+        <!-- <div>
+            <button id="stop">Stop</button>
+            <progress id="progressBar" max="100" value="0"></progress>
+        </div>
+        <div id="resultsContainer"></div> -->
+
+        <div id="output">
+            <svg
+                id="Layer_1"
+                data-name="Layer 1"
+                xmlns="http://www.w3.org/2000/svg"
+                version="1.1"
+                viewBox="0 0 1080 1920"
+            >
+                <defs>
+                    <style>
+                        .cls-1 {
+                            fill: none;
+                            stroke: #000;
+                            stroke-miterlimit: 10;
+                            stroke-width: 12px;
+                        }
+                    </style>
+                </defs>
+                <line class="cls-1" x2="1080" y2="1920" />
+                <line class="cls-1" y1="1920" x2="1080" />
+            </svg>
+        </div>
+
+        <script type="module" src="/src/main.ts"></script>
+    </body>
 </html>
