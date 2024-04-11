@@ -3,7 +3,7 @@ import './style.css'
 import { createUI } from './gui'
 import { App, AppParams } from './app'
 
-const output = document.getElementById('output')!
+const outputElm = document.getElementById('output')!
 
 const params: AppParams = {
     canvasSize: {
@@ -17,7 +17,7 @@ let app: App | undefined
 createUI(
     params,
     (progressCallback) => {
-        app = new App(params)
+        app = new App(params, outputElm)
         app.start(progressCallback)
     },
     () => {
@@ -38,3 +38,5 @@ function adjustAspectRatio() {
 }
 adjustAspectRatio()
 window.addEventListener('resize', adjustAspectRatio)
+
+// TODO: S to save SVG

@@ -16,7 +16,7 @@ export class ShapePacker {
     private compareCanvas: OffscreenCanvas
     private compareCtx: OffscreenCanvasRenderingContext2D
 
-    constructor(width: number, height: number, downscale: number = 4) {
+    constructor(width: number, height: number, downscale: number = 2) {
         this.domainBounds = rect([0, 0], [width, height])
 
         this.scale = 1.0 / downscale
@@ -63,8 +63,8 @@ export class ShapePacker {
         // // bounds = this.domainBounds
         const pos = floor([], mulN([], bounds.pos, this.scale))
         const size = ceil([], mulN([], bounds.size, this.scale))
-        const imageData: ImageData = this.compareCtx.getImageData(pos[0], pos[1], size[0], size[1])
-        // const imageData: ImageData = this.compareCtx.getImageData(0, 0, this.downscaleWidth, this.downscaleHeight)
+        // const imageData: ImageData = this.compareCtx.getImageData(pos[0], pos[1], size[0], size[1])
+        const imageData: ImageData = this.compareCtx.getImageData(0, 0, this.downscaleWidth, this.downscaleHeight)
         const data: Uint8ClampedArray = imageData.data
         // console.log(
         //     this.compareCanvas.width,

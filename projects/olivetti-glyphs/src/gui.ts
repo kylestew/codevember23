@@ -6,6 +6,10 @@ export type ProgressCallback = (progress: number, completed: boolean) => void
 export function createUI(params: AppParams, start: (progressCallback: ProgressCallback) => void, stop: () => void) {
     const pane = new Pane()
 
+    let status = {
+        progress: 0,
+    }
+
     pane.addBinding(params, 'density', {
         label: 'Density',
         min: 0.01,
@@ -13,6 +17,10 @@ export function createUI(params: AppParams, start: (progressCallback: ProgressCa
         step: 0.01,
     })
 
+    const progressReadout = pane.addBinding(status, 'progress', {
+        readonly: true,
+    })
+    progressReadout.hidden = true
     const stopButton = pane.addButton({
         title: 'Stop',
     })
@@ -36,8 +44,10 @@ export function createUI(params: AppParams, start: (progressCallback: ProgressCa
         start((progress: number, completed: boolean) => {
             if (completed) {
                 setRunningState(false)
+                progressReadout.hidden = true
             } else {
-                console.log('progress', progress)
+                progressReadout.hidden = false
+                status.progress = progress * 100
             }
         })
     }
