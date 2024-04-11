@@ -13,9 +13,10 @@ Sketches are small ideas that don't need thi.ng or other such libraries
 ## Making a new PROJECT
 Projects are more sizable, and can include a modern bundling system.
 Most things are projects these days.
+I've made a nice template with a Sketch class and some light UI for params
 
     $ cd projects
-    $ npm create vite@latest
+    $ npx degit kylestew/vite-sketch-template#ether name-of-new-project-replace-me
 
 ## Shared Libraries
 As I begin to reuse code, I'll lift them up into the lib directory at the root of this project
