@@ -5,8 +5,8 @@ import { SketchParams } from './types'
 import { createUI } from './gui'
 
 const params: SketchParams = {
-    background: { r: 33, g: 66, b: 55, a: 1 },
-    tint: { r: 192, g: 64, b: 64, a: 0.8 },
+    background: { r: 249, g: 248, b: 244, a: 1 },
+    tint: { r: 194, g: 101, b: 75, a: 1.0 },
     subdivisions: 6,
 }
 
