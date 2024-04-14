@@ -2,16 +2,21 @@ import { SketchParams } from './types'
 import { Sketch } from './util/ISketch'
 import tinycolor from 'tinycolor2'
 import { adaptiveCanvas2d } from '@thi.ng/canvas'
-import { draw } from '@thi.ng/hiccup-canvas'
-import { circle, Circle } from '@thi.ng/geom'
+import { APC, polyline } from '@thi.ng/geom'
+import { Vec } from '@thi.ng/vectors'
+import { range, transduce, map, push } from '@thi.ng/transducers'
 import { SYSTEM } from '@thi.ng/random'
+import { draw } from '@thi.ng/hiccup-canvas'
 
 export class MySketch extends Sketch {
     private ctx: CanvasRenderingContext2D
     private width: number = 640
     private height: number = 480
+    private onePx: number = 1.0
+    private xrange: number[] = [-1, 1]
+    private yrange: number[] = [-1, 1]
 
-    private shapes: Circle[] = []
+    private shapes: APC[] = []
 
     constructor(params: SketchParams, appElm: HTMLElement) {
         super(params, 100)
@@ -25,41 +30,55 @@ export class MySketch extends Sketch {
             const scale = (this.height / 2.0) * dpr
             this.ctx.scale(scale, scale)
             this.ctx.translate((this.width * 0.5 * dpr) / scale, 1.0)
+            this.onePx = 1.0 / scale / dpr
+            this.xrange = [-this.width / this.height, this.width / this.height]
         } else {
             const scale = (this.width / 2.0) * dpr
             this.ctx.scale(scale, scale)
             this.ctx.translate(1.0, (this.height * 0.5 * dpr) / scale)
+            this.onePx = 1.0 / scale / dpr
+            this.yrange = [-this.height / this.width, this.height / this.width]
         }
     }
 
-    // *circleGenerator(count: number): Generator<Circle, void, undefined> {
-    //     for (let i = 0; i < count; i++) {
-    //         yield circle(
-    //             [SYSTEM.float(this.width * this.dpr), SYSTEM.float(this.height * this.dpr)],
-    //             SYSTEM.float(100 * this.dpr),
-    //             { fill: tinycolor(this.params.tint).toRgbString() }
-    //         )
-    //     }
-    // }
+    *randomRange(from: number, to: number, jumpScale: number): Generator<number> {
+        let current = from
+        while (current < to) {
+            yield current
+            current += SYSTEM.float(jumpScale)
+        }
+        yield to
+    }
 
     setup() {
         this.shapes = []
-        console.log('restarting', this.params.subdivisions)
-        // this.generator = this.circleGenerator(100)
     }
 
     update(iteration: number): number {
-        // const next = this.generator.next()
-        // if (next.done) {
-        this.stop()
-        // } else {
-        //     this.shapes.push(next.value)
-        // }
-        // return iteration
+        if (iteration < 100) {
+            const xrange = this.randomRange(this.xrange[0], this.xrange[1], 0.5)
+            const xys = transduce(
+                map((x) => [x, SYSTEM.norm(0.8)]),
+                push<Vec>(),
+                xrange
+            )
+            const pline = polyline(xys, {
+                stroke: tinycolor(this.params.tint).toRgbString(),
+                weight: this.onePx * 18.0,
+                closed: false,
+                lineJoin: 'round',
+            })
+            this.shapes = [pline]
+
+            // TODO: apply chaikin curve subdivision "subdivision" times
+        } else {
+            this.stop()
+        }
+        return iteration
     }
 
     render() {
-        // const bgColor = tinycolor(this.params.background)
-        // draw(this.ctx, ['g', { __background: bgColor.toRgbString() }, ...this.shapes])
+        const bgColor = tinycolor(this.params.background)
+        draw(this.ctx, ['g', { __background: bgColor.toRgbString() }, ...this.shapes])
     }
 }

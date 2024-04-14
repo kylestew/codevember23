@@ -20,7 +20,7 @@ createUI(params, sketch, (pane, wrapMidiBinding) => {
     f1.addBinding(params, 'background')
     f1.addBinding(params, 'tint')
 
-    wrapMidiBinding(f1, params, 'subdivisions', { label: 'Subdivisions', min: 0, max: 12, step: 1 })
+    wrapMidiBinding(f1, params, 'subdivisions', { label: 'Subdivisions', min: 0, max: 12, step: 1.0 })
 })
 sketch.start()
 
