@@ -3,7 +3,7 @@ import { Sketch, SketchParams } from './types'
 import tinycolor from 'tinycolor2'
 import { draw } from '@thi.ng/hiccup-canvas'
 import { circle, Polygon, asPolygon, points, edges, line, arcLength, Line, pointAt, polygon } from '@thi.ng/geom'
-import { transduce, comp, push, trace, map, mapcat, flatten1 } from '@thi.ng/transducers'
+import { transduce, comp, push, trace, map, mapcat, flatten1, pluck } from '@thi.ng/transducers'
 import { Vec, vec2, Vec2, VecPair, perpendicularCW, mag, normalize, add, mulN, rotate } from '@thi.ng/vectors'
 import { SYSTEM, gaussian } from '@thi.ng/random'
 import { clamp01 } from '@thi.ng/math'
@@ -12,13 +12,29 @@ function asVec2(p: VecPair): Vec2 {
     return vec2(p[1][0] - p[0][0], p[1][1] - p[0][1])
 }
 
+type EdgeInfo = {
+    edge: VecPair
+    variablity: number
+    iteration: number
+}
+function edgeListToPoly(edgeList: EdgeInfo[], attribs: any): Polygon {
+    return polygon(
+        transduce(
+            map(({ edge }) => edge[0]),
+            push(),
+            edgeList
+        ),
+        attribs
+    )
+    // startingEdges.reduce( (edgeInfo) => { edgeInfo.edge[0] }))
+}
+
 export class MySketch extends Sketch {
     private ctx: CanvasRenderingContext2D
     private width: number = 640
     private height: number = 480
 
     private shapes: Polygon[] = []
-    private shapeGen: Generator<Polygon> = this.makeShape()
 
     constructor(params: SketchParams, appElm: HTMLElement) {
         super(params, 100)
@@ -43,90 +59,98 @@ export class MySketch extends Sketch {
         this.shapes = []
     }
 
-    *makeShape(): Generator<Polygon> {
+    makeShape(): Polygon {
         // TODO: make more organic shapes
         const r = 0.5
-        yield asPolygon(
+        return asPolygon(
             circle([0, 0], r, { fill: tinycolor(this.params.tint).toRgbString() }), //
             10
         )
     }
 
-    randomEdgeBreak = () => {
+    randomVariablility(): number {
+        const gauss = gaussian(SYSTEM, 24, 1.0, 1.0)
+        return gauss()
+    }
+    mutateVariablility(variablity: number): number {
+        // mutate just a little bit each iteration
+        const gauss = gaussian(SYSTEM, 24, 0.0, 0.3)
+        return gauss() + variablity
+    }
+    randomEdgeBreak(variance: number): number {
         // gaussian ditro centered around 0.5 with a scale of 2
         const gauss = gaussian(SYSTEM, 24, 0.5, 2.0)
-        return clamp01(gauss())
+        return clamp01(gauss() * variance)
     }
-    randomAngle = () => {
-        return gaussian(SYSTEM, 24, 0.0, Math.PI)()
+    randomAngle(variance: number): number {
+        return gaussian(SYSTEM, 24, 0.0, 2.0 * Math.PI)() * variance
     }
-    randomLength = (edgeLength: number) => {
-        return Math.abs(gaussian(SYSTEM, 24, 0.0, 2.0)()) * edgeLength
+    randomLength(edgeLength: number, variance: number): number {
+        return Math.abs(gaussian(SYSTEM, 24, 0.0, 3.0)()) * edgeLength * variance
     }
 
-    iterateCoastline(poly: Polygon): Polygon {
-        const points = transduce(
-            comp(
-                map((edge) => {
-                    // cut the edge at some point near the middle
-                    const breakPt = pointAt(line(edge), randomEdgeBreak())!
-                    // determine vector perpendicular to edge
-                    const vecAB = asVec2(edge)
-                    let perp = perpendicularCW([], vecAB)
-                    const length = mag(vecAB)
-                    // adjust the angle a random amount
-                    rotate(perp, perp, randomAngle())
-                    // project the break point outwards
-                    const proj = mulN([], normalize(null, perp), randomLength(length))
-                    const pt = add([], breakPt, proj)
+    iterateCoastline(edgeList: EdgeInfo[]): EdgeInfo[] {
+        return transduce(
+            mapcat(({ edge, variablity, iteration }) => {
+                // cut the edge at some point near the middle
+                const breakPt = pointAt(line(edge), this.randomEdgeBreak(variablity))!
+                // determine vector perpendicular to edge
+                const vecAB = asVec2(edge)
+                let perp = perpendicularCW([], vecAB)
+                const length = mag(vecAB)
+                // adjust the angle a random amount
+                rotate(perp, perp, this.randomAngle(variablity))
+                // project the break point outwards
+                const proj = mulN([], normalize(null, perp), this.randomLength(length, variablity))
+                const pt = add([], breakPt, proj)
 
-                    // return new edge (2nd edge is defined by end of this edge and start of next)
-                    return [edge[0] as Vec, pt]
-                }),
-                flatten1()
-                // trace()
-            ),
-            push<Vec>(),
-            edges(poly)
+                return [
+                    {
+                        edge: [edge[0] as Vec, pt] as VecPair,
+                        variablity: this.mutateVariablility(variablity),
+                        iteration: iteration + 1,
+                    },
+                    {
+                        edge: [pt, edge[1] as Vec] as VecPair,
+                        variablity: this.mutateVariablility(variablity),
+                        iteration: iteration + 1,
+                    },
+                ]
+            }),
+            push<EdgeInfo>(),
+            edgeList
         )
-        return polygon(points, poly.attribs)
     }
 
     update(iteration: number): number {
-        // TODO: create the points yourself
-        const shape = this.shapeGen.next().value
+        const baseShape = this.makeShape()
 
-        // assign base probabilities
-        const edgeware = [
-            ...map((edge: VecPair) => {
-                edge.attr = { abc: 123 }
-                return edge
-            }, edges(shape)),
-        ]
-        const newShape = polygon(edgeware)
-        console.log(newShape)
+        // convert to edges, we only work with edges now
+        // and need to collapse back into polys at the last minute
+        const startingEdges: IterableIterator<EdgeInfo> = map(
+            (edge) => ({
+                edge,
+                variablity: this.randomVariablility(),
+                iteration: 0,
+            }),
+            edges(baseShape)
+        )
 
-        // const edge0 = [...edges(shape)][0]
-        // console.log(edge0)
-        // console.log(...edges(shape))
-        //...
+        // create a base subdivided poly (consisting of edges)
+        let baseEdgeList = this.iterateCoastline([...startingEdges])
+        baseEdgeList = this.iterateCoastline(baseEdgeList)
+        baseEdgeList = this.iterateCoastline(baseEdgeList)
 
-        // create a base subdivided poly
-        // let poly = this.oneRound(shape)
-        // poly = this.oneRound(poly)
-        // poly = this.oneRound(poly)
-        // const baseShape = this.oneRound(poly)
-
-        // Create 50 version of this subdivided 3 more times
-        // for (let i = 0; i < 100; i++) {
-        //     let newPoly = this.oneRound(baseShape)
-        //     newPoly = this.oneRound(baseShape)
-        //     newPoly = this.oneRound(baseShape)
-        //     this.shapes.push(newPoly)
-        // TODO: push the color with a opacity scaled to # of iterations
-        // }
-
-        // this.shapes.push(poly)
+        // Create TONS version of this subdivided 3 more times
+        const newColor = tinycolor(this.params.tint).setAlpha(0.02).toRgbString()
+        for (let i = 0; i < 100; i++) {
+            let subEdgeList = this.iterateCoastline(baseEdgeList)
+            subEdgeList = this.iterateCoastline(subEdgeList)
+            subEdgeList = this.iterateCoastline(subEdgeList)
+            subEdgeList = this.iterateCoastline(subEdgeList)
+            subEdgeList = this.iterateCoastline(subEdgeList)
+            this.shapes.push(edgeListToPoly(subEdgeList, { fill: newColor }))
+        }
 
         this.stop()
         return iteration
