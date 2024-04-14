@@ -15,8 +15,7 @@ Projects are more sizable, and can include a modern bundling system.
 Most things are projects these days.
 I've made a nice template with a Sketch class and some light UI for params
 
-    $ cd projects
-    $ npx degit kylestew/vite-sketch-template#ether name-of-new-project-replace-me
+> Copy `projects/_template` and modify as needed    
 
 ## Shared Libraries
 As I begin to reuse code, I'll lift them up into the lib directory at the root of this project
