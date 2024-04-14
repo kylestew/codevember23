@@ -26,7 +26,6 @@ function edgeListToPoly(edgeList: EdgeInfo[], attribs: any): Polygon {
         ),
         attribs
     )
-    // startingEdges.reduce( (edgeInfo) => { edgeInfo.edge[0] }))
 }
 
 export class MySketch extends Sketch {
@@ -137,19 +136,22 @@ export class MySketch extends Sketch {
         )
 
         // create a base subdivided poly (consisting of edges)
-        let baseEdgeList = this.iterateCoastline([...startingEdges])
-        baseEdgeList = this.iterateCoastline(baseEdgeList)
-        baseEdgeList = this.iterateCoastline(baseEdgeList)
+        let baseEdgeList = [...startingEdges]
 
-        // Create TONS version of this subdivided 3 more times
-        const newColor = tinycolor(this.params.tint).setAlpha(0.02).toRgbString()
-        for (let i = 0; i < 100; i++) {
-            let subEdgeList = this.iterateCoastline(baseEdgeList)
-            subEdgeList = this.iterateCoastline(subEdgeList)
-            subEdgeList = this.iterateCoastline(subEdgeList)
-            subEdgeList = this.iterateCoastline(subEdgeList)
-            subEdgeList = this.iterateCoastline(subEdgeList)
-            this.shapes.push(edgeListToPoly(subEdgeList, { fill: newColor }))
+        // in 3 phases, break down the base polygon
+        const fillColor = tinycolor(this.params.tint)
+        let alpha = 0.08
+        for (let i = 0; i < 3; i++) {
+            baseEdgeList = this.iterateCoastline(baseEdgeList)
+            alpha -= 0.02
+
+            // subdivide this generation many times adding them up
+            for (let i = 0; i < 33; i++) {
+                let subEdgeList = this.iterateCoastline(baseEdgeList)
+                subEdgeList = this.iterateCoastline(subEdgeList)
+                subEdgeList = this.iterateCoastline(subEdgeList)
+                this.shapes.push(edgeListToPoly(subEdgeList, { fill: fillColor.setAlpha(alpha).toRgbString() }))
+            }
         }
 
         this.stop()

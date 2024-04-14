@@ -1,25 +1,25 @@
 {
-  "name": "vite-sketch-template",
-  "private": true,
-  "version": "0.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "preview": "vite preview"
-  },
-  "devDependencies": {
-    "@tweakpane/core": "^2.0.3",
-    "@types/tinycolor2": "^1.4.6",
-    "typescript": "^5.2.2",
-    "vite": "^5.2.0"
-  },
-  "dependencies": {
-    "@thi.ng/canvas": "^0.2.16",
-    "@thi.ng/geom": "^6.1.6",
-    "@thi.ng/hiccup-canvas": "^2.5.35",
-    "@thi.ng/random": "^3.7.3",
-    "tinycolor2": "^1.6.0",
-    "tweakpane": "^4.0.3"
-  }
+    "name": "vite-sketch-template",
+    "private": true,
+    "version": "0.0.0",
+    "type": "module",
+    "scripts": {
+        "dev": "vite --host",
+        "build": "tsc && vite build",
+        "preview": "vite preview"
+    },
+    "devDependencies": {
+        "@tweakpane/core": "^2.0.3",
+        "@types/tinycolor2": "^1.4.6",
+        "typescript": "^5.2.2",
+        "vite": "^5.2.0"
+    },
+    "dependencies": {
+        "@thi.ng/canvas": "^0.2.16",
+        "@thi.ng/geom": "^6.1.6",
+        "@thi.ng/hiccup-canvas": "^2.5.35",
+        "@thi.ng/random": "^3.7.3",
+        "tinycolor2": "^1.6.0",
+        "tweakpane": "^4.0.3"
+    }
 }
