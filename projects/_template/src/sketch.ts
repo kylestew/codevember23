@@ -1,45 +1,18 @@
 import { SketchParams } from './types'
-import { Sketch } from './util/ISketch'
+import { CanvasSketch, SketchState } from './util/Sketch'
 import tinycolor from 'tinycolor2'
-import { adaptiveCanvas2d } from '@thi.ng/canvas'
 import { APC, polyline } from '@thi.ng/geom'
-import { Vec } from '@thi.ng/vectors'
-import { range, transduce, map, push } from '@thi.ng/transducers'
+import { iterator, map } from '@thi.ng/transducers'
 import { SYSTEM } from '@thi.ng/random'
 import { draw } from '@thi.ng/hiccup-canvas'
 import { chaikinCurve } from './lib/chaikin_curve'
 
-export class MySketch extends Sketch {
-    private ctx: CanvasRenderingContext2D
-    private width: number = 640
-    private height: number = 480
-    private onePx: number = 1.0
-    private xrange: number[] = [-1, 1]
-    private yrange: number[] = [-1, 1]
-
+export class MySketch extends CanvasSketch {
+    private iteration = 0
     private shapes: APC[] = []
 
     constructor(params: SketchParams, appElm: HTMLElement) {
-        super(params, 100)
-
-        const dpr = window.devicePixelRatio || 1
-        const { ctx } = adaptiveCanvas2d(this.width, this.height, appElm)
-        this.ctx = ctx
-
-        // scale canvas so shortest side is in range [-1, 1]
-        if (this.width > this.height) {
-            const scale = (this.height / 2.0) * dpr
-            this.ctx.scale(scale, scale)
-            this.ctx.translate((this.width * 0.5 * dpr) / scale, 1.0)
-            this.onePx = (1.0 / scale) * dpr
-            this.xrange = [-this.width / this.height, this.width / this.height]
-        } else {
-            const scale = (this.width / 2.0) * dpr
-            this.ctx.scale(scale, scale)
-            this.ctx.translate(1.0, (this.height * 0.5 * dpr) / scale)
-            this.onePx = (1.0 / scale) * dpr
-            this.yrange = [-this.height / this.width, this.height / this.width]
-        }
+        super(params, appElm, 100)
     }
 
     *randomRange(from: number, to: number, jumpScale: number): Generator<number> {
@@ -52,37 +25,37 @@ export class MySketch extends Sketch {
     }
 
     setup() {
+        this.iteration = 0
         this.shapes = []
     }
 
-    update(iteration: number): number {
-        if (iteration < 100) {
-            const xrange = this.randomRange(this.xrange[0] * 1.2, this.xrange[1] * 1.2, 0.5)
-            const xys = transduce(
-                map((x) => [x, SYSTEM.norm(0.8)]),
-                push<Vec>(),
-                xrange
-            )
-
-            const smooth = chaikinCurve(xys, this.params.subdivisions)
-
-            const pline = polyline(smooth, {
-                stroke: tinycolor(this.params.tint).toRgbString(),
-                weight: this.onePx * 9.0,
-                closed: false,
-                lineJoin: 'round',
-                lineCap: 'round',
-            })
-            this.shapes = [pline]
-
-            // TODO: apply chaikin curve subdivision "subdivision" times
-        } else {
-            this.stop()
+    next(): SketchState {
+        if (this.iteration++ > this.params.iterations) {
+            return { status: 'stopped', progress: 0 }
         }
-        return iteration
+
+        const xrange = this.randomRange(this.xrange[0] * 1.2, this.xrange[1] * 1.2, 0.5)
+        const xys = iterator(
+            map((x) => [x, SYSTEM.norm(0.8)]),
+            xrange
+        )
+        const smooth = chaikinCurve([...xys], this.params.subdivisions)
+        const pline = polyline(smooth, {
+            stroke: tinycolor(this.params.tint).toRgbString(),
+            weight: this.onePx * 9.0,
+            closed: false,
+            lineJoin: 'round',
+            lineCap: 'round',
+        })
+        this.shapes = [pline]
+
+        // sketch is in charge or rendering as needed
+        this.render()
+
+        return { status: 'running', progress: this.iteration / this.params.iterations }
     }
 
-    render() {
+    private render() {
         const bgColor = tinycolor(this.params.background)
         draw(this.ctx, ['g', { __background: bgColor.toRgbString() }, ...this.shapes])
     }

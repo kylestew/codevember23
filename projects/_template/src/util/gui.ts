@@ -104,7 +104,7 @@ function setupExecutionFolder(pane: Pane, sketch: ISketch) {
     function updateReadout() {
         if (sketch.state.status === 'running') {
             progressReadout.hidden = false
-            progressReadout.value = sketch.state.progress
+            progressReadout.value = Math.round(sketch.state.progress * 100) + '%'
             stopButton.disabled = false
             startButton.disabled = true
         } else {

@@ -1,6 +1,7 @@
 export type SketchParams = {
     background: Color
     tint: Color
+    iterations: number
     subdivisions: number
 }
 
