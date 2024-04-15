@@ -40,6 +40,11 @@ export function createUI(
         .catch((err) => alert(err))
 
     function onEnabled() {
+        if (WebMidi.inputs.length === 0) {
+            return
+        }
+        console.info('MIDI devices enabled')
+
         WebMidi.inputs[0].addListener('controlchange', (e) => {
             const channel = e.message.channel
             const number = e.controller.number

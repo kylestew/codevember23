@@ -7,6 +7,7 @@ import { Vec } from '@thi.ng/vectors'
 import { range, transduce, map, push } from '@thi.ng/transducers'
 import { SYSTEM } from '@thi.ng/random'
 import { draw } from '@thi.ng/hiccup-canvas'
+import { chaikinCurve } from './lib/chaikin_curve'
 
 export class MySketch extends Sketch {
     private ctx: CanvasRenderingContext2D
@@ -30,13 +31,13 @@ export class MySketch extends Sketch {
             const scale = (this.height / 2.0) * dpr
             this.ctx.scale(scale, scale)
             this.ctx.translate((this.width * 0.5 * dpr) / scale, 1.0)
-            this.onePx = 1.0 / scale / dpr
+            this.onePx = (1.0 / scale) * dpr
             this.xrange = [-this.width / this.height, this.width / this.height]
         } else {
             const scale = (this.width / 2.0) * dpr
             this.ctx.scale(scale, scale)
             this.ctx.translate(1.0, (this.height * 0.5 * dpr) / scale)
-            this.onePx = 1.0 / scale / dpr
+            this.onePx = (1.0 / scale) * dpr
             this.yrange = [-this.height / this.width, this.height / this.width]
         }
     }
@@ -56,17 +57,21 @@ export class MySketch extends Sketch {
 
     update(iteration: number): number {
         if (iteration < 100) {
-            const xrange = this.randomRange(this.xrange[0], this.xrange[1], 0.5)
+            const xrange = this.randomRange(this.xrange[0] * 1.2, this.xrange[1] * 1.2, 0.5)
             const xys = transduce(
                 map((x) => [x, SYSTEM.norm(0.8)]),
                 push<Vec>(),
                 xrange
             )
-            const pline = polyline(xys, {
+
+            const smooth = chaikinCurve(xys, this.params.subdivisions)
+
+            const pline = polyline(smooth, {
                 stroke: tinycolor(this.params.tint).toRgbString(),
-                weight: this.onePx * 18.0,
+                weight: this.onePx * 9.0,
                 closed: false,
                 lineJoin: 'round',
+                lineCap: 'round',
             })
             this.shapes = [pline]
 

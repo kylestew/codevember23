@@ -7,7 +7,7 @@ import { createUI } from './util/gui'
 const params: SketchParams = {
     background: { r: 33, g: 66, b: 55, a: 1 },
     tint: { r: 192, g: 64, b: 64, a: 0.8 },
-    subdivisions: 6,
+    subdivisions: 4,
 }
 
 const sketch = new MySketch(params, document.getElementById('app')!)
@@ -20,7 +20,7 @@ createUI(params, sketch, (pane, wrapMidiBinding) => {
     f1.addBinding(params, 'background')
     f1.addBinding(params, 'tint')
 
-    wrapMidiBinding(f1, params, 'subdivisions', { label: 'Subdivisions', min: 0, max: 12, step: 1.0 })
+    wrapMidiBinding(f1, params, 'subdivisions', { label: 'Subdivisions', min: 0, max: 9, step: 1.0 })
 })
 sketch.start()
 
