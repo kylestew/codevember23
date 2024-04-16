@@ -3,10 +3,10 @@ import { CanvasSketch, SketchState } from './util/Sketch'
 import tinycolor from 'tinycolor2'
 import { APC, asPolygon, asSvg, svgDoc } from '@thi.ng/geom'
 import { transduce, push, comp, filter, mapcat, map, trace } from '@thi.ng/transducers'
-import { parse as parseXML, Type } from '@thi.ng/sax'
-import { Path, circle, asPath, pathFromSvg, translate, scale } from '@thi.ng/geom'
+import { Path, circle, translate, scale } from '@thi.ng/geom'
 import { SYSTEM } from '@thi.ng/random'
 import { draw } from '@thi.ng/hiccup-canvas'
+import { svgToPaths } from './lib/svg_path_reader'
 
 import SVG from './assets/glyphs.svg?raw'
 
@@ -23,55 +23,7 @@ export class MySketch extends CanvasSketch {
 
     setup() {
         // this.iteration = 0
-        this.shapes = []
-
-        // TODO: move to library
-        this.shapes = transduce(
-            comp(
-                // test -> SAX
-                parseXML(),
-                // filter all groups - each group is a shape layer
-                filter(
-                    (ev) => ev.type === Type.ELEM_END && (ev.tag === 'path' || ev.tag === 'rect' || ev.tag === 'circle')
-                ),
-                // convert to Path object
-                mapcat((ev) => {
-                    switch (ev.tag) {
-                        case 'rect':
-                            const { x, y, width, height } = ev.attribs
-
-                            // Convert strings to numbers
-                            const xNum = Number(x)
-                            const yNum = Number(y)
-                            const widthNum = Number(width)
-                            const heightNum = Number(height)
-
-                            // Construct the path string using numeric calculations
-                            return pathFromSvg(
-                                `M${xNum},${yNum} H${xNum + widthNum} V${yNum + heightNum} H${xNum} V${yNum} Z`
-                            )
-
-                        case 'circle':
-                            const { cx, cy, r } = ev.attribs
-
-                            // Convert strings to numbers
-                            const cxNum = Number(cx)
-                            const cyNum = Number(cy)
-                            const radiusNum = Number(r)
-
-                            return [asPath(circle([cxNum, cyNum], radiusNum))]
-
-                        default:
-                            return pathFromSvg(ev.attribs!.d)
-                    }
-                }),
-                // scale to unit size
-                map((path) => translate(scale(path, 0.001), [-0.5, -0.5]) as Path)
-                // trace()
-            ),
-            push<Path>(),
-            SVG
-        )
+        this.shapes = svgToPaths(SVG)
     }
 
     next(): SketchState {
