@@ -3,25 +3,30 @@ import { transduce, pluck, trace, flatten, map, mapcat, filter, push, comp } fro
 import { SYSTEM, pickRandom } from '@thi.ng/random'
 import { Vec } from '@thi.ng/vectors'
 import { parse as parseXML, Type } from '@thi.ng/sax'
-import { Path, pathFromSvg, asSvg, svgDoc, asPolygon } from '@thi.ng/geom'
+import { Path, rect, pathFromSvg, asSvg, svgDoc, asPolygon, bounds } from '@thi.ng/geom'
+import { draw } from '@thi.ng/hiccup-canvas'
 
 import { Sketch, SketchParams } from './types'
-import { ShapePacker } from './lib/ShapePacker'
+import { CanvasPacker } from './lib/CanvasPacker'
 
 interface Glyph {
+    paths: Path[]
+
     position: Vec
     scale: number
-    rotation: number
-    fill: boolean // or stroke if false
-    paths: Path[]
+    // rotation: number
+    // fill: boolean // or stroke if false
 }
+
+// TODO: define one ore more glyph loaders that generate a base path that can be scaled
+// and some rules as to sizes, locations, rotations, etc
 
 export class MySketch extends Sketch {
     private outputElm: HTMLElement
     private width: number
     private height: number
 
-    private packer: ShapePacker
+    private packer: CanvasPacker
     private attempts: number = 0
 
     // TODO: bring these in as params
@@ -38,17 +43,19 @@ export class MySketch extends Sketch {
         this.outputElm = appElm
         this.width = params.canvasSize.width
         this.height = params.canvasSize.height
-        this.packer = new ShapePacker(this.width, this.height, 1)
+        this.packer = new CanvasPacker(this.width, this.height, 1)
     }
 
     setup() {
-        this.packer = new ShapePacker(this.width, this.height, 1)
+        this.packer = new CanvasPacker(this.width, this.height, 1)
         this.attempts = this.params.density * 10000 // [0,1] -> [0, 10000]
     }
 
-    randomGlyph(): Glyph {
+    // vend next glyph
+    nextGlyph(): Glyph {
         const font = pickRandom(this.params.fonts)
-        const letter = pickRandom(this.params.characterSet)
+        // const letter = pickRandom(this.params.characterSet)
+        const letter = 'A'
 
         const x = SYSTEM.float(this.width)
         const y = SYSTEM.float(this.height)
@@ -56,49 +63,59 @@ export class MySketch extends Sketch {
         const paths = transduce(
             comp(
                 // opentype to SVG string
-                mapcat((letter) => font.getPath(letter, x, y, 64.0).toSVG(2)),
+                map((letter) => font.getPath(letter, x, y, 64.0).toPathData(2)),
                 // svg string to SAX events
-                parseXML(), //
+                // parseXML(), //
                 // filter for path elements
-                filter((ev) => ev.type === Type.ELEM_END && ev.tag === 'path'),
+                // filter((ev) => ev.type === Type.ELEM_END && ev.tag === 'path'),
                 // convert path strings to geom.Path objects
-                mapcat((ev) => pathFromSvg(ev.attribs!.d))
-                // // convert paths to polygons to vertices
+                // mapcat((ev) => pathFromSvg(ev.attribs!.d))
+                trace(),
+                mapcat((d) => pathFromSvg(d)),
+                trace()
+                // trace()
+                // convert paths to polygons to vertices
                 // mapcat((path) => vertices(asPolygon(path), { dist: circleRad * 2 })),
+                // mapcat((path) => asPolygon(path))
             ),
             push<Path>(),
             [letter]
         )
 
         return {
+            paths,
             position: [x, y],
             scale: 1.0,
-            rotation: 0,
-            fill: true,
-            paths,
+            // rotation: 0,
+            // fill: true,
         }
     }
 
     update(iteration: number): number {
-        if (iteration > this.attempts) {
-            this.stop()
-            return 0
-        }
+        // if (iteration > this.attempts) {
+        this.stop()
+        // return 0
+        // }
 
         // try to place one glyph
-        const glyph = this.randomGlyph()
-        // glyph.scale = this.minScale
+        const glyph = this.nextGlyph()
+        glyph.scale = this.minScale
 
-        let placedGlyph = glyph
+        console.log(glyph.paths)
+        console.log(glyph.paths[0].toHiccup())
+
         // let placedGlyph: Glyph | undefined
         // while (
-        //     glyph.scale <= this.maxScale
-        //     // &&
-        //     // this.packer.canPlaceShape(asRect(path.getBoundingBox()), (ctx: OffscreenCanvasRenderingContext2D) => {
-        //     //     ctx.lineWidth = this.strokePadding
-        //     //     path.draw(ctx)
-        //     //     if (this.strokePadding > 0) ctx.stroke() // adds a stroke to space out glyphs
-        //     // })
+        //     glyph.scale <= this.maxScale &&
+        //     this.packer.canPlaceShape(
+        //         // not using bounding rect
+        //         // asRect(bounds(glyph.paths)),
+        //         rect([0, 0], [this.width, this.height]),
+        //         (ctx: OffscreenCanvasRenderingContext2D) => {
+        //             draw(ctx, { fill: '#000' }, [...glyph.paths][0])
+        //             // draw(ctx, ['path', { fill: '#000', weight: this.glyphPadding }, ...glyph.paths])
+        //         }
+        //     )
         // ) {
         //     placedGlyph = { ...glyph }
 
@@ -106,31 +123,25 @@ export class MySketch extends Sketch {
         //     glyph.scale += this.scaleStepSize
         // }
 
-        if (placedGlyph) {
-            this.placedGlyphs.push(placedGlyph)
-            this.dirty = true
+        // if (placedGlyph) {
+        //     this.placedGlyphs.push(placedGlyph)
+        //     this.dirty = true
 
-            // draw to placed glyphs
-            this.packer.commitShape((ctx: OffscreenCanvasRenderingContext2D) => {
-                // TODO: draw again
-                // //         const path = placedGlyph.font.getPath(
-                // //             placedGlyph.letter,
-                // //             placedGlyph.pos[0],
-                // //             placedGlyph.pos[1],
-                // //             placedGlyph.fontSize
-                //         )
-                //         ctx.lineWidth = this.strokePadding
-                //         path.draw(ctx)
-                //         if (this.strokePadding > 0) ctx.stroke() // adds a stroke to space out glyphs
-            })
-        }
+        //     this.stop()
+
+        //     // draw to placed glyphs
+        //     this.packer.commitShape((ctx: OffscreenCanvasRenderingContext2D) => {
+        //         draw(ctx, ['path', { fill: '#000', stroke: '#000', weight: this.glyphPadding }, ...placedGlyph.paths])
+        //     })
+        // }
         return (iteration / this.attempts) * 100
     }
 
     render() {
-        this.outputElm.innerHTML = asSvg(
-            svgDoc({ width: this.width, height: this.height }, ...this.placedGlyphs.map((glyph) => glyph.paths).flat())
-        )
+        this.packer.dumpToCanvas('glyph')
+        // this.outputElm.innerHTML = asSvg(
+        //     svgDoc({ width: this.width, height: this.height }, ...this.placedGlyphs.map((glyph) => glyph.paths).flat())
+        // )
     }
 }
 

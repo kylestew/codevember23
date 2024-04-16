@@ -2,7 +2,7 @@ import { Rect, rect, intersects } from '@thi.ng/geom'
 import { IntersectionType } from '@thi.ng/geom-api'
 import { ceil, floor, mulN } from '@thi.ng/vectors'
 
-export class ShapePacker {
+export class CanvasPacker {
     private domainBounds: Rect
 
     private scale: number
@@ -112,17 +112,31 @@ export class ShapePacker {
         }
     }
 
-    dumpToCanvas(canvas: HTMLCanvasElement, whichOne: string) {
+    dumpToCanvas(whichOne: string) {
+        // create temp canvas element
+        const canvas = document.createElement('canvas')
+
         // size the canvas for display
         canvas.width = this.downscaleWidth
         canvas.height = this.downscaleHeight
+
+        const ctx = canvas.getContext('2d')
+        if (!ctx) return // If the context is not available, exit the function
+
+        // Clear the canvas with white background
+        ctx.fillStyle = 'white'
+        ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+        // Choose the source canvas to draw from
         if (whichOne == 'glyph') {
-            console.log('render glyph canvas')
-            canvas.getContext('2d')!.drawImage(this.glyphCanvas, 0, 0)
+            ctx.drawImage(this.glyphCanvas, 0, 0)
         } else if (whichOne == 'packed') {
-            canvas.getContext('2d')!.drawImage(this.packedCanvas, 0, 0)
+            ctx.drawImage(this.packedCanvas, 0, 0)
         } else {
-            canvas.getContext('2d')!.drawImage(this.compareCanvas, 0, 0)
+            ctx.drawImage(this.compareCanvas, 0, 0)
         }
+
+        // Append canvas to the body or another element in the document
+        document.body.appendChild(canvas)
     }
 }
