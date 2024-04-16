@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 1000 1000">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #fff;
+        stroke: #000;
+        stroke-miterlimit: 10;
+      }
+
+      .cls-1, .cls-2 {
+        display: none;
+      }
+
+      .cls-2 {
+        fill: #000;
+        stroke-width: 0px;
+      }
+    </style>
+  </defs>
+  <path id="triangle" class="cls-2" d="M0,0l1000,500L0,1000V0Z"/>
+  <path id="hoop" class="cls-2" d="M0,0c500,1500,1000,0,1000,0H0Z"/>
+  <rect id="rect" class="cls-2" x="80" y="80" width="840" height="840"/>
+  <circle id="circle" class="cls-1" cx="500" cy="500" r="451.1"/>
+  <path id="forks" class="cls-1" d="M0,1000V0l500,1000L1000,0v1000H0Z"/>
+  <circle id="small_circle" class="cls-1" cx="500" cy="500" r="300"/>
+  <path id="half" class="cls-1" d="M0,0l1000,1000H0V0Z"/>
+  <rect id="small_rect" class="cls-1" x="300" y="300" width="400" height="400"/>
+  <path id="moon" d="M0,500 C0,223.86 223.86,0 500,0 C776.14,0 1000,223.86 1000,500"/>
+</svg>
