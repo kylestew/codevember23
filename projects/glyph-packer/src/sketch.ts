@@ -3,14 +3,28 @@ import { transduce, pluck, trace, flatten, map, mapcat, filter, push, comp } fro
 import { SYSTEM, pickRandom } from '@thi.ng/random'
 import { Vec } from '@thi.ng/vectors'
 import { parse as parseXML, Type } from '@thi.ng/sax'
-import { Path, rect, pathFromSvg, asSvg, svgDoc, asPolygon, bounds } from '@thi.ng/geom'
+import {
+    Path,
+    path,
+    pathFromSvg,
+    asSvg,
+    svgDoc,
+    scale,
+    bounds,
+    points,
+    translate,
+    Rect,
+    centroid,
+    center,
+} from '@thi.ng/geom'
 import { draw } from '@thi.ng/hiccup-canvas'
+import { PathSegment } from '@thi.ng/geom-api'
 
 import { Sketch, SketchParams } from './types'
 import { CanvasPacker } from './lib/CanvasPacker'
 
 interface Glyph {
-    paths: Path[]
+    path: Path
 
     position: Vec
     scale: number
@@ -30,9 +44,9 @@ export class MySketch extends Sketch {
     private attempts: number = 0
 
     // TODO: bring these in as params
-    private minScale = 0.1
-    private maxScale = 2.0
-    private scaleStepSize = 0.2
+    private minScale = 0.2
+    private maxScale = 4.0
+    private scaleStepSize = 0.02
     private glyphPadding = 2
 
     placedGlyphs: Glyph[] = []
@@ -47,6 +61,7 @@ export class MySketch extends Sketch {
     }
 
     setup() {
+        this.placedGlyphs = []
         this.packer = new CanvasPacker(this.width, this.height, 1)
         this.attempts = this.params.density * 10000 // [0,1] -> [0, 10000]
     }
@@ -54,36 +69,35 @@ export class MySketch extends Sketch {
     // vend next glyph
     nextGlyph(): Glyph {
         const font = pickRandom(this.params.fonts)
-        // const letter = pickRandom(this.params.characterSet)
-        const letter = 'A'
+        const letter = pickRandom(this.params.characterSet)
 
         const x = SYSTEM.float(this.width)
         const y = SYSTEM.float(this.height)
 
-        const paths = transduce(
+        const segments = transduce(
             comp(
                 // opentype to SVG string
-                map((letter) => font.getPath(letter, x, y, 64.0).toPathData(2)),
-                // svg string to SAX events
-                // parseXML(), //
-                // filter for path elements
-                // filter((ev) => ev.type === Type.ELEM_END && ev.tag === 'path'),
-                // convert path strings to geom.Path objects
-                // mapcat((ev) => pathFromSvg(ev.attribs!.d))
-                trace(),
+                map((letter) => font.getPath(letter, 0, 0, 64.0).toPathData(4)),
+                // trace(),
+                // convert path string to geom.Path objects
                 mapcat((d) => pathFromSvg(d)),
-                trace()
+                // trace(),
+                // flatten segments
+                mapcat((path) => path.segments)
                 // trace()
-                // convert paths to polygons to vertices
-                // mapcat((path) => vertices(asPolygon(path), { dist: circleRad * 2 })),
-                // mapcat((path) => asPolygon(path))
             ),
-            push<Path>(),
+            push<PathSegment>(),
             [letter]
         )
 
+        // center the path on itself
+        let centeredPath = path(segments)
+        const cent = centroid(bounds(centeredPath))
+        centeredPath = translate(centeredPath, [-cent[0], -cent[1]]) as Path
+
         return {
-            paths,
+            path: centeredPath,
+
             position: [x, y],
             scale: 1.0,
             // rotation: 0,
@@ -92,61 +106,59 @@ export class MySketch extends Sketch {
     }
 
     update(iteration: number): number {
-        // if (iteration > this.attempts) {
-        this.stop()
-        // return 0
-        // }
+        if (iteration > this.attempts) {
+            this.stop()
+            return 0
+        }
 
         // try to place one glyph
         const glyph = this.nextGlyph()
         glyph.scale = this.minScale
 
-        console.log(glyph.paths)
-        console.log(glyph.paths[0].toHiccup())
+        let placedGlyph: Glyph | undefined = undefined
+        while (
+            glyph.scale <= this.maxScale &&
+            this.packer.canPlaceShape(
+                bounds(scale(glyph.path, glyph.scale)) as Rect,
+                (ctx: OffscreenCanvasRenderingContext2D) => {
+                    draw(ctx, [
+                        'g',
+                        { fill: '#000', stroke: '#000', weight: this.glyphPadding },
+                        translate(scale(glyph.path, glyph.scale), glyph.position),
+                    ])
+                }
+            )
+        ) {
+            placedGlyph = { ...glyph }
 
-        // let placedGlyph: Glyph | undefined
-        // while (
-        //     glyph.scale <= this.maxScale &&
-        //     this.packer.canPlaceShape(
-        //         // not using bounding rect
-        //         // asRect(bounds(glyph.paths)),
-        //         rect([0, 0], [this.width, this.height]),
-        //         (ctx: OffscreenCanvasRenderingContext2D) => {
-        //             draw(ctx, { fill: '#000' }, [...glyph.paths][0])
-        //             // draw(ctx, ['path', { fill: '#000', weight: this.glyphPadding }, ...glyph.paths])
-        //         }
-        //     )
-        // ) {
-        //     placedGlyph = { ...glyph }
+            // attempt to step it up
+            glyph.scale += this.scaleStepSize
+        }
 
-        //     // attempt to step it up
-        //     glyph.scale += this.scaleStepSize
-        // }
+        if (placedGlyph !== undefined) {
+            this.placedGlyphs.push(placedGlyph)
+            this.dirty = true
 
-        // if (placedGlyph) {
-        //     this.placedGlyphs.push(placedGlyph)
-        //     this.dirty = true
-
-        //     this.stop()
-
-        //     // draw to placed glyphs
-        //     this.packer.commitShape((ctx: OffscreenCanvasRenderingContext2D) => {
-        //         draw(ctx, ['path', { fill: '#000', stroke: '#000', weight: this.glyphPadding }, ...placedGlyph.paths])
-        //     })
-        // }
+            // draw to placed glyphs
+            this.packer.commitShape((ctx: OffscreenCanvasRenderingContext2D) => {
+                draw(ctx, [
+                    'g',
+                    { fill: '#000', stroke: '#000', weight: this.glyphPadding },
+                    translate(scale(placedGlyph.path, placedGlyph.scale), placedGlyph.position),
+                ])
+            })
+        }
         return (iteration / this.attempts) * 100
     }
 
     render() {
-        this.packer.dumpToCanvas('glyph')
-        // this.outputElm.innerHTML = asSvg(
-        //     svgDoc({ width: this.width, height: this.height }, ...this.placedGlyphs.map((glyph) => glyph.paths).flat())
-        // )
+        // this.packer.dumpToCanvas('packed')
+
+        this.outputElm.innerHTML = asSvg(
+            svgDoc(
+                { width: this.width, height: this.height, viewBox: `0 0 ${this.width} ${this.height}`, fill: '#000' },
+                ...this.placedGlyphs.map((glyph) => translate(scale(glyph.path, glyph.scale), glyph.position)).flat()
+            )
+        )
     }
 }
-
-/*
-function asRect(bounds: BoundingBox): Rect {
-    return new Rect([bounds.x1, bounds.y1], [bounds.x1 + bounds.x2, bounds.y1 + bounds.y2])
-}
-*/

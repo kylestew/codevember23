@@ -16,7 +16,7 @@ export class CanvasPacker {
     private compareCanvas: OffscreenCanvas
     private compareCtx: OffscreenCanvasRenderingContext2D
 
-    constructor(width: number, height: number, downscale: number = 2) {
+    constructor(width: number, height: number, downscale: number = 1) {
         this.domainBounds = rect([0, 0], [width, height])
 
         this.scale = 1.0 / downscale
