@@ -1,56 +1,24 @@
-import { BoundingBox, Font } from 'opentype.js'
-import { transduce, pluck, trace, flatten, map, mapcat, filter, push, comp } from '@thi.ng/transducers'
-import { SYSTEM, pickRandom } from '@thi.ng/random'
-import { Vec } from '@thi.ng/vectors'
-import { parse as parseXML, Type } from '@thi.ng/sax'
-import {
-    Path,
-    path,
-    pathFromSvg,
-    asSvg,
-    svgDoc,
-    scale,
-    bounds,
-    points,
-    translate,
-    Rect,
-    centroid,
-    center,
-} from '@thi.ng/geom'
+import { SketchParams } from './types'
+import { Sketch, SketchState } from './util/Sketch'
+import { SYSTEM } from '@thi.ng/random'
+import { asSvg, svgDoc, scale, bounds, translate, Rect } from '@thi.ng/geom'
 import { draw } from '@thi.ng/hiccup-canvas'
-import { PathSegment } from '@thi.ng/geom-api'
 
-import { Sketch, SketchParams } from './types'
-import { CanvasPacker } from './CanvasPacker'
-
-interface Glyph {
-    path: Path
-
-    position: Vec
-    scale: number
-    // rotation: number
-
-    fill: boolean // or stroke if false
-}
-
-// TODO: define one ore more glyph loaders that generate a base path that can be scaled
-// and some rules as to sizes, locations, rotations, etc
+import { CanvasPacker } from './shared_lib/CanvasPacker'
+import { Glyph, GlyphMaker, FontGlyphMaker } from './lib/glyph-vend'
 
 export class MySketch extends Sketch {
     private outputElm: HTMLElement
     private width: number
     private height: number
 
+    private glyphMakers: GlyphMaker[] = []
     private packer: CanvasPacker
+
+    private iteration: number = 0
     private attempts: number = 0
 
-    // TODO: bring these in as params
-    private minScale = 0.2
-    private maxScale = 4.0
-    private scaleStepSize = 0.02
-    private glyphPadding = 2
-
-    placedGlyphs: Glyph[] = []
+    private placedGlyphs: Glyph[] = []
 
     constructor(params: SketchParams, appElm: HTMLElement) {
         super(params, 1)
@@ -58,98 +26,116 @@ export class MySketch extends Sketch {
         this.outputElm = appElm
         this.width = params.canvasSize.width
         this.height = params.canvasSize.height
+
         this.packer = new CanvasPacker(this.width, this.height, 1)
     }
 
     setup() {
         this.placedGlyphs = []
+
         this.packer = new CanvasPacker(this.width, this.height, 1)
+
+        this.iteration = 0
         this.attempts = this.params.density * 10000 // [0,1] -> [0, 10000]
-    }
 
-    // vend next glyph
-    nextGlyph(): Glyph {
-        const font = pickRandom(this.params.fonts)
-        const letter = pickRandom(this.params.characterSet)
+        this.glyphMakers = [
+            // TODO: shapes
 
-        const x = SYSTEM.float(this.width)
-        const y = SYSTEM.float(this.height)
-
-        const segments = transduce(
-            comp(
-                // opentype to SVG string
-                map((letter) => font.getPath(letter, 0, 0, 64.0).toPathData(4)),
-                // trace(),
-                // convert path string to geom.Path objects
-                mapcat((d) => pathFromSvg(d)),
-                // trace(),
-                // flatten segments
-                mapcat((path) => path.segments)
-                // trace()
+            // large fonts
+            new FontGlyphMaker(
+                0.2, // percent progress
+                2.0,
+                3.0,
+                0.1, // min, max, step
+                this.params.fonts,
+                this.params.characterSet,
+                () => {
+                    // place anywhere
+                    return [SYSTEM.float(this.width), SYSTEM.float(this.height)]
+                },
+                () => {
+                    // never hollow
+                    return false
+                }
             ),
-            push<PathSegment>(),
-            [letter]
-        )
-
-        // center the path on itself
-        let centeredPath = path(segments)
-        const cent = centroid(bounds(centeredPath))
-        centeredPath = translate(centeredPath, [-cent[0], -cent[1]]) as Path
-
-        return {
-            path: centeredPath,
-
-            position: [x, y],
-            scale: 1.0,
-            // rotation: 0,
-            fill: false,
-        }
+            // small fonts
+            new FontGlyphMaker(
+                0.6, // percent progress
+                0.5,
+                2.0,
+                0.1, // min, max, step
+                this.params.fonts,
+                this.params.characterSet,
+                () => {
+                    // place anywhere
+                    return [SYSTEM.float(this.width), SYSTEM.float(this.height)]
+                },
+                () => {
+                    // never hollow
+                    return false
+                }
+            ),
+            // tiny fonts
+            new FontGlyphMaker(
+                1.0, // percent progress
+                0.1,
+                0.5,
+                0.01, // min, max, step
+                this.params.fonts,
+                this.params.characterSet,
+                () => {
+                    // place anywhere
+                    return [SYSTEM.float(this.width), SYSTEM.float(this.height)]
+                },
+                () => {
+                    // never hollow
+                    return false
+                }
+            ),
+        ]
     }
 
-    update(iteration: number): number {
-        if (iteration > this.attempts) {
-            this.stop()
-            return 0
+    next(): SketchState {
+        if (this.iteration++ > this.attempts) {
+            return { status: 'stopped', progress: 0 }
         }
 
-        // try to place one glyph
-        const glyph = this.nextGlyph()
-        glyph.scale = this.minScale
+        // select glyph vendor based on progress
+        const progress = this.iteration / this.attempts
+        const maker =
+            this.glyphMakers.find((maker) => progress <= maker.progress) ??
+            this.glyphMakers[this.glyphMakers.length - 1]
+        const glyph = maker.make()
+
+        const glyphCanvasRenderer = (ctx: OffscreenCanvasRenderingContext2D) => {
+            const fill = glyph.hollow ? '#0000' : '#000'
+            draw(ctx, [
+                'g',
+                { fill, stroke: '#000', weight: this.params.padding },
+                translate(scale(glyph.path, glyph.scale), glyph.position),
+            ])
+        }
 
         let placedGlyph: Glyph | undefined = undefined
         while (
-            glyph.scale <= this.maxScale &&
-            this.packer.canPlaceShape(
-                bounds(scale(glyph.path, glyph.scale)) as Rect,
-                (ctx: OffscreenCanvasRenderingContext2D) => {
-                    draw(ctx, [
-                        'g',
-                        { fill: '#0000', stroke: '#000', weight: this.glyphPadding },
-                        translate(scale(glyph.path, glyph.scale), glyph.position),
-                    ])
-                }
-            )
+            glyph.scale <= maker.maxScale &&
+            this.packer.canPlaceShape(bounds(scale(glyph.path, glyph.scale)) as Rect, glyphCanvasRenderer)
         ) {
             placedGlyph = { ...glyph }
-
             // attempt to step it up
-            glyph.scale += this.scaleStepSize
+            glyph.scale += maker.scaleStepSize
         }
 
         if (placedGlyph !== undefined) {
             this.placedGlyphs.push(placedGlyph)
-            this.dirty = true
 
             // draw to placed glyphs
-            this.packer.commitShape((ctx: OffscreenCanvasRenderingContext2D) => {
-                draw(ctx, [
-                    'g',
-                    { fill: '#0000', stroke: '#000', weight: this.glyphPadding },
-                    translate(scale(placedGlyph.path, placedGlyph.scale), placedGlyph.position),
-                ])
-            })
+            this.packer.commitShape(glyphCanvasRenderer)
+
+            this.render()
         }
-        return (iteration / this.attempts) * 100
+
+        return { status: 'running', progress }
     }
 
     render() {
@@ -161,8 +147,7 @@ export class MySketch extends Sketch {
                     width: this.width,
                     height: this.height,
                     viewBox: `0 0 ${this.width} ${this.height}`,
-                    fill: '#0000',
-                    stroke: '#000',
+                    fill: '#000',
                 },
                 ...this.placedGlyphs.map((glyph) => translate(scale(glyph.path, glyph.scale), glyph.position)).flat()
             )
