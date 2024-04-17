@@ -29,7 +29,8 @@ interface Glyph {
     position: Vec
     scale: number
     // rotation: number
-    // fill: boolean // or stroke if false
+
+    fill: boolean // or stroke if false
 }
 
 // TODO: define one ore more glyph loaders that generate a base path that can be scaled
@@ -101,7 +102,7 @@ export class MySketch extends Sketch {
             position: [x, y],
             scale: 1.0,
             // rotation: 0,
-            // fill: true,
+            fill: false,
         }
     }
 
@@ -123,7 +124,7 @@ export class MySketch extends Sketch {
                 (ctx: OffscreenCanvasRenderingContext2D) => {
                     draw(ctx, [
                         'g',
-                        { fill: '#000', stroke: '#000', weight: this.glyphPadding },
+                        { fill: '#0000', stroke: '#000', weight: this.glyphPadding },
                         translate(scale(glyph.path, glyph.scale), glyph.position),
                     ])
                 }
@@ -143,7 +144,7 @@ export class MySketch extends Sketch {
             this.packer.commitShape((ctx: OffscreenCanvasRenderingContext2D) => {
                 draw(ctx, [
                     'g',
-                    { fill: '#000', stroke: '#000', weight: this.glyphPadding },
+                    { fill: '#0000', stroke: '#000', weight: this.glyphPadding },
                     translate(scale(placedGlyph.path, placedGlyph.scale), placedGlyph.position),
                 ])
             })
@@ -156,7 +157,13 @@ export class MySketch extends Sketch {
 
         this.outputElm.innerHTML = asSvg(
             svgDoc(
-                { width: this.width, height: this.height, viewBox: `0 0 ${this.width} ${this.height}`, fill: '#000' },
+                {
+                    width: this.width,
+                    height: this.height,
+                    viewBox: `0 0 ${this.width} ${this.height}`,
+                    fill: '#0000',
+                    stroke: '#000',
+                },
                 ...this.placedGlyphs.map((glyph) => translate(scale(glyph.path, glyph.scale), glyph.position)).flat()
             )
         )
