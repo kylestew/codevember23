@@ -8,7 +8,6 @@ export type SketchParams = {
 
     shapeSet: Path[]
 
-    attempts: number
     padding: number
 }
 

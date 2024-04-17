@@ -26,7 +26,8 @@ export class MySketch extends Sketch {
     private glyphMakers: GlyphMaker[] = []
     private packer: CanvasPacker
 
-    private iteration: number = 0
+    private attempts: number = 0
+    private totalAttempts: number = 0
     private placedGlyphs: Glyph[] = []
 
     constructor(params: SketchParams, appElm: HTMLElement) {
@@ -40,16 +41,14 @@ export class MySketch extends Sketch {
     }
 
     setup() {
-        this.iteration = 0
-
         this.placedGlyphs = []
         this.packer = new CanvasPacker(this.width, this.height, 1)
 
         this.glyphMakers = [
             // TODO: shapes
             new ShapeGlyphMaker(
-                // TODO: do by count instead?
-                0.01, // percent progress
+                8,
+                1000, // count, attempts
 
                 // not a scaled canvas, shapes are in [0, 1] space
                 20,
@@ -69,29 +68,13 @@ export class MySketch extends Sketch {
                 never
             ),
 
-            // // large fonts
-            // new FontGlyphMaker(
-            //     0.2, // percent progress
-            //     2.0,
-            //     3.0,
-            //     0.1, // min, max, step
-            //     this.params.fonts,
-            //     this.params.characterSet,
-            //     () => {
-            //         // place anywhere
-            //         return [SYSTEM.float(this.width), SYSTEM.float(this.height)]
-            //     },
-            //     () => {
-            //         // never hollow
-            //         return false
-            //     }
-            // ),
-
-            // small fonts
+            // large fonts
             new FontGlyphMaker(
-                0.6, // percent progress
-                0.5,
+                20,
+                1000, // count, attempts
+
                 2.0,
+                3.0,
                 0.1, // min, max, step
                 this.params.fonts,
                 this.params.characterSet,
@@ -99,49 +82,73 @@ export class MySketch extends Sketch {
                     // place anywhere
                     return [SYSTEM.float(this.width), SYSTEM.float(this.height)]
                 },
-                never,
-                () => {
-                    // never hollow
-                    return false
-                }
+                randomPI_4,
+                never
             ),
 
-            // // tiny fonts
-            // new FontGlyphMaker(
-            //     1.0, // percent progress
-            //     0.1,
-            //     0.5,
-            //     0.01, // min, max, step
-            //     this.params.fonts,
-            //     this.params.characterSet,
-            //     () => {
-            //         // place anywhere
-            //         return [SYSTEM.float(this.width), SYSTEM.float(this.height)]
-            //     },
-            //     () => {
-            //         // never hollow
-            //         return false
-            //     }
-            // ),
+            // small fonts
+            new FontGlyphMaker(
+                100,
+                1000, // count, attempts
+
+                0.5,
+                2.0,
+                0.1, // min, max, step
+
+                this.params.fonts,
+                this.params.characterSet,
+
+                () => {
+                    // place anywhere
+                    return [SYSTEM.float(this.width), SYSTEM.float(this.height)]
+                },
+                randomPI_2,
+                never
+            ),
+
+            // tiny fonts
+            new FontGlyphMaker(
+                200,
+                4000,
+
+                0.05,
+                0.5,
+                0.01, // min, max, step
+
+                this.params.fonts,
+                this.params.characterSet,
+
+                () => {
+                    // place anywhere
+                    return [SYSTEM.float(this.width), SYSTEM.float(this.height)]
+                },
+                randomPI_4,
+                never
+            ),
         ]
+
+        this.attempts = 0
+        this.totalAttempts = this.glyphMakers.reduce((acc, maker) => acc + maker.attempts, 0)
     }
 
     next(): SketchState {
-        if (this.iteration++ > this.params.attempts) {
+        if (this.glyphMakers.length === 0) {
+            // nothing left to do
             return { status: 'stopped', progress: 0 }
         }
 
-        // select glyph vendor based on progress
-        const progress = this.iteration / this.params.attempts
-        const maker =
-            this.glyphMakers.find((maker) => progress <= maker.progress) ??
-            this.glyphMakers[this.glyphMakers.length - 1]
-        const glyph = maker.make()
+        // do we still have attempts to make?
+        const maker = this.glyphMakers[0]
+        if (maker.attempts === 0 || maker.count === 0) {
+            // remove maker - will not be available on next iteration
+            this.glyphMakers.shift()
+        }
+        maker.attempts--
 
+        const glyph = maker.make()
         const transformGlyph = (glyph: Glyph) => {
             return translate(rotate(scale(glyph.path, glyph.scale), glyph.rotation), glyph.position)
         }
-
         const glyphCanvasRenderer = (ctx: OffscreenCanvasRenderingContext2D) => {
             const fill = glyph.hollow ? '#0000' : '#000'
             draw(ctx, ['g', { fill, stroke: '#000', weight: this.params.padding }, transformGlyph(glyph)])
@@ -159,6 +166,7 @@ export class MySketch extends Sketch {
 
         if (placedGlyph !== undefined) {
             this.placedGlyphs.push(placedGlyph)
+            maker.count--
 
             // draw to placed glyphs
             this.packer.commitShape(glyphCanvasRenderer)
@@ -166,7 +174,7 @@ export class MySketch extends Sketch {
             this.render()
         }
 
-        return { status: 'running', progress }
+        return { status: 'running', progress: this.attempts++ / this.totalAttempts }
     }
 
     render() {

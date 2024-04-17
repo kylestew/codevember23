@@ -17,7 +17,8 @@ export interface Glyph {
 }
 
 export abstract class GlyphMaker {
-    progress: number
+    count: number // goal placement count
+    attempts: number // attempts to reach goal
 
     minScale: number
     maxScale: number
@@ -28,7 +29,9 @@ export abstract class GlyphMaker {
     hollowRule: () => boolean
 
     constructor(
-        progress: number,
+        count: number,
+        attempts: number,
+
         minScale: number,
         maxScale: number,
         scaleStepSize: number,
@@ -36,7 +39,9 @@ export abstract class GlyphMaker {
         rotationRule: () => number,
         hollowRule: () => boolean
     ) {
-        this.progress = progress
+        this.count = count
+        this.attempts = attempts
+
         this.minScale = minScale
         this.maxScale = maxScale
         this.scaleStepSize = scaleStepSize
@@ -64,7 +69,9 @@ export class ShapeGlyphMaker extends GlyphMaker {
     shapeSet: Path[]
 
     constructor(
-        progress: number,
+        count: number,
+        attempts: number,
+
         minScale: number,
         maxScale: number,
         scaleStepSize: number,
@@ -73,7 +80,7 @@ export class ShapeGlyphMaker extends GlyphMaker {
         rotationRule: () => number,
         hollowRule: () => boolean
     ) {
-        super(progress, minScale, maxScale, scaleStepSize, placementRule, rotationRule, hollowRule)
+        super(count, attempts, minScale, maxScale, scaleStepSize, placementRule, rotationRule, hollowRule)
         this.shapeSet = shapeSet
     }
 
@@ -87,7 +94,9 @@ export class FontGlyphMaker extends GlyphMaker {
     characterSet: string[]
 
     constructor(
-        progress: number,
+        count: number,
+        attempts: number,
+
         minScale: number,
         maxScale: number,
         scaleStepSize: number,
@@ -97,7 +106,7 @@ export class FontGlyphMaker extends GlyphMaker {
         rotationRule: () => number,
         hollowRule: () => boolean
     ) {
-        super(progress, minScale, maxScale, scaleStepSize, placementRule, rotationRule, hollowRule)
+        super(count, attempts, minScale, maxScale, scaleStepSize, placementRule, rotationRule, hollowRule)
         this.fontSet = fontSet
         this.characterSet = characterSet
     }

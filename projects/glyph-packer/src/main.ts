@@ -26,7 +26,6 @@ const params: SketchParams = {
         height: 1920 / 2,
     },
 
-    attempts: 1,
     padding: 2,
 }
 
@@ -36,12 +35,6 @@ createUI(params, sketch, (pane, wrapMidiBinding) => {
     const f1 = pane.addFolder({
         title: 'Basic',
         expanded: true,
-    })
-    f1.addBinding(params, 'attempts', {
-        label: 'Attempts',
-        min: 0,
-        max: 10000,
-        step: 10,
     })
     f1.addBinding(params, 'padding', {
         label: 'Padding',
