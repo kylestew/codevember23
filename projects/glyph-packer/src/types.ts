@@ -1,11 +1,14 @@
 import { Font } from 'opentype.js'
+import { Path } from '@thi.ng/geom'
 
 export type SketchParams = {
     fonts: Font[]
     characterSet: string[]
     canvasSize: { width: number; height: number }
 
-    density: number
+    shapeSet: Path[]
+
+    attempts: number
     padding: number
 }
 

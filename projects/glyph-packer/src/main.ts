@@ -6,22 +6,27 @@ import { createUI } from './util/gui'
 
 import { alphaNumericCharacterSet } from './lib/glyph-sets'
 import { loadFontSet } from './lib/font-set'
+import { svgToPaths } from './shared_lib/svg_path_reader'
+
+import SVG from './assets/glyphs.svg?raw'
 
 const fonts = await loadFontSet()
 // const characterSet = 'Speak softly and carry a big stick'.split('')
 // array containing 61-73 ascii characters
 const characterSet = alphaNumericCharacterSet
+const shapeSet = svgToPaths(SVG)
 
 const params: SketchParams = {
     fonts,
     characterSet,
-    // shapeSet
+    shapeSet,
+
     canvasSize: {
         width: 1200 / 2,
         height: 1920 / 2,
     },
 
-    density: 0.0001,
+    attempts: 1,
     padding: 2,
 }
 
@@ -32,11 +37,11 @@ createUI(params, sketch, (pane, wrapMidiBinding) => {
         title: 'Basic',
         expanded: true,
     })
-    f1.addBinding(params, 'density', {
-        label: 'Density',
-        min: 0.01,
-        max: 1,
-        step: 0.01,
+    f1.addBinding(params, 'attempts', {
+        label: 'Attempts',
+        min: 0,
+        max: 10000,
+        step: 10,
     })
     f1.addBinding(params, 'padding', {
         label: 'Padding',

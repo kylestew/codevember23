@@ -11,12 +11,12 @@ export interface Glyph {
 
     position: Vec
     scale: number
-    // rotation: number
+    rotation: number
 
-    hollow: boolean // or stroke if false
+    hollow: boolean
 }
 
-export interface GlyphMaker {
+export abstract class GlyphMaker {
     progress: number
 
     minScale: number
@@ -24,21 +24,65 @@ export interface GlyphMaker {
     scaleStepSize: number
 
     placementRule: () => Vec
+    rotationRule: () => number
     hollowRule: () => boolean
 
-    make(): Glyph
+    constructor(
+        progress: number,
+        minScale: number,
+        maxScale: number,
+        scaleStepSize: number,
+        placementRule: () => Vec,
+        rotationRule: () => number,
+        hollowRule: () => boolean
+    ) {
+        this.progress = progress
+        this.minScale = minScale
+        this.maxScale = maxScale
+        this.scaleStepSize = scaleStepSize
+        this.placementRule = placementRule
+        this.rotationRule = rotationRule
+        this.hollowRule = hollowRule
+    }
+
+    abstract randomPath(): Path
+
+    make(): Glyph {
+        const path = this.randomPath()
+
+        return {
+            path: path,
+            position: this.placementRule(),
+            scale: this.minScale,
+            rotation: this.rotationRule(),
+            hollow: this.hollowRule(),
+        }
+    }
 }
 
-export class FontGlyphMaker implements GlyphMaker {
-    progress: number
+export class ShapeGlyphMaker extends GlyphMaker {
+    shapeSet: Path[]
 
-    minScale: number
-    maxScale: number
-    scaleStepSize: number
+    constructor(
+        progress: number,
+        minScale: number,
+        maxScale: number,
+        scaleStepSize: number,
+        shapeSet: Path[],
+        placementRule: () => Vec,
+        rotationRule: () => number,
+        hollowRule: () => boolean
+    ) {
+        super(progress, minScale, maxScale, scaleStepSize, placementRule, rotationRule, hollowRule)
+        this.shapeSet = shapeSet
+    }
 
-    placementRule: () => Vec
-    hollowRule: () => boolean
+    randomPath(): Path {
+        return pickRandom(this.shapeSet)
+    }
+}
 
+export class FontGlyphMaker extends GlyphMaker {
     fontSet: Font[]
     characterSet: string[]
 
@@ -50,19 +94,15 @@ export class FontGlyphMaker implements GlyphMaker {
         fontSet: Font[],
         characterSet: string[],
         placementRule: () => Vec,
+        rotationRule: () => number,
         hollowRule: () => boolean
     ) {
-        this.progress = progress
+        super(progress, minScale, maxScale, scaleStepSize, placementRule, rotationRule, hollowRule)
         this.fontSet = fontSet
         this.characterSet = characterSet
-        this.minScale = minScale
-        this.maxScale = maxScale
-        this.scaleStepSize = scaleStepSize
-        this.placementRule = placementRule
-        this.hollowRule = hollowRule
     }
 
-    make(): Glyph {
+    randomPath(): Path {
         const font = pickRandom(this.fontSet)
         const letter = pickRandom(this.characterSet)
 
@@ -85,15 +125,6 @@ export class FontGlyphMaker implements GlyphMaker {
         // center the path on itself
         let centeredPath = path(segments)
         const cent = centroid(bounds(centeredPath))
-        centeredPath = translate(centeredPath, [-cent[0], -cent[1]]) as Path
-
-        return {
-            path: centeredPath,
-
-            position: this.placementRule(),
-            scale: this.minScale,
-            // rotation: 0,
-            hollow: this.hollowRule(),
-        }
+        return translate(centeredPath, [-cent[0], -cent[1]]) as Path
     }
 }
