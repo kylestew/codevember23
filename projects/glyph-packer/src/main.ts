@@ -4,8 +4,8 @@ import { MySketch } from './sketch'
 import { SketchParams } from './types'
 import { createUI } from './gui'
 
-import { alphaNumericCharacterSet } from './lib/glyph-sets'
-import { loadFontSet } from './lib/font-set'
+import { alphaNumericCharacterSet } from './glyph-sets'
+import { loadFontSet } from './font-set'
 
 const fonts = await loadFontSet()
 // const characterSet = 'Speak softly and carry a big stick'.split('')

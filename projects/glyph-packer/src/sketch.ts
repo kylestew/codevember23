@@ -21,7 +21,7 @@ import { draw } from '@thi.ng/hiccup-canvas'
 import { PathSegment } from '@thi.ng/geom-api'
 
 import { Sketch, SketchParams } from './types'
-import { CanvasPacker } from './lib/CanvasPacker'
+import { CanvasPacker } from './CanvasPacker'
 
 interface Glyph {
     path: Path
