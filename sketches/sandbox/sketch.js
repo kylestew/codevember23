@@ -1,36 +1,27 @@
-import { setupShaderProgram, glClear, drawQuad } from './gl.js'
+import { createGLCanvas, loadShader, useShader, useTexture, glClear, drawScreen } from './gl-util.js'
+import { createOffscreenCanvas } from './canvas-util.js'
 
 const w = 1080
 const h = 1500
-const marg = w * 0.05
 
-let canvas = document.getElementById('mainCanvas')
-canvas.width = w
-canvas.height = h
-let gl = canvas.getContext('webgl')
-if (!gl) {
-    console.error('WebGL not supported in this browser!')
-}
+createGLCanvas(w, h)
+const shader = await loadShader('shader.vert', 'shader.frag')
 
-let shaderProgram = await setupShaderProgram(gl, 'shader.vert', 'shader.frag')
-let programInfo = {
-    program: shaderProgram,
-    attribLocations: {
-        vertexPosition: gl.getAttribLocation(shaderProgram, 'aVertexPosition'),
-    },
-    uniformLocations: {
-        fragmentColor: gl.getUniformLocation(shaderProgram, 'uFragmentColor'),
-    },
-}
+const offCtx = createOffscreenCanvas(w, h)
 
 function draw() {
-    glClear(gl)
+    // Draw something on the offscreen canvas
+    offCtx.fillStyle = 'green'
+    offCtx.fillRect(0, 0, 256, 256)
+    offCtx.fillStyle = 'red'
+    offCtx.fillRect(10, 10, 100, 100)
 
-    // Set the color to blue
-    gl.useProgram(programInfo.program)
-    gl.uniform4f(programInfo.uniformLocations.fragmentColor, 0.0, 0.0, 1.0, 1.0)
+    glClear([0, 0, 0, 1])
 
-    drawQuad(gl, programInfo)
+    useShader(shader)
+
+    useTexture('uSampler', offCtx.canvas)
+
+    drawScreen()
 }
-
 draw()
