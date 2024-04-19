@@ -28,7 +28,9 @@ export function glClear(color) {
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT)
 }
 
-export function useTexture(uniformName, data) {
+export function useTexture(textureId, uniformName, data) {
+    gl.activeTexture(textureId)
+
     const texture = gl.createTexture()
     gl.bindTexture(gl.TEXTURE_2D, texture)
 
@@ -37,13 +39,43 @@ export function useTexture(uniformName, data) {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR)
 
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, data)
-    gl.activeTexture(gl.TEXTURE0)
-    gl.uniform1i(gl.getUniformLocation(currentProgram, uniformName), 0)
+
+    // Connect the texture to the shader uniform
+    const uniformLocation = gl.getUniformLocation(currentProgram, uniformName)
+    // Since textureId typically is gl.TEXTURE0 + n, extract 'n' to set as the uniform
+    const textureUnitIndex = textureId - gl.TEXTURE0
+    gl.uniform1i(uniformLocation, textureUnitIndex)
 }
 
 export function setUniform(name, value) {
-    // TODO:
-    console.error('setUniform not implemented')
+    const uniformLocation = gl.getUniformLocation(currentProgram, name)
+    if (uniformLocation === null) {
+        console.warn(`Uniform '${name}' not found.`)
+        return
+    }
+
+    // Check the type of the value and use the appropriate uniform function
+    if (typeof value === 'number') {
+        gl.uniform1f(uniformLocation, value)
+    } else if (Array.isArray(value)) {
+        switch (value.length) {
+            case 2:
+                gl.uniform2fv(uniformLocation, value)
+                break
+            case 3:
+                gl.uniform3fv(uniformLocation, value)
+                break
+            case 4:
+                gl.uniform4fv(uniformLocation, value)
+                break
+            default:
+                console.error(`Unsupported uniform array size: ${value.length}`)
+        }
+    } else if (value instanceof Float32Array && value.length === 16) {
+        gl.uniformMatrix4fv(uniformLocation, false, value)
+    } else {
+        console.error(`Unsupported uniform type for '${name}'`)
+    }
 }
 
 let positionBuffer = undefined
