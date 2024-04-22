@@ -1,6 +1,7 @@
 import { createGLCanvas, loadShader, useShader, useTexture, glClear, drawScreen, setUniform } from './util/gl-util.js'
 import { createOffscreenCanvas } from './util/canvas-util.js'
 import { random, randomInt, mapRange, pickRandom } from './util/util.js'
+import { installSaveCanvasCommand } from './util/canvas-util.js'
 
 const w = 1200
 const h = 1200
@@ -36,7 +37,29 @@ function draw(frame) {
         ctx.stroke()
     }
 
+    // SECOND APPROACH: lines drawn from edge to edge of a circle clipped to shape
+    function circleTexture(ctx, iter) {
+        const r = 80
+        ctx.lineWidth = 0.1
+        for (let i = 0; i <= 2 * Math.PI * r * iter * 1.0; i++) {
+            const rt1 = random(0, Math.PI * 2.0)
+            const rt2 = random(0, Math.PI * 2.0)
+
+            const cx1 = 50 + r * Math.cos(rt1)
+            const cy1 = 50 + r * Math.sin(rt1)
+
+            const cx2 = 50 + r * Math.cos(rt2)
+            const cy2 = 50 + r * Math.sin(rt2)
+
+            ctx.beginPath()
+            ctx.moveTo(cx1, cy1)
+            ctx.lineTo(cx2, cy2)
+            ctx.stroke()
+        }
+    }
+
     // Second Approach: circles (stroke, no sroke)
+
     // First Approach: simulated brush strokes
     // Third Approach: pixel based noise sampling
     // generate small rectangles randomly distributed in a large rectangular area
@@ -88,5 +111,3 @@ function draw(frame) {
 }
 
 draw(0)
-
-// TODO: save canvas FN

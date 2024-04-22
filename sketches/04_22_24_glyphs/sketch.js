@@ -31,16 +31,40 @@ function drawGlyph(row, col, rot, glyph) {
     ctx.translate(-glyphSide / 2, -glyphSide / 2)
 
     // clip the shape to the cell
-    // ctx.beginPath()
-    // ctx.rect(0, 0, glyphSide, glyphSide)
-    // ctx.clip()
+    ctx.beginPath()
+    ctx.rect(0, 0, glyphSide, glyphSide)
+    ctx.clip()
 
     // invoke draw
-    glyph(ctx)
+    glyph(ctx, row * 4 + col)
+    ctx.clip()
+
+    circleTexture(ctx, 9)
 
     ctx.restore()
 }
 const random90Deg = () => (randomInt(0, 4) * Math.PI) / 2
+
+// one way to make a texture
+function circleTexture(ctx, iter) {
+    const r = 80
+    ctx.lineWidth = 0.1
+    for (let i = 0; i <= 2 * Math.PI * r * iter * 1.0; i++) {
+        const rt1 = random(0, Math.PI * 2.0)
+        const rt2 = random(0, Math.PI * 2.0)
+
+        const cx1 = 50 + r * Math.cos(rt1)
+        const cy1 = 50 + r * Math.sin(rt1)
+
+        const cx2 = 50 + r * Math.cos(rt2)
+        const cy2 = 50 + r * Math.sin(rt2)
+
+        ctx.beginPath()
+        ctx.moveTo(cx1, cy1)
+        ctx.lineTo(cx2, cy2)
+        ctx.stroke()
+    }
+}
 
 function draw(frame) {
     glClear([0, 0, 0, 1])
@@ -48,14 +72,13 @@ function draw(frame) {
 
     ctx.background('#222')
     ctx.fillStyle = '#eee'
+    ctx.strokeStyle = '#eee'
 
     // build grid
     for (let row = 0; row < rows; row++) {
         for (let col = 0; col < cols; col++) {
             // draw only sometimes
-            if (random() < 0.3) continue
-
-            // TODO: disturb the shapes a bit
+            if (random() < 0.4) continue
 
             // drawGlyph(row, col, 0, pickRandom(Object.values(glyphs)))
             drawGlyph(row, col, random90Deg(), pickRandom(Object.values(glyphs)))
@@ -79,18 +102,6 @@ function draw(frame) {
     }
 
     useTexture(gl.TEXTURE0, 'tex', ctx.canvas)
-
-    //Create shader values
-    // const noiseModA = random(2, 10)
-    // const noiseModB = random(2, 10)
-    // const noiseStart = random(0, 100)
-    // const fieldOff = random(0.05, 0.1)
-
-    // // send uniform values to shader
-    // setUniform('noiseModA', noiseModA)
-    // setUniform('noiseModB', noiseModB)
-    // setUniform('noiseStart', noiseStart)
-    // setUniform('fieldOff', fieldOff)
 
     drawScreen()
 }

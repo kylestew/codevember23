@@ -1,5 +1,6 @@
 let gl
 let currentProgram
+import { installSaveCanvasCommand } from './canvas-util.js'
 
 export function createGLCanvas(width, height) {
     let canvas = document.createElement('canvas')
@@ -9,10 +10,14 @@ export function createGLCanvas(width, height) {
     canvas.width = width
     canvas.height = height
 
-    gl = canvas.getContext('webgl')
+    // preserve buffer to CMD+S saving
+    gl = canvas.getContext('webgl', { preserveDrawingBuffer: true })
     if (!gl) {
         console.error('WebGL not supported in this browser!')
     }
+
+    installSaveCanvasCommand(gl.canvas)
+
     return gl
 }
 
