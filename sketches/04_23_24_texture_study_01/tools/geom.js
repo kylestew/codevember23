@@ -1,5 +1,4 @@
-import { random } from './util/util.js'
-import { rotateLeft, chunkArray } from './util/util.js'
+import { rotateLeft, chunkArray, random } from '../util/util.js'
 
 export class Line {
     constructor(start, end) {
@@ -18,10 +17,11 @@ export class Line {
         return [x, y]
     }
 
-    outputPath(ctx) {
-        ctx.beginPath()
-        ctx.moveTo(this.pts[0][0], this.pts[0][1])
-        ctx.lineTo(this.pts[1][0], this.pts[1][1])
+    path() {
+        let path = new Path2D()
+        path.moveTo(this.pts[0][0], this.pts[0][1])
+        path.lineTo(this.pts[1][0], this.pts[1][1])
+        return path
     }
 }
 
@@ -46,6 +46,10 @@ export class Rect {
         return new Rect(pos, size)
     }
 
+    area() {
+        return this.size[0] * this.size[1]
+    }
+
     toLines() {
         return [
             new Line(this.pts[0], this.pts[1]),
@@ -55,17 +59,16 @@ export class Rect {
         ]
     }
 
-    outputPath(ctx) {
-        ctx.beginPath()
-        this.pts.forEach((pt, idx) => {
-            const [x, y] = pt
-            if (idx == 0) {
-                ctx.moveTo(x, y)
-            } else {
-                ctx.lineTo(x, y)
-            }
-        })
-        ctx.closePath()
+    randomPointIn() {
+        const x = random(this.pos[0], this.pos[0] + this.size[0])
+        const y = random(this.pos[1], this.pos[1] + this.size[1])
+        return [x, y]
+    }
+
+    path() {
+        let path = new Path2D()
+        path.rect(this.pos[0], this.pos[1], this.size[0], this.size[1])
+        return path
     }
 }
 
@@ -107,11 +110,51 @@ export class Circle {
         return new Beziers(firstPoint, controls)
     }
 
-    outputPath(ctx) {
+    randomPointIn() {
         const [x, y] = this.centerPT
 
-        ctx.beginPath()
-        ctx.arc(x, y, this.radius, 0, Math.PI * 2)
+        // don't get stuck if none found
+        for (let i = 0; i < 100; i++) {
+            // throw for random in rect containing circle
+            let rx = random(x - this.radius, x + this.radius)
+            let ry = random(y - this.radius, y + this.radius)
+
+            // is it in circle
+            if (this.#distanceFromCenter(x, y, rx, ry) <= this.radius) {
+                return [rx, ry]
+            }
+        }
+        return pt
+    }
+
+    #distanceFromCenter(centerX, centerY, pointX, pointY) {
+        const dx = pointX - centerX
+        const dy = pointY - centerY
+        return Math.sqrt(dx * dx + dy * dy)
+    }
+
+    // TODO: toPoints or toPolygon function
+
+    degradedPoly(degradation = 0.3) {
+        const [x, y] = this.centerPT
+        const r = this.radius
+
+        // sweep around circle unevenly
+        let pts = []
+        for (let angle = 0; angle < Math.PI * 2; angle += Math.PI / 16.0 + random(0, degradation)) {
+            const radius = r + r * random(-degradation, degradation)
+            // const radius = r
+            const pt = [x + Math.cos(angle) * radius, y + Math.sin(angle) * radius]
+            pts.push(pt)
+        }
+        return new Polygon(pts)
+    }
+
+    path() {
+        const [x, y] = this.centerPT
+        let path = new Path2D()
+        path.arc(x, y, this.radius, 0, Math.PI * 2)
+        return path
     }
 }
 
@@ -123,13 +166,14 @@ export class Beziers {
         this.controls = controls
     }
 
-    outputPath(ctx) {
-        ctx.beginPath()
-        ctx.moveTo(this.startPt[0], this.startPt[1])
+    path() {
+        let path = new Path2D()
+        path.moveTo(this.startPt[0], this.startPt[1])
         this.controls.forEach(([ctrlPt1, ctrlPt2, anchorPt]) => {
-            ctx.bezierCurveTo(ctrlPt1[0], ctrlPt1[1], ctrlPt2[0], ctrlPt2[1], anchorPt[0], anchorPt[1])
+            path.bezierCurveTo(ctrlPt1[0], ctrlPt1[1], ctrlPt2[0], ctrlPt2[1], anchorPt[0], anchorPt[1])
         })
-        ctx.closePath()
+        path.closePath()
+        return path
     }
 }
 
@@ -138,39 +182,17 @@ export class Polygon {
         this.pts = pts
     }
 
-    outputPath(ctx) {
-        ctx.beginPath()
+    path() {
+        let path = new Path2D()
         this.pts.forEach((pt, idx) => {
             const [x, y] = pt
             if (idx == 0) {
-                ctx.moveTo(x, y)
+                path.moveTo(x, y)
             } else {
-                ctx.lineTo(x, y)
+                path.lineTo(x, y)
             }
         })
-        ctx.closePath()
+        path.closePath()
+        return path
     }
-}
-
-export function randomInCircle(pt, rad) {
-    const [x, y] = pt
-
-    // don't get stuck if none found
-    for (let i = 0; i < 100; i++) {
-        // throw for random in rect containing circle
-        let rx = random(x - rad, x + rad)
-        let ry = random(y - rad, y + rad)
-
-        // is it in circle
-        if (distanceFromCenter(x, y, rx, ry) <= rad) {
-            return [rx, ry]
-        }
-    }
-    return pt
-}
-
-function distanceFromCenter(centerX, centerY, pointX, pointY) {
-    const dx = pointX - centerX
-    const dy = pointY - centerY
-    return Math.sqrt(dx * dx + dy * dy)
 }

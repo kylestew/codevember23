@@ -1,7 +1,7 @@
-import { createGLCanvas, loadShader, useShader, useTexture, glClear, drawScreen, setUniform } from './util/gl-util.js'
+import { createGLCanvas, loadShader, useShader, useTexture, glClear, drawScreen } from './util/gl-util.js'
 import { createOffscreenCanvas } from './util/canvas-util.js'
-import { random, randomInt, mapRange, pickRandom } from './util/util.js'
-import { installSaveCanvasCommand } from './util/canvas-util.js'
+import { Rect } from './tools/geom.js'
+import { textureFill, TextureFill } from './tools/fills.js'
 
 const w = 1200
 const h = 1200
@@ -11,31 +11,59 @@ const shader = await loadShader('shader.vert', 'shader.frag')
 
 const ctx = createOffscreenCanvas(w, h)
 
-function draw(frame) {
+function draw() {
     ctx.background('#eee')
-    ctx.fillStyle = '#222'
-    ctx.strokeStyle = '#2222'
+    ctx.fillStyle = '#22222202'
 
+    // === How to fill a shape with texture ===
+    // (1) use the shape as a cliping mask
+    // (2) draw the texture into a rect containing the clipping mask
+    let rectSmall = new Rect([50, 50], [100, 100])
+    let rectMedium = new Rect([50, 200], [250, 250])
+    let rectLarge = new Rect([50, 500], [400, 650])
+
+    // === FILL EXPLORATION ===
+    // (1) Random Polys
+    ctx.save()
+    ctx.clip(rectSmall.path())
+    textureFill(ctx, TextureFill.POLYS, rectSmall, 0.5, 20, 10)
+    ctx.restore()
+
+    ctx.save()
+    ctx.clip(rectMedium.path())
+    textureFill(ctx, TextureFill.POLYS, rectMedium, 0.5, 20, 10)
+    ctx.restore()
+
+    ctx.save()
+    ctx.clip(rectLarge.path())
+    textureFill(ctx, TextureFill.POLYS, rectLarge, 0.5, 20, 10)
+    ctx.restore()
+
+    // (2) Random Polys
+    ctx.translate(450, 0)
+    ctx.save()
+    ctx.clip(rectSmall.path())
+    textureFill(ctx, TextureFill.CIRCLES, rectSmall, 0.5, 20, 10)
+    ctx.restore()
+
+    ctx.save()
+    ctx.clip(rectMedium.path())
+    textureFill(ctx, TextureFill.CIRCLES, rectMedium, 0.5, 20, 10)
+    ctx.restore()
+
+    ctx.save()
+    ctx.clip(rectLarge.path())
+    textureFill(ctx, TextureFill.CIRCLES, rectLarge, 0.5, 20, 10)
+    ctx.restore()
+
+    // == OUTPUT to SHADER ===
+    glClear([0, 0, 0, 1])
+    useShader(shader)
+    useTexture(gl.TEXTURE0, 'tex', ctx.canvas)
+    drawScreen()
+
+    /*
     let drawnRect = { x: 100, y: 400, w: 1200 - 200, h: 400 }
-
-    // FIRST APPROACH: lines across canvas area, small has lines
-    // ctx.fillRect(drawnRect.x, drawnRect.y, drawnRect.w, drawnRect.h)
-    // pick two random points in the rect
-    // draw a line between them
-    function randomInRect() {
-        return {
-            x: drawnRect.x + Math.random() * drawnRect.w,
-            y: drawnRect.y + Math.random() * drawnRect.h,
-        }
-    }
-    for (let i = 0; i < 100000; i++) {
-        const pt0 = randomInRect()
-        const pt1 = randomInRect()
-        ctx.beginPath()
-        ctx.moveTo(pt0.x, pt0.y)
-        ctx.lineTo(pt1.x, pt1.y)
-        ctx.stroke()
-    }
 
     // SECOND APPROACH: lines drawn from edge to edge of a circle clipped to shape
     function circleTexture(ctx, iter) {
@@ -103,11 +131,7 @@ function draw(frame) {
     //     ctx.fillRect(x, y, rectWidth + random(1, 3), rectHeight + random(1, 3))
     //     ctx.restore()
     // }
-
-    glClear([0, 0, 0, 1])
-    useShader(shader)
-    useTexture(gl.TEXTURE0, 'tex', ctx.canvas)
-    drawScreen()
+    */
 }
 
-draw(0)
+draw()
