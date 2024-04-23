@@ -50,6 +50,33 @@ export class Rect {
         return this.size[0] * this.size[1]
     }
 
+    split(t, horizontal = true) {
+        if (horizontal) {
+            const y = this.pos[1] + this.size[1] * t
+            return [
+                new Rect(this.pos, [this.size[0], y - this.pos[1]]),
+                new Rect([this.pos[0], y], [this.size[0], this.size[1] - y]),
+            ]
+        } else {
+            const x = this.pos[0] + this.size[0] * t
+            return [
+                new Rect(this.pos, [x - this.pos[0], this.size[1]]),
+                new Rect([x, this.pos[1]], [this.size[0] - x, this.size[1]]),
+            ]
+        }
+    }
+
+    inset(by) {
+        return new Rect([this.pos[0] + by, this.pos[1] + by], [this.size[0] - 2 * by, this.size[1] - 2 * by])
+    }
+
+    enclosingCircle() {
+        const centerX = this.pos[0] + this.size[0] / 2
+        const centerY = this.pos[1] + this.size[1] / 2
+        const radius = Math.hypot(this.size[0] / 2, this.size[1] / 2)
+        return new Circle([centerX, centerY], radius)
+    }
+
     toLines() {
         return [
             new Line(this.pts[0], this.pts[1]),
@@ -84,6 +111,10 @@ export class Circle {
             [x - this.radius, y - this.radius],
             [x + this.radius, y + this.radius],
         ]
+    }
+
+    area() {
+        return Math.PI * this.radius * this.radius
     }
 
     blobbyBeziers(perturbation = 10) {
@@ -125,6 +156,14 @@ export class Circle {
             }
         }
         return pt
+    }
+
+    /// t = [0, 1]
+    pointAt(t) {
+        const theta = t * Math.PI * 2
+        const x = Math.cos(theta) * this.radius + this.centerPT[0]
+        const y = Math.sin(theta) * this.radius + this.centerPT[1]
+        return [x, y]
     }
 
     #distanceFromCenter(centerX, centerY, pointX, pointY) {
