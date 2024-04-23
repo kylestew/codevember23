@@ -1,10 +1,10 @@
 import { createGLCanvas, loadShader, useShader, useTexture, glClear, drawScreen } from './util/gl-util.js'
 import { createOffscreenCanvas } from './util/canvas-util.js'
 import { Rect } from './tools/geom.js'
-import { textureFill, TextureFill } from './tools/fills.js'
+import { FillType, renderFill } from './tools/fills.js'
 
-const w = 1200
-const h = 1200
+const w = 800
+const h = 1000
 
 const gl = createGLCanvas(w, h)
 const shader = await loadShader('shader.vert', 'shader.frag')
@@ -13,48 +13,79 @@ const ctx = createOffscreenCanvas(w, h)
 
 function draw() {
     ctx.background('#eee')
-    ctx.fillStyle = '#22222202'
+
+    ctx.fillStyle = '#22222204'
+    ctx.strokeStyle = '#22222204'
 
     // === How to fill a shape with texture ===
     // (1) use the shape as a cliping mask
     // (2) draw the texture into a rect containing the clipping mask
-    let rectSmall = new Rect([50, 50], [100, 100])
-    let rectMedium = new Rect([50, 200], [250, 250])
-    let rectLarge = new Rect([50, 500], [400, 650])
+    let rectSmall = new Rect([40, 40], [300, 120])
+    let rectMedium = new Rect([40, 200], [300, 240])
+    let rectLarge = new Rect([40, 480], [300, 480])
 
     // === FILL EXPLORATION ===
     // (1) Random Polys
     ctx.save()
     ctx.clip(rectSmall.path())
-    textureFill(ctx, TextureFill.POLYS, rectSmall, 0.5, 20, 10)
+    renderFill(ctx, rectSmall, FillType.BLOBS, false, 0.8, 0.1, 10, 5)
     ctx.restore()
 
     ctx.save()
     ctx.clip(rectMedium.path())
-    textureFill(ctx, TextureFill.POLYS, rectMedium, 0.5, 20, 10)
+    renderFill(ctx, rectMedium, FillType.BLOBS, false, 0.6, 0.2, 20, 10)
     ctx.restore()
 
     ctx.save()
     ctx.clip(rectLarge.path())
-    textureFill(ctx, TextureFill.POLYS, rectLarge, 0.5, 20, 10)
+    renderFill(ctx, rectLarge, FillType.BLOBS, false, 0.4, 0.3, 30, 15)
     ctx.restore()
 
-    // (2) Random Polys
-    ctx.translate(450, 0)
+    // (2) Random Polys Stroked
+    ctx.translate(340, 0)
     ctx.save()
     ctx.clip(rectSmall.path())
-    textureFill(ctx, TextureFill.CIRCLES, rectSmall, 0.5, 20, 10)
+    renderFill(ctx, rectSmall, FillType.BLOBS, true, 0.8, 1.0, 10, 5)
     ctx.restore()
 
     ctx.save()
     ctx.clip(rectMedium.path())
-    textureFill(ctx, TextureFill.CIRCLES, rectMedium, 0.5, 20, 10)
+    renderFill(ctx, rectMedium, FillType.BLOBS, true, 0.8, 0.2, 20, 10)
     ctx.restore()
 
     ctx.save()
     ctx.clip(rectLarge.path())
-    textureFill(ctx, TextureFill.CIRCLES, rectLarge, 0.5, 20, 10)
+    renderFill(ctx, rectLarge, FillType.BLOBS, true, 0.6, 0.3, 30, 15)
     ctx.restore()
+
+    // (2) CIRCLES
+    // ctx.translate(450, 0)
+    // ctx.save()
+    // ctx.clip(rectSmall.path())
+    // textureFill(ctx, TextureFill.CIRCLES, rectSmall, 0.5, 20, 10)
+    // ctx.restore()
+
+    // ctx.save()
+    // ctx.clip(rectMedium.path())
+    // textureFill(ctx, TextureFill.CIRCLES, rectMedium, 0.5, 20, 10)
+    // ctx.restore()
+
+    // ctx.save()
+    // ctx.clip(rectLarge.path())
+    // textureFill(ctx, TextureFill.CIRCLES, rectLarge, 0.5, 20, 10)
+    // ctx.restore()
+
+    // (3) LINES
+    // ctx.translate(450, 0)
+    // ctx.save()
+    // ctx.clip(rectSmall.path())
+    // textureFill(ctx, TextureFill.LINES, rectSmall, 0.5, 20, 10)
+    // ctx.restore()
+
+    // ctx.save()
+    // ctx.clip(rectLarge.path())
+    // textureFill(ctx, TextureFill.LINES, rectLarge, 0.5, 20, 10)
+    // ctx.restore()
 
     // == OUTPUT to SHADER ===
     glClear([0, 0, 0, 1])
