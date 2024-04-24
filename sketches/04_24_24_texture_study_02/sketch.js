@@ -9,13 +9,12 @@ const h = 1020
 const gl = createGLCanvas(w, h)
 const shader = await loadShader('shader.vert', 'shader.frag')
 
+const colorSamplingCtx = createOffscreenCanvas(w, h)
 const ctx = createOffscreenCanvas(w, h)
 
 function draw() {
     ctx.background('#eee')
-
-    ctx.fillStyle = '#22222214'
-    ctx.strokeStyle = '#22222214'
+    colorSamplingCtx.background('#eee')
 
     // === Golden Ratio Rect ===
     const goldenRatio = (1 + Math.sqrt(5)) / 2
@@ -23,37 +22,36 @@ function draw() {
     // split into 3 nested rects
     let [rect0, rect12] = goldenRect.split(1.0 / goldenRatio, true)
     let [rect1, rect2] = rect12.split(1.0 / goldenRatio, false)
-    rect0 = rect0.inset(10)
-    rect1 = rect1.inset(10)
-    rect2 = rect2.inset(10)
-    // rect2 = new Rect([0, 0], [300, 20])
+    // rect0 = rect0.inset(10)
+    // rect1 = rect1.inset(10)
+    // rect2 = rect2.inset(10)
 
-    // === How to fill a shape with texture ===
-    // (1) use the shape as a cliping mask
-    // (2) draw the texture into a rect containing the clipping mask
+    // == Fill them with colors ===
+    colorSamplingCtx.translate(10, 10)
+    colorSamplingCtx.fillStyle = '#a10b2b'
+    colorSamplingCtx.fill(rect0.path())
+    colorSamplingCtx.fillStyle = '#b5d1cc'
+    colorSamplingCtx.fill(rect1.path())
+    colorSamplingCtx.fillStyle = '#000000'
+    colorSamplingCtx.fill(rect2.path())
 
     // === FILL EXPLORATION ===
-    ctx.translate(10, 10)
-
-    ctx.save()
-    ctx.clip(rect0.path())
-    renderFill(ctx, rect0, FillType.FIBERS, true, 0.2, 1.0, 1.5, 0.5)
-    ctx.restore()
-
-    ctx.save()
-    ctx.clip(rect1.path())
-    renderFill(ctx, rect1, FillType.FIBERS, true, 0.5, 0.5, 0.5, 0.25)
-    ctx.restore()
-
-    ctx.save()
-    ctx.clip(rect2.path())
-    renderFill(ctx, rect2, FillType.FIBERS, true, 0.8, 0.8, 0.5, 0.05)
-    ctx.restore()
+    // render fullscreen texture sampling underlying colors
+    const fullRect = new Rect([0, 0], [w, h])
+    ctx.fillStyle = '#22222214'
+    ctx.strokeStyle = '#22222214'
+    renderFill(ctx, fullRect, FillType.FIBERS, true, 0.6, 1.0, 1.2, 0.6, (pt) => {
+        const [x, y] = pt
+        const pixel = colorSamplingCtx.getImageData(Math.floor(x), Math.floor(y), 1, 1).data
+        const [r, g, b, a] = pixel
+        return `rgba(${r}, ${g}, ${b}, ${a / 3000})`
+    })
 
     // == OUTPUT to SHADER ===
     glClear([0, 0, 0, 1])
     useShader(shader)
     useTexture(gl.TEXTURE0, 'tex', ctx.canvas)
+    // useTexture(gl.TEXTURE0, 'tex', colorSamplingCtx.canvas)
     drawScreen()
 }
 

@@ -27,7 +27,7 @@ export const FillType = Object.freeze({
  *
  * @returns {Path2D} - The generated texture pattern as a Path2D object.
  */
-export function renderFill(ctx, rect, type, stroke, density, noisiness, featureSize, featureVariability) {
+export function renderFill(ctx, rect, type, stroke, density, noisiness, featureSize, featureVariability, colorSampler) {
     const area = rect.area()
     const iterations = (density * area) / featureSize
     switch (type) {
@@ -96,7 +96,7 @@ export function renderFill(ctx, rect, type, stroke, density, noisiness, featureS
                 // (1) Determine length and width
                 // fibers are 100x longer than wide
                 let width = random(featureSize - featureVariability, featureSize + featureVariability)
-                let length = 10 * width
+                let length = 20 * width
 
                 // (1) Pick a random point in the rectangle
                 const pt = rect.randomPointIn()
@@ -108,6 +108,7 @@ export function renderFill(ctx, rect, type, stroke, density, noisiness, featureS
                 const line = Line.fromPointAngleLength(pt, theta, length)
 
                 ctx.lineWidth = width
+                if (colorSampler !== undefined) ctx.strokeStyle = colorSampler(pt)
                 ctx.stroke(line.path())
             }
             break
