@@ -15,6 +15,10 @@ export function randomInt(min, max) {
     return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled) // The maximum is exclusive and the minimum is inclusive
 }
 
+export function randomCoinToss() {
+    return Math.random() < 0.5
+}
+
 /**
  * Generates a random number from a Gaussian distribution.
  * @returns {number} The random number.

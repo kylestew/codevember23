@@ -1,5 +1,5 @@
 import { random, randomInt } from '../tools/random.js'
-import { Circle, Line } from './geom.js'
+import { Circle, Line } from '../tools/geom.js'
 
 /**
  * Enum representing different types of fills.
