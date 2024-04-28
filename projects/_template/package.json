@@ -16,12 +16,13 @@
     },
     "dependencies": {
         "@thi.ng/canvas": "^0.2.16",
+        "@thi.ng/color": "^5.6.44",
         "@thi.ng/geom": "^6.1.6",
         "@thi.ng/hiccup-canvas": "^2.5.35",
         "@thi.ng/random": "^3.7.3",
         "canvas-utils": "file:../../../canvas-utils",
         "colorjs.io": "^0.5.0",
-        "tweakpane": "^4.0.3",
+        "tweakpane": "^4.0.0",
         "webmidi": "^3.1.8"
     }
 }

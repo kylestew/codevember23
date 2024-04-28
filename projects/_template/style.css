@@ -9,9 +9,11 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+
+    background-color: #252525;
 }
 
-canvas {
+#mainCanvas {
     max-width: 94%;
     max-height: 94%;
 
@@ -26,5 +28,5 @@ canvas {
     left: 0;
     right: 0;
 
-    filter: drop-shadow(0 0 0.5rem #25252599);
+    filter: drop-shadow(0 0 0.6rem #25252599);
 }

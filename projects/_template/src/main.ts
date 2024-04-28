@@ -1,32 +1,26 @@
-import './style.css'
+import { Sketch, SketchParams } from './sketch'
+import { Pane } from 'tweakpane'
 
-import { draw } from './sketch'
+const params: SketchParams = {
+    canvasSize: [800, 600],
 
-draw()
+    background: '#222222',
+    tint: '#ff88AA',
 
-// =======================================
-// import { MySketch } from './sketch'
-// import { SketchParams } from './types'
-// import { createUI } from './util/gui'
+    subdivisions: 4,
+}
 
-// const params: SketchParams = {
-//     background: { r: 33, g: 66, b: 55, a: 1 },
-//     tint: { r: 192, g: 64, b: 64, a: 0.8 },
-//     subdivisions: 4,
-//     iterations: 15,
-// }
+const sketch = new Sketch(params)
+sketch.reset()
 
-// const sketch = new MySketch(params, document.getElementById('app')!)
-// createUI(params, sketch, (pane, wrapMidiBinding) => {
-//     // https://tweakpane.github.io/docs/input-bindings
-//     const f1 = pane.addFolder({
-//         title: 'Basic',
-//         expanded: true,
-//     })
-//     f1.addBinding(params, 'background')
-//     f1.addBinding(params, 'tint')
-
-//     wrapMidiBinding(f1, params, 'iterations', { label: 'Iterations', min: 0, max: 100, step: 1 })
-//     wrapMidiBinding(f1, params, 'subdivisions', { label: 'Subdivisions', min: 0, max: 9, step: 1.0 })
-// })
-// sketch.start()
+const pane = new Pane()
+pane.on('change', () => {
+    sketch.reset()
+})
+const f1 = pane.addFolder({
+    title: 'Basic',
+    expanded: true,
+})
+f1.addBinding(params, 'background')
+f1.addBinding(params, 'tint')
+f1.addBinding(params, 'subdivisions', { label: 'Subdivisions', min: 0, max: 9, step: 1 })
