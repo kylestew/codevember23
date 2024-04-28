@@ -10,6 +10,7 @@ import {
 import { SYSTEM, pickRandom } from '@thi.ng/random'
 import { rect, Rect } from '@thi.ng/geom'
 import { draw as drawToCanvas } from '@thi.ng/hiccup-canvas'
+import { FillType, renderFill } from './fills'
 
 import vertexShaderSource from './shader.vert?raw'
 import fragmentShaderSource from './shader.frag?raw'
@@ -63,17 +64,19 @@ function recursiveSplit(rect: Rect, horizontal: boolean, iteration = 0): Rect[] 
     return rects0.concat(rects1)
 }
 
+function filltextures() {
+    const linesFill = renderFill(rect([0, 0], [w, h]), FillType.lines, 0.1, 10)
+    drawToCanvas(texACtx, ['g', { __background: '#ff0' }, ...linesFill])
+}
+
 export function draw() {
+    filltextures()
+
     // create base rect and apply subdivision algo
     const baseRect = rect([20, 20], [w - 40, h - 40])
 
     // split
     let rects = recursiveSplit(baseRect, true)
-
-    // set stroke
-    rects.forEach((r) => {
-        r.attribs = { fill: '#222', stroke: '#eee' }
-    })
 
     // draw
     drawToCanvas(maskCtx, ['g', { __background: '#222' }, ...rects])
@@ -82,8 +85,9 @@ export function draw() {
     glClear([0, 0, 0, 1])
     useShader(shader)
 
-    useTexture(gl.TEXTURE0, 'tex', maskCtx.canvas)
-    // useTexture(gl.TEXTURE0, 'tex', colorSamplingCtx.canvas)
+    useTexture(gl.TEXTURE0, 'mask', maskCtx.canvas)
+    useTexture(gl.TEXTURE1, 'textureA', texACtx.canvas)
+    useTexture(gl.TEXTURE2, 'textureB', texBCtx.canvas)
 
     drawScreen()
 }

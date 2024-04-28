@@ -4,7 +4,9 @@ precision highp float;
 
 varying vec2 vTexCoord;
 
-uniform sampler2D tex;
+uniform sampler2D mask;
+uniform sampler2D textureA;
+uniform sampler2D textureB;
 
 // float noiseModA = 2.;
 // float noiseModB = 2.;
@@ -49,8 +51,14 @@ void main(void) {
     // // uvW.xy += (nsB)*fieldOff / 2.0;
     // uvW.xy += random(uvW.xy) * 0.001;
 
-    gl_FragColor = texture2D(tex, uv);
-    // gl_FragColor = texture2D(tex, uvW);
+    // use mask to blend between texA and texB
+    vec3 texAlpha = texture2D(mask, uv).rgb;
+    vec4 texA = texture2D(textureA, uv);
+    vec4 texB = texture2D(textureB, uv);
+    vec4 col = texA * texAlpha.r + texB * texAlpha.g;
+    gl_FragColor = col;
+
+    // gl_FragColor = texture2D(textureA, uv);
 
     // uv.y *= 3.0;  // TEMP - just for visual ref
     // // texture is loaded upside down and backwards
