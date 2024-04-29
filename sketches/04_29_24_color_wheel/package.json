@@ -14,6 +14,7 @@
     "dependencies": {
         "@thi.ng/geom": "^6.1.9",
         "@thi.ng/hiccup-canvas": "^2.5.38",
+        "@thi.ng/transducers": "^9.0.4",
         "canvas-utils": "file:../../../canvas-utils"
     }
 }
