@@ -18,6 +18,7 @@
         "@thi.ng/canvas": "^0.2.16",
         "@thi.ng/geom": "^6.1.6",
         "@thi.ng/hiccup-canvas": "^2.5.35",
+        "@thi.ng/iterators": "^6.1.117",
         "@thi.ng/random": "^3.7.3",
         "canvas-utils": "file:../../../canvas-utils",
         "colorjs.io": "^0.5.0",

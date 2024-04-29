@@ -8,9 +8,10 @@ import {
     drawScreen,
 } from 'canvas-utils'
 import { SYSTEM, pickRandom } from '@thi.ng/random'
-import { rect, Rect } from '@thi.ng/geom'
+import { rect, Rect, scatter } from '@thi.ng/geom'
 import { draw as drawToCanvas } from '@thi.ng/hiccup-canvas'
-import { FillType, renderFill } from './fills'
+import { iterator, map } from '@thi.ng/transducers'
+import { genLinesIn, genBlobsIn } from './fills'
 
 import vertexShaderSource from './shader.vert?raw'
 import fragmentShaderSource from './shader.frag?raw'
@@ -64,13 +65,62 @@ function recursiveSplit(rect: Rect, horizontal: boolean, iteration = 0): Rect[] 
     return rects0.concat(rects1)
 }
 
-function filltextures() {
-    const linesFill = renderFill(rect([0, 0], [w, h]), FillType.lines, 0.1, 10)
-    drawToCanvas(texACtx, ['g', { __background: '#ff0' }, ...linesFill])
+// const textureBFillFn
+
+function createFillTextures() {
+    const fullRect = rect([0, 0], [w, h])
+
+    // Texture A - Lines (in bounding circle)
+    drawToCanvas(texACtx, [
+        'g',
+        { __background: '#000' },
+        ...iterator(
+            map((line) => {
+                line.attribs = { stroke: '#fff', weight: 0.1 }
+                return line
+            }),
+            genLinesIn(fullRect, 0.005)
+        ),
+    ])
+
+    // Texture B - Blobs
+    drawToCanvas(texBCtx, [
+        'g',
+        { __background: '#000' },
+        ...iterator(
+            map((blob) => {
+                blob.attribs = { fill: '#ffffff08' }
+                return blob
+            }),
+            genBlobsIn(fullRect, 0.0001, 128, 0.4)
+        ),
+    ])
+    drawToCanvas(texBCtx, [
+        'g',
+        { __background: '#0000' },
+        ...iterator(
+            map((blob) => {
+                blob.attribs = { fill: '#ffffff08' }
+                return blob
+            }),
+            genBlobsIn(fullRect, 0.001, 64, 0.4)
+        ),
+    ])
+    drawToCanvas(texBCtx, [
+        'g',
+        { __background: '#0000' },
+        ...iterator(
+            map((blob) => {
+                blob.attribs = { stroke: '#000000FF', weight: 0.1 }
+                return blob
+            }),
+            genBlobsIn(fullRect, 0.005, 32, 0.8)
+        ),
+    ])
 }
 
 export function draw() {
-    filltextures()
+    createFillTextures()
 
     // create base rect and apply subdivision algo
     const baseRect = rect([20, 20], [w - 40, h - 40])

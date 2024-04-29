@@ -8,10 +8,10 @@ uniform sampler2D mask;
 uniform sampler2D textureA;
 uniform sampler2D textureB;
 
-// float noiseModA = 2.;
-// float noiseModB = 2.;
-// float noiseStart = 0.1;
-// float fieldOff = 0.1;
+float noiseModA = 2.;
+float noiseModB = 2.;
+float noiseStart = 0.1;
+float fieldOff = 0.1;
 
 float map(float value, float inMin, float inMax, float outMin, float outMax) {
     return outMin + (outMax - outMin) * (value - inMin) / (inMax - inMin);
@@ -44,21 +44,21 @@ void main(void) {
     vec2 uv = vTexCoord;
     uv.y = 1.0 - uv.y;
 
-    // vec2 uvW = uv;
-    // // float ns = map(noise((noiseStart + uvW.xy) * noiseModA), 0.0, 1.0, -1.0, 1.0);
-    // // float nsB = map(noise((noiseStart + uvW.xy) * noiseModB), 0.0, 1.0, -1.0, 1.0);
-    // // uvW.xy += (ns)*fieldOff / 2.0;
-    // // uvW.xy += (nsB)*fieldOff / 2.0;
-    // uvW.xy += random(uvW.xy) * 0.001;
+    vec2 uvW = uv;
+    // float ns = map(noise((noiseStart + uvW.xy) * noiseModA), 0.0, 1.0, -1.0, 1.0);
+    // float nsB = map(noise((noiseStart + uvW.xy) * noiseModB), 0.0, 1.0, -1.0, 1.0);
+    // uvW.xy += (ns)*fieldOff / 2.0;
+    // uvW.xy += (nsB)*fieldOff / 2.0;
+    uvW.xy += random(uvW.xy) * 0.001;
 
     // use mask to blend between texA and texB
-    vec3 texAlpha = texture2D(mask, uv).rgb;
+    vec3 texAlpha = texture2D(mask, uvW).rgb;
     vec4 texA = texture2D(textureA, uv);
     vec4 texB = texture2D(textureB, uv);
     vec4 col = texA * texAlpha.r + texB * texAlpha.g;
     gl_FragColor = col;
 
-    // gl_FragColor = texture2D(textureA, uv);
+    // gl_FragColor = texture2D(textureB, uv);
 
     // uv.y *= 3.0;  // TEMP - just for visual ref
     // // texture is loaded upside down and backwards
