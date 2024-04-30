@@ -12,6 +12,7 @@
         "vite": "^5.2.0"
     },
     "dependencies": {
+        "@thi.ng/arrays": "^2.9.5",
         "@thi.ng/geom": "^6.1.9",
         "@thi.ng/hiccup-canvas": "^2.5.38",
         "@thi.ng/transducers": "^9.0.4",
