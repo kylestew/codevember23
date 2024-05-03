@@ -133,13 +133,14 @@ class CanvasPacker {
         // Read back the pixels from comparCtx to check for non-zero pixels
         // We only need to read withing the bounds of the newly rendered area
         // grow those bounds a bit to ensure no issues with antialiasing
-        console.log('CANVAS PACKER: not optimized at all currently, scaled? ', this.scale)
+        // console.log('CANVAS PACKER: not optimized at all currently, scaled? ', this.scale)
+        // bounds = this.domainBounds
         bounds.offset(2)
-        // // bounds = this.domainBounds
         const pos = floor([], mulN([], bounds.pos, this.scale))
         const size = ceil([], mulN([], bounds.size, this.scale))
-        // const imageData: ImageData = this.compareCtx.getImageData(pos[0], pos[1], size[0], size[1])
-        const imageData: ImageData = this.compareCtx.getImageData(0, 0, this.downscaleWidth, this.downscaleHeight)
+        // console.log('CANVAS PACKER: bounds', bounds, 'pos', pos, 'size', size)
+        const imageData: ImageData = this.compareCtx.getImageData(pos[0], pos[1], size[0], size[1])
+        // const imageData: ImageData = this.compareCtx.getImageData(0, 0, this.downscaleWidth, this.downscaleHeight)
         const data: Uint8ClampedArray = imageData.data
         // console.log(
         //     this.compareCanvas.width,

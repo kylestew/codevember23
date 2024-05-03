@@ -16,7 +16,7 @@ const w = 1000
 const h = 1000
 const outputElm = document.getElementById('output')
 // const ctx = createCanvas(w, h, 'sketchCanvas')
-const packer = new GlyphPacker(w, h, 2, 1)
+const packer = new GlyphPacker(w, h, 1, 1)
 
 const fontSet = await loadFontSet()
 
@@ -40,28 +40,29 @@ const randomPI_4 = () => {
 // ======================
 
 packer.glyphMakers = [
-    // new SetGlyphMaker(
-    //     1000,
-    //     100000, // count, attempts
-    //     // not a scaled canvas, shapes are in [0, 1] space
-    //     8,
-    //     64.0,
-    //     1.0, // min, max, step
-    //     // [rect([-1, -1], [1, 1])],
-    //     childsBlocks,
-    //     // placement rule
-    //     randomPosition,
-    //     // rotation rule
-    //     randomPI_4,
-    //     // hollow rule
-    //     never
-    // ),
+    new SetGlyphMaker(
+        12,
+        100, // count, attempts
+        // not a scaled canvas, shapes are in [0, 1] space
+
+        [32, 128],
+        1.0, // range, step
+
+        childsBlocks,
+        // placement rule
+        randomPosition,
+        // rotation rule
+        randomPI_4,
+        // hollow rule
+        () => SYSTEM.float() < 0.5
+        // never
+    ),
 
     new FontGlyphMaker(
         1000,
         100000, // count, attempts
 
-        [0.2, 8.0],
+        [0.4, 8.0],
         0.2, // range, step
 
         gaussPosition(),
@@ -109,6 +110,7 @@ function render() {
                 height: h,
                 viewBox: `0 0 ${w} ${h}`,
                 // fill: '#fff',
+                // stroke: '#00000000',
                 stroke: '#fff',
             },
             ...placedGlyphs
