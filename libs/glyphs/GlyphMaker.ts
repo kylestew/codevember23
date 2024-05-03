@@ -6,8 +6,7 @@ export abstract class GlyphMaker {
     count: number // goal placement count
     attempts: number // attempts to reach goal
 
-    minScale: number
-    maxScale: number
+    scaleRange: [number, number]
     scaleStepSize: number
 
     placementRule: () => Vec
@@ -17,9 +16,7 @@ export abstract class GlyphMaker {
     constructor(
         count: number,
         attempts: number,
-
-        minScale: number,
-        maxScale: number,
+        scaleRange: [number, number],
         scaleStepSize: number,
         placementRule: () => Vec,
         rotationRule: () => number,
@@ -28,9 +25,9 @@ export abstract class GlyphMaker {
         this.count = count
         this.attempts = attempts
 
-        this.minScale = minScale
-        this.maxScale = maxScale
+        this.scaleRange = scaleRange
         this.scaleStepSize = scaleStepSize
+
         this.placementRule = placementRule
         this.rotationRule = rotationRule
         this.hollowRule = hollowRule
@@ -45,7 +42,7 @@ export abstract class GlyphMaker {
         return {
             path: path,
             position: this.placementRule(),
-            scale: this.minScale,
+            scale: this.scaleRange[0], // start at min scale
             rotation: this.rotationRule(),
             hollow: this.hollowRule(),
         }

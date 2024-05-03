@@ -32,19 +32,24 @@ export class GlyphPacker {
             // remove Maker - will not be available on next iteration
             this.glyphMakers.shift()
         }
-        const glyph = maker.make()
+        let glyph = maker.make()
+        maker.attempts--
 
         const transformGlyph = (glyph: Glyph) => {
             return translate(rotate(scale(glyph.path, glyph.scale), glyph.rotation), glyph.position)
         }
         const glyphCanvasRenderer = (ctx: OffscreenCanvasRenderingContext2D) => {
             const fill = glyph.hollow ? '#0000' : '#000'
-            draw(ctx, ['g', { fill, stroke: '#000', weight: this.padding }, transformGlyph(glyph)])
+            draw(ctx, [
+                'g',
+                { fill, stroke: '#000', lineJoin: 'round', lineCap: 'round', weight: this.padding },
+                transformGlyph(glyph),
+            ])
         }
 
         let placedGlyph: Glyph | undefined = undefined
         while (
-            glyph.scale <= maker.maxScale &&
+            glyph.scale <= maker.scaleRange[1] &&
             this.packer.canPlaceShape(bounds(transformGlyph(glyph)) as Rect, glyphCanvasRenderer)
         ) {
             placedGlyph = { ...glyph }
@@ -53,6 +58,8 @@ export class GlyphPacker {
         }
 
         if (placedGlyph !== undefined) {
+            // copy it back in place
+            glyph = { ...placedGlyph }
             this.packer.commitShape(glyphCanvasRenderer)
             maker.count--
 
@@ -180,26 +187,39 @@ class CanvasPacker {
     //     }
     // }
 
-    dumpDebugCanvas(whichOne: ['glyph' | 'packed' | 'compare']) {
-        // create temp canvas element
-        const canvas = document.createElement('canvas')
-        // size the canvas for display
+    /**
+     * Dumps the specified canvas to a debug canvas element on the page.
+     * It either updates an existing debug canvas or creates a new one if not present.
+     *
+     * @param {('glyph' | 'packed' | 'compare')} whichOne - Specifies which canvas to display for debugging.
+     */
+    dumpDebugCanvas(whichOne: 'glyph' | 'packed' | 'compare') {
+        // Attempt to find an existing debug canvas
+        let canvas = document.getElementById('debugCanvas')
+        if (!canvas) {
+            // Create a new canvas element if it does not exist
+            canvas = document.createElement('canvas')
+            canvas.id = 'debugCanvas'
+            document.body.appendChild(canvas)
+        }
+
+        // Set the size of the canvas for display
         canvas.width = this.downscaleWidth
         canvas.height = this.downscaleHeight
         const ctx = canvas.getContext('2d')
         if (!ctx) return // If the context is not available, exit the function
-        // Clear the canvas with white background
+
+        // Clear the canvas with a white background
         ctx.fillStyle = 'white'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
-        // // Choose the source canvas to draw from
-        if (whichOne == 'glyph') {
+
+        // Choose the source canvas to draw from based on the argument
+        if (whichOne === 'glyph') {
             ctx.drawImage(this.glyphCanvas, 0, 0)
-        } else if (whichOne == 'packed') {
+        } else if (whichOne === 'packed') {
             ctx.drawImage(this.packedCanvas, 0, 0)
         } else {
             ctx.drawImage(this.compareCanvas, 0, 0)
         }
-        // Append canvas to the body or another element in the document
-        document.body.appendChild(canvas)
     }
 }

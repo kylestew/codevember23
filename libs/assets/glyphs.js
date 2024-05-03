@@ -1,34 +1,38 @@
-import { rect, polygon, asPath } from '@thi.ng/geom'
-// import { Arc, Rectangle, Polygon, asPath } from '../tools/geo.js'
-// import { random } from '../tools/random.js'
+import { circle, rect, polygon, pathBuilder } from '@thi.ng/geom'
 
 /*
  * Shape set reminiscent of a child's block set
  * All shapes are in -1 to 1 space and fill the space
  */
 export const childsBlocks = [
-    // square
     () => {
-        return asPath(new rect([-1, 1], [1, 1]))
+        // circle
+        return new circle([0, 0], 1)
     },
-    // halfCircle: () => {
-    //     return asPath(new Arc([0, 0], 1, 0, Math.PI))
-    // },
-    // quarterCircle: () => {
-    //     let path = new Path2D()
-    //     path.addPath(asPath(new Arc([0, 0], 1, 0, Math.PI / 2.0)))
-    //     path.lineTo(0, 0)
-    //     return path
-    // },
-    // triangle
     () => {
-        return asPath(
-            polygon([
-                [-1, -1],
-                [1, -1],
-                [-1, 1],
-            ])
-        )
+        // square
+        return new rect([-1, -1], [2, 2])
+    },
+    () => {
+        // half circle (small)
+        return pathBuilder().moveTo([1, 1]).cubicTo([1, -0.5], [-1, -0.5], [-1, 1]).closePath().current()
+    },
+    () => {
+        // quarter circle
+        return pathBuilder()
+            .moveTo([-1, -1]) // Start at the top left corner
+            .cubicTo([-1, 1], [1, 1], [1, 1]) // Control points and end point to form a quarter circle
+            .lineTo([1, -1])
+            .closePath()
+            .current()
+    },
+    () => {
+        // triangle
+        return polygon([
+            [-1, -1],
+            [1, -1],
+            [-1, 1],
+        ])
     },
 ]
 

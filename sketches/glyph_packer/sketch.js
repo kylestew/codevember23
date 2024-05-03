@@ -1,23 +1,36 @@
-import { createCanvas } from 'canvas-utils'
-import { SYSTEM } from '@thi.ng/random'
+// import { createCanvas } from 'canvas-utils'
+import { SYSTEM, gaussian } from '@thi.ng/random'
+import { bounds, rect, asSvg, translate, scale, rotate, svgDoc } from '@thi.ng/geom'
 import { draw } from '@thi.ng/hiccup-canvas'
 // files in /lib need these
-import {} from '@thi.ng/geom'
 import {} from '@thi.ng/geom-api'
 import {} from '@thi.ng/vectors'
-import {} from '@thi.ng/random'
+import {} from '@thi.ng/transducers'
 import { GlyphPacker } from './libs/glyphs/GlyphPacker'
 import { SetGlyphMaker } from './libs/glyphs/SetGlyphMaker'
+import { FontGlyphMaker } from './libs/glyphs/FontGlyphMaker'
 import { childsBlocks } from './libs/assets/glyphs'
+import { loadFontSet } from './font-loader'
 
 const w = 1000
 const h = 1000
+const outputElm = document.getElementById('output')
 // const ctx = createCanvas(w, h, 'sketchCanvas')
-const packer = new GlyphPacker(w, h, 1)
+const packer = new GlyphPacker(w, h, 2, 1)
+
+const fontSet = await loadFontSet()
 
 // == SOME GLYPH RULES ==
 const always = () => true
 const never = () => false
+const randomPosition = () => [SYSTEM.minmax(0, w), SYSTEM.minmax(0, h)]
+const gaussPosition = (mu = 1.0) => {
+    const gauss = gaussian(SYSTEM, 24, 0, mu)
+    return () => {
+        return [gauss() * w + w / 2.0, gauss() * h + h / 2.0]
+    }
+}
+const randomRotation = () => SYSTEM.float(Math.PI * 2)
 const randomPI_2 = () => {
     return (SYSTEM.minmaxInt(0, 3) * Math.PI) / 2
 }
@@ -27,56 +40,82 @@ const randomPI_4 = () => {
 // ======================
 
 packer.glyphMakers = [
-    new SetGlyphMaker(
-        8,
-        1000, // count, attempts
+    // new SetGlyphMaker(
+    //     1000,
+    //     100000, // count, attempts
+    //     // not a scaled canvas, shapes are in [0, 1] space
+    //     8,
+    //     64.0,
+    //     1.0, // min, max, step
+    //     // [rect([-1, -1], [1, 1])],
+    //     childsBlocks,
+    //     // placement rule
+    //     randomPosition,
+    //     // rotation rule
+    //     randomPI_4,
+    //     // hollow rule
+    //     never
+    // ),
 
-        // not a scaled canvas, shapes are in [0, 1] space
-        20,
-        200.0,
-        4.0, // min, max, step
+    new FontGlyphMaker(
+        1000,
+        100000, // count, attempts
 
-        childsBlocks,
+        [0.2, 8.0],
+        0.2, // range, step
 
-        // placement rule
-        () => {
-            // place anywhere
-            return [SYSTEM.float(w), SYSTEM.float(h)]
-        },
-        // rotation rule
-        randomPI_2,
-        // hollow rule
-        never
+        gaussPosition(),
+        randomRotation,
+        never,
+
+        fontSet,
+        ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J']
     ),
 ]
-console.log(childsBlocks)
-console.log('MAKE MORE GLYPHS in glyphs.js')
+
+// let glyph = packer.glyphMakers[0].make()
+// console.log(glyph, bounds(glyph.path))
+// ctx.background('#333344')
+
+// const path = translate(scale(glyph.path, 2), [w / 2, h / 2])
+
+// draw(ctx, ['g', { stroke: 'red' }, path])
+// draw(ctx, ['g', { stroke: 'blue' }, rect([w / 2 - 40, h / 2 - 40], [80, 80])])
+// , centroid(glyph.path))
+// console.log(glyph)
 
 let placedGlyphs = []
-const nextGlyph = packer.next()
-if (nextGlyph) {
-    placedGlyphs.push(nextGlyph)
+function doLoop() {
+    const nextGlyph = packer.next()
 
-    render()
-    //     // LOOP
+    if (nextGlyph !== false) {
+        if (nextGlyph !== true) {
+            // new glyph!
+            placedGlyphs.push(nextGlyph)
+            render()
+        }
+        requestAnimationFrame(doLoop)
+    } // else - packing complete
 }
+doLoop()
 
 function render() {
-    packer.packer.dumpDebugCanvas('packed')
-    //         // this.packer.dumpToCanvas('packed')
-    //         this.outputElm.innerHTML = asSvg(
-    //             svgDoc(
-    //                 {
-    //                     width: this.width,
-    //                     height: this.height,
-    //                     viewBox: `0 0 ${this.width} ${this.height}`,
-    //                     fill: '#000',
-    //                 },
-    //                 ...this.placedGlyphs
-    //                     .map((glyph) => translate(rotate(scale(glyph.path, glyph.scale), glyph.rotation), glyph.position))
-    //                     .flat()
-    //             )
-    //         )
+    // packer.packer.dumpDebugCanvas('packed')
+    outputElm.innerHTML = asSvg(
+        svgDoc(
+            {
+                style: 'background-color: #333344;',
+                width: w,
+                height: h,
+                viewBox: `0 0 ${w} ${h}`,
+                // fill: '#fff',
+                stroke: '#fff',
+            },
+            ...placedGlyphs
+                .map((glyph) => translate(rotate(scale(glyph.path, glyph.scale), glyph.rotation), glyph.position))
+                .flat()
+        )
+    )
 }
 
 // NOTE: for multi path glyphs, rotation and scaling can be applied in the Maker to each individual path first
@@ -85,9 +124,6 @@ function render() {
 
 // ctx.background('#333344')
 // draw(ctx, ['g', { __background: '#333344' }, ...coloredWedges])
-
-//     private attempts: number = 0
-//     private totalAttempts: number = 0
 
 //     setup() {
 //         this.glyphMakers = [
@@ -172,10 +208,3 @@ function render() {
 //                 never
 //             ),
 //         ]
-
-//         this.attempts = 0
-//         this.totalAttempts = this.glyphMakers.reduce((acc, maker) => acc + maker.attempts, 0)
-//     }
-
-//
-// }

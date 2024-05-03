@@ -1,10 +1,10 @@
 import { parse as parseFont, Font } from 'opentype.js'
 
-import font01 from '../assets/Roboto/Roboto-Black.ttf?url'
-import font02 from '../assets/Roboto/Roboto-Medium.ttf?url'
-import font03 from '../assets/Roboto/Roboto-Italic.ttf?url'
-import font04 from '../assets/Roboto/Roboto-Regular.ttf?url'
-import font05 from '../assets/Roboto/Roboto-Thin.ttf?url'
+import font01 from './assets/Roboto/Roboto-Black.ttf?url'
+import font02 from './assets/Roboto/Roboto-Medium.ttf?url'
+import font03 from './assets/Roboto/Roboto-Italic.ttf?url'
+import font04 from './assets/Roboto/Roboto-Regular.ttf?url'
+import font05 from './assets/Roboto/Roboto-Thin.ttf?url'
 
 async function loadFont(url: string) {
     const response = await fetch(url)
