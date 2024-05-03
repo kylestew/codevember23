@@ -1,8 +1,75 @@
-import { Rect, rect, intersects } from '@thi.ng/geom'
+import { Glyph } from './types'
+import { GlyphMaker } from './GlyphMaker'
+import { Rect, rect, intersects, bounds, rotate, scale, translate } from '@thi.ng/geom'
 import { IntersectionType } from '@thi.ng/geom-api'
 import { ceil, floor, mulN } from '@thi.ng/vectors'
+import { draw } from '@thi.ng/hiccup-canvas'
 
-export class CanvasPacker {
+export class GlyphPacker {
+    public packer: CanvasPacker
+    public padding: number = 0
+
+    public glyphMakers: GlyphMaker[] = []
+
+    constructor(width: number, height: number, glyphPadding: number = 2, downscale: number = 1) {
+        this.packer = new CanvasPacker(width, height, downscale)
+        this.padding = glyphPadding
+    }
+
+    /// Attempts to place one glyph, returns it if successful
+    /// Uses the glyph makers in order, trying to fulfill their rules
+    /// returns FALSE if packing rules are completed
+    next(): Glyph | boolean {
+        if (this.glyphMakers.length === 0) {
+            // nothing left to do
+            console.log('PACKING COMPLETE!')
+            return false
+        }
+
+        // do we still have attempts to make?
+        const maker = this.glyphMakers[0]
+        if (maker.attempts === 0 || maker.count === 0) {
+            // remove Maker - will not be available on next iteration
+            this.glyphMakers.shift()
+        }
+        const glyph = maker.make()
+
+        const transformGlyph = (glyph: Glyph) => {
+            return translate(rotate(scale(glyph.path, glyph.scale), glyph.rotation), glyph.position)
+        }
+        const glyphCanvasRenderer = (ctx: OffscreenCanvasRenderingContext2D) => {
+            const fill = glyph.hollow ? '#0000' : '#000'
+            draw(ctx, ['g', { fill, stroke: '#000', weight: this.padding }, transformGlyph(glyph)])
+        }
+
+        let placedGlyph: Glyph | undefined = undefined
+        while (
+            glyph.scale <= maker.maxScale &&
+            this.packer.canPlaceShape(bounds(transformGlyph(glyph)) as Rect, glyphCanvasRenderer)
+        ) {
+            placedGlyph = { ...glyph }
+            // attempt to step it up
+            glyph.scale += maker.scaleStepSize
+        }
+
+        if (placedGlyph !== undefined) {
+            this.packer.commitShape(glyphCanvasRenderer)
+            maker.count--
+
+            return placedGlyph
+        }
+        return true
+    }
+}
+
+/// Uses actual pixel data to determine if a shape can be placed
+/// Manages several canvases to do this (packed, glyph, compare)
+/// (1) A new candidate shape is drawn on the glyph canvas
+/// (2) The packed canvas is drawn to the compare canvas using (source-over) blend mode
+/// (3) If the compare canvas has any non-zero pixels, the shape overlaps and cannot be placed
+///
+/// TODO: candidate for speed up using WebGL and smarter pixel reading (dirty rect)
+class CanvasPacker {
     private domainBounds: Rect
 
     private scale: number
@@ -59,6 +126,7 @@ export class CanvasPacker {
         // Read back the pixels from comparCtx to check for non-zero pixels
         // We only need to read withing the bounds of the newly rendered area
         // grow those bounds a bit to ensure no issues with antialiasing
+        console.log('CANVAS PACKER: not optimized at all currently, scaled? ', this.scale)
         bounds.offset(2)
         // // bounds = this.domainBounds
         const pos = floor([], mulN([], bounds.pos, this.scale))
@@ -85,49 +153,45 @@ export class CanvasPacker {
         renderCallback(this.packedCtx)
     }
 
-    test() {
-        const rectA = new Rect([10, 10], [20, 20])
-        let result = this.canPlaceShape(rectA, (ctx: OffscreenCanvasRenderingContext2D) => {
-            console.log('drawing rectA')
-            ctx.fillRect(rectA.pos[0], rectA.pos[1], rectA.size[0], rectA.size[1])
-        })
-        if (result) {
-            this.commitShape((ctx: OffscreenCanvasRenderingContext2D) => {
-                console.log('committing rectA')
-                ctx.fillRect(rectA.pos[0], rectA.pos[1], rectA.size[0], rectA.size[1])
-            })
-        }
+    // test() {
+    //     const rectA = new Rect([10, 10], [20, 20])
+    //     let result = this.canPlaceShape(rectA, (ctx: OffscreenCanvasRenderingContext2D) => {
+    //         console.log('drawing rectA')
+    //         ctx.fillRect(rectA.pos[0], rectA.pos[1], rectA.size[0], rectA.size[1])
+    //     })
+    //     if (result) {
+    //         this.commitShape((ctx: OffscreenCanvasRenderingContext2D) => {
+    //             console.log('committing rectA')
+    //             ctx.fillRect(rectA.pos[0], rectA.pos[1], rectA.size[0], rectA.size[1])
+    //         })
+    //     }
 
-        const rectB = new Rect([20, 20], [20, 20])
-        result = this.canPlaceShape(rectB, (ctx: OffscreenCanvasRenderingContext2D) => {
-            console.log('drawing rectB')
-            ctx.fillRect(rectB.pos[0], rectB.pos[1], rectB.size[0], rectB.size[1])
-        })
-        console.log(result, 'should be false')
-        if (result) {
-            this.commitShape((ctx: OffscreenCanvasRenderingContext2D) => {
-                console.log('committing rectB')
-                ctx.fillRect(rectB.pos[0], rectB.pos[1], rectB.size[0], rectB.size[1])
-            })
-        }
-    }
+    //     const rectB = new Rect([20, 20], [20, 20])
+    //     result = this.canPlaceShape(rectB, (ctx: OffscreenCanvasRenderingContext2D) => {
+    //         console.log('drawing rectB')
+    //         ctx.fillRect(rectB.pos[0], rectB.pos[1], rectB.size[0], rectB.size[1])
+    //     })
+    //     console.log(result, 'should be false')
+    //     if (result) {
+    //         this.commitShape((ctx: OffscreenCanvasRenderingContext2D) => {
+    //             console.log('committing rectB')
+    //             ctx.fillRect(rectB.pos[0], rectB.pos[1], rectB.size[0], rectB.size[1])
+    //         })
+    //     }
+    // }
 
-    dumpToCanvas(whichOne: string) {
+    dumpDebugCanvas(whichOne: ['glyph' | 'packed' | 'compare']) {
         // create temp canvas element
         const canvas = document.createElement('canvas')
-
         // size the canvas for display
         canvas.width = this.downscaleWidth
         canvas.height = this.downscaleHeight
-
         const ctx = canvas.getContext('2d')
         if (!ctx) return // If the context is not available, exit the function
-
         // Clear the canvas with white background
         ctx.fillStyle = 'white'
         ctx.fillRect(0, 0, canvas.width, canvas.height)
-
-        // Choose the source canvas to draw from
+        // // Choose the source canvas to draw from
         if (whichOne == 'glyph') {
             ctx.drawImage(this.glyphCanvas, 0, 0)
         } else if (whichOne == 'packed') {
@@ -135,7 +199,6 @@ export class CanvasPacker {
         } else {
             ctx.drawImage(this.compareCanvas, 0, 0)
         }
-
         // Append canvas to the body or another element in the document
         document.body.appendChild(canvas)
     }
