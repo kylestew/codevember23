@@ -35,6 +35,25 @@
 
                 filter: drop-shadow(0 0 0.5rem #25252599);
             }
+
+            #output {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                width: calc(100vw - 40px); /* Subtracting margin from total width */
+                height: calc(100vh - 40px); /* Subtracting margin from total height */
+                margin: 20px; /* Adjust margin as needed */
+
+                position: fixed; /* Can use fixed if margin calculations are correct */
+                overflow: auto; /* Set to auto to handle potential minor overflows */
+                box-sizing: border-box; /* Ensures padding and borders are included in width/height */
+            }
+
+            svg {
+                max-width: 100%; /* Ensures SVG does not exceed its container */
+                max-height: 100%; /* Ensures SVG does not exceed its container */
+                display: block; /* Removes extra line space below SVG */
+            }
         </style>
     </head>
     <body>

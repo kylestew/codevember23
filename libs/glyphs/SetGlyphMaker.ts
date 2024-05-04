@@ -13,10 +13,12 @@ export class SetGlyphMaker extends GlyphMaker {
 
         scaleRange: [number, number],
         scaleStepSize: number,
-        pathSet: Path[],
+
         placementRule: () => Vec,
         rotationRule: () => number,
-        hollowRule: () => boolean
+        hollowRule: () => boolean,
+
+        pathSet: Path[]
     ) {
         super(count, attempts, scaleRange, scaleStepSize, placementRule, rotationRule, hollowRule)
         this.pathSet = pathSet
