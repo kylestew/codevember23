@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Sketch</title>
+        <style>
+            :root {
+                font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+                line-height: 1.5;
+                font-weight: 400;
+                color-scheme: light dark;
+                color: rgba(255, 255, 255, 0.87);
+                background-color: #242424;
+                font-synthesis: none;
+                text-rendering: optimizeLegibility;
+                -webkit-font-smoothing: antialiased;
+                -moz-osx-font-smoothing: grayscale;
+            }
+
+            #sketchCanvas {
+                max-width: 94%;
+                max-height: 94%;
+
+                margin: auto;
+
+                overflow: auto;
+                object-fit: contain;
+
+                position: fixed;
+                top: 0;
+                bottom: 0;
+                left: 0;
+                right: 0;
+
+                filter: drop-shadow(0 0 0.5rem #25252599);
+            }
+        </style>
+    </head>
+    <body>
+        <script type="module" src="/sketch.js"></script>
+    </body>
+</html>
