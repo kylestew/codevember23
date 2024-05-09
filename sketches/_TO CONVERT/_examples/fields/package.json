@@ -9,12 +9,8 @@
         "preview": "vite preview"
     },
     "devDependencies": {
-        "vite": "^5.2.0"
+        "vite": "^5.2.0",
+        "typescript": "^5.4.5"
     },
-    "dependencies": {
-        "@thi.ng/geom": "^6.1.9",
-        "@thi.ng/hiccup-canvas": "^2.5.38",
-        "@thi.ng/transducers": "^9.0.4",
-        "canvas-utils": "file:../../../canvas-utils"
-    }
+    "dependencies": {}
 }
