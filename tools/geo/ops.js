@@ -1,3 +1,4 @@
+import { Arc, Circle, Ellipse, Line, Polygon, Polyline, Rectangle } from './types'
 /*
 export function operation(geo) {
     if (geo instanceof Arc) {
@@ -176,9 +177,49 @@ export function asPath(geo) {
 //     throw new Error(`Method not implemented on ${geo.constructor.name}`)
 // }
 
-// // + transform() - apply transformation matrix
-// // + translate() - translate shape
-// // + vertices() - extract/sample vertices from shape boundary
+// + transform() - apply transformation matrix
+// + translate() - translate shape
+
+/**
+ * Extracts/samples vertices from given shape's boundary and returns them as
+ * array.
+ *
+ * @example
+ * ```ts
+ * import { circle, vertices } from "@thi.ng/geom";
+ *
+ * // using default
+ * vertices(circle(100))
+ *
+ * // specify resolution only
+ * vertices(circle(100), 6)
+ *
+ * // specify more advanced options
+ * vertices(circle(100), { dist: 10 })
+ * ```
+ *
+ * @param geo
+ * @param opts
+ */
+export function vertices(geo, num) {
+    if (geo instanceof Arc) {
+    } else if (geo instanceof Circle) {
+        const pos = geo.pos
+        const r = geo.r
+        const delta = (Math.PI * 2.0) / num
+        let xys = []
+        for (let i = 0; i < num; i++) {
+            xys.push([r * Math.cos(i * delta) + pos[0], r * Math.sin(i * delta) + pos[1]])
+        }
+        return xys
+    } else if (geo instanceof Ellipse) {
+    } else if (geo instanceof Line) {
+    } else if (geo instanceof Polygon) {
+    } else if (geo instanceof Polyline) {
+    } else if (geo instanceof Rectangle) {
+    }
+    throw new Error(`Method not implemented on ${geo.constructor.name}`)
+}
 
 // // randomPointIn() {
 // //     const x = random(this.pos[0], this.pos[0] + this.size[0])
