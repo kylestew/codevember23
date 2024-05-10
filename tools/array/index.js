@@ -1,4 +1,14 @@
 /**
+ * === Array Utils ===
+ *
+ * range(from, to, step) - Generates an array of numbers within a specified range.
+ * range2d(xRange, yRange, stepX, stepY) - Generates a 2D range array based on the given x and y ranges.
+ * partition(data, size, step, partial) - Creates overlapping and non-overlapping sliding windows of inputs.
+ * shuffle(array) - Shuffles the elements of an array in place.
+ * interleave(array1, array2) - Interleaves two arrays by alternating their elements.
+ */
+
+/**
  * Generates an array of numbers within a specified range [from, to)
  *
  * @param {number} from - The starting number of the range.
@@ -137,4 +147,26 @@ export function shuffle(array) {
         ;[array[i], array[j]] = [array[j], array[i]]
     }
     return array
+}
+
+/**
+ * Interleaves two arrays by alternating their elements.
+ * @param {Array} array1 - The first array.
+ * @param {Array} array2 - The second array.
+ * @returns {Array} - The interleaved array.
+ */
+export function interleave(array1, array2) {
+    const result = []
+    const maxLength = Math.max(array1.length, array2.length)
+
+    for (let i = 0, j = 0; i < array1.length || j < array2.length; ) {
+        if (i < array1.length) {
+            result.push(array1[i++])
+        }
+        if (j < array2.length) {
+            result.push(array2[j++])
+        }
+    }
+
+    return result
 }

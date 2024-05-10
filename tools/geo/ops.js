@@ -1,5 +1,6 @@
 import { Arc, Circle, Ellipse, Line, Polygon, Polyline, Rectangle } from './shapes'
 import { random, randomPoint } from '../random'
+import { neg } from '../math/vectors'
 
 /*
 export function operation(shape) {
@@ -92,9 +93,27 @@ export function asPath(shape) {
     return path
 }
 
-// export function asPolygon(geo) {
-//     throw new Error(`Method not implemented on ${geo.constructor.name}`)
-// }
+/**
+ * Converts given shape into an array of {@link Polygon}s, using provided `num` parameter
+ * to determine the number of vertices for each polygon.
+ *
+ * @param shape
+ * @param num
+ */
+export function asPolygon(shape, num) {
+    if (shape instanceof Line || shape instanceof Polyline) {
+        throw new Error(`Cannot convert ${shape.constructor.name} to Polygon`)
+    }
+
+    let pts = []
+    if (shape instanceof Rectangle) {
+        // for a rectangle I really just want to corner points
+        pts = shape.points()
+    } else {
+        pts = vertices(shape, num)
+    }
+    return new Polygon(pts, shape.attribs)
+}
 
 /**
  * Computes and returns bounding rect/box for the given shape.
@@ -119,24 +138,35 @@ export function bounds(shape) {
 //     throw new Error(`Method not implemented on ${geo.constructor.name}`)
 // }
 
-// /**
-//  * Computes centroid of given shape
-//  *
-//  * @param geo
-//  */
-// export function centroid(geo) {
-//     if (geo instanceof Arc) {
-//     } else if (geo instanceof Circle) {
-//         return geo.centerPT
-//     } else if (geo instanceof Ellipse) {
-//     } else if (geo instanceof Line) {
-//     } else if (geo instanceof Polygon) {
-//     } else if (geo instanceof Polyline) {
-//     } else if (geo instanceof Rectangle) {
-//         return [geo.pos[0] + geo.size[0] / 2, geo.pos[1] + geo.size[1] / 2]
-//     }
-//     throw new Error(`Method not implemented on ${geo.constructor.name}`)
-// }
+/**
+ * Rotates a shape around its centroid by a given angle.
+ * @param {Array} shape - The shape to be rotated.
+ * @param {number} theta - The angle of rotation in radians.
+ * @returns {Array} - The rotated shape.
+ */
+export function centerRotate(shape, theta) {
+    const cent = centroid(shape)
+    return translate(rotate(translate(shape, neg(cent)), theta), cent)
+}
+
+/**
+ * Computes centroid (center point) of given shape
+ *
+ * @param shape
+ */
+export function centroid(shape) {
+    if (shape instanceof Arc) {
+    } else if (shape instanceof Circle) {
+        return shape.centerPT
+    } else if (shape instanceof Ellipse) {
+    } else if (shape instanceof Line) {
+    } else if (shape instanceof Polygon) {
+    } else if (shape instanceof Polyline) {
+    } else if (shape instanceof Rectangle) {
+        return [shape.pos[0] + shape.size[0] / 2, shape.pos[1] + shape.size[1] / 2]
+    }
+    throw new Error(`Method not implemented on ${shape.constructor.name}`)
+}
 
 // // export function edges(geo) {
 // //     if (geo instanceof Rect) {
@@ -200,7 +230,33 @@ export function pointInside(shape, pt) {
 }
 
 // + resample() - resample/convert shape
-// + rotate() - rotate shape
+
+/**
+ * Rotates given 2D shape by `theta` (in radians).
+ *
+ * @param shape
+ * @param theta
+ */
+export function rotate(shape, theta) {
+    if (shape instanceof Arc) {
+    } else if (shape instanceof Circle) {
+    } else if (shape instanceof Ellipse) {
+    } else if (shape instanceof Line) {
+    } else if (shape instanceof Polygon) {
+        // rotate all points and make new polygon
+        const newPts = shape.pts.map((pt) => [
+            pt[0] * Math.cos(theta) - pt[1] * Math.sin(theta),
+            pt[0] * Math.sin(theta) + pt[1] * Math.cos(theta),
+        ])
+        return new Polygon(newPts, shape.attribs)
+    } else if (shape instanceof Polyline) {
+    } else if (shape instanceof Rectangle) {
+        // for a rectangle I really just want to corner points
+        return rotate(new Polygon(shape.points(), shape.attribs), theta)
+    }
+    throw new Error(`Method not implemented on ${shape.constructor.name}`)
+}
+
 // + scale() - scale shape
 
 /**
@@ -244,7 +300,32 @@ export function scatter(shape, num) {
 // }
 
 // + transform() - apply transformation matrix
-// + translate() - translate shape
+
+/**
+ * Translates given shape by given `offset` vector.
+ *
+ * @param shape
+ * @param offset - [x, y] offset vector
+ */
+export function translate(shape, offset) {
+    if (!Array.isArray(offset) || offset.length !== 2) {
+        throw new Error('Offset must be a 2D vector')
+    }
+
+    if (shape instanceof Arc) {
+    } else if (shape instanceof Circle) {
+    } else if (shape instanceof Ellipse) {
+    } else if (shape instanceof Line) {
+    } else if (shape instanceof Polygon) {
+        // move all points
+        const newPts = shape.pts.map((pt) => [pt[0] + offset[0], pt[1] + offset[1]])
+        return new Polygon(newPts, shape.attribs)
+    } else if (shape instanceof Polyline) {
+    } else if (shape instanceof Rectangle) {
+        return new Rectangle([shape.pos[0] + offset[0], shape.pos[1] + offset[1]], shape.size, shape.attribs)
+    }
+    throw new Error(`Method not implemented on ${shape.constructor.name}`)
+}
 
 /**
  * Extracts/samples vertices from given shape's boundary and returns them as
@@ -286,29 +367,3 @@ export function vertices(geo, num) {
     }
     throw new Error(`Method not implemented on ${geo.constructor.name}`)
 }
-
-// // randomPointIn() {
-// //     const x = random(this.pos[0], this.pos[0] + this.size[0])
-// //     const y = random(this.pos[1], this.pos[1] + this.size[1])
-// //     return [x, y]
-// // }
-
-// // /// t = [0, 1]
-// // pointAt(t) {
-// //     const theta = t * Math.PI * 2
-// //     const x = Math.cos(theta) * this.radius + this.centerPT[0]
-// //     const y = Math.sin(theta) * this.radius + this.centerPT[1]
-// //     return [x, y]
-// // }
-
-// // pointAt(t) {
-// //     const x = this.pts[0][0] + t * (this.pts[1][0] - this.pts[0][0])
-// //     const y = this.pts[0][1] + t * (this.pts[1][1] - this.pts[0][1])
-// //     return [x, y]
-// // }
-
-// // randomPointIn() {
-// //     const x = random(this.pos[0], this.pos[0] + this.size[0])
-// //     const y = random(this.pos[1], this.pos[1] + this.size[1])
-// //     return [x, y]
-// // }

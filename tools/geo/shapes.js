@@ -116,6 +116,22 @@ export class Rectangle {
         return [this.pos[0] + this.size[0], this.pos[1] + this.size[1]]
     }
 
+    /**
+     * Returns an array of points representing the shape's bounding box.
+     *
+     * @returns {Array<Array<number>>} An array of points in the format [x, y].
+     */
+    points() {
+        const [x0, y0] = this.pos
+        const [x1, y1] = this.max()
+        return [
+            [x0, y0],
+            [x1, y0],
+            [x1, y1],
+            [x0, y1],
+        ]
+    }
+
     //     static fromBounds(bounds) {
     //         const [topLeft, bottomRight] = bounds
     //         const pos = topLeft
@@ -177,11 +193,6 @@ export class Rectangle {
     //         //     new Line(this.pts[2], this.pts[3]),
     //         //     new Line(this.pts[3], this.pts[0]),
     //         // ]
-    //     }
-    //     randomPointIn() {
-    //         const x = random(this.pos[0], this.pos[0] + this.size[0])
-    //         const y = random(this.pos[1], this.pos[1] + this.size[1])
-    //         return [x, y]
     //     }
     //     */
 }

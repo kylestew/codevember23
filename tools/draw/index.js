@@ -34,18 +34,18 @@ export function draw(ctx, geo, attribs = {}) {
     }
 
     // geo attribs override
-    if (geo.attribs.fill && geo.attribs.fill !== 'none') {
+    if (geo.attribs !== undefined && geo.attribs.fill && geo.attribs.fill !== 'none') {
         ctx.fillStyle = geo.attribs.fill
         hasFill = true
     }
-    if (geo.attribs.stroke) {
+    if (geo.attribs && geo.attribs.stroke) {
         ctx.strokeStyle = geo.attribs.stroke
         hasStroke = true
     }
-    if (geo.attribs.weight) {
+    if (geo.attribs && geo.attribs.weight) {
         ctx.lineWidth = geo.attribs.weight
     }
-    if (geo.attribs.lineCap) {
+    if (geo.attribs && geo.attribs.lineCap) {
         ctx.lineCap = geo.attribs.lineCap
     }
 

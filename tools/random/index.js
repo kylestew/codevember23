@@ -1,4 +1,13 @@
 /**
+ * === RANDOM UTILS ===
+ *
+ * random(min, max) - generates a random number between the specified minimum and maximum values
+ * randomInt(min, max) - generates a random integer between the specified minimum and maximum values
+ * pickRandom(arr) - picks a random element from an array
+ * randomPoint(min, max) - generates a random point within a specified range
+ */
+
+/**
  * Generates a random number between the specified minimum and maximum values.
  * If only one argument is provided, it is assumed to be the maximum value and the minimum value is set to 0.
  *
