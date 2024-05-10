@@ -82,30 +82,40 @@ export class Polygon {
 export class Polyline {}
 
 export class Rectangle {
-    //     /**
-    //      * Represents a Geo object.
-    //      * @constructor
-    //      * @param {Object} pos - The position of the Geo object.
-    //      * @param {Object} size - The size of the Geo object.
-    //      */
-    //     constructor(pos, size) {
-    //         this.pos = pos
-    //         this.size = size
-    //         this.info = {}
-    //     }
-    //     /**
-    //      * Creates a new `Rect` object from a center point and size.
-    //      *
-    //      * @param {Array<number>} center - The center point of the rectangle.
-    //      * @param {Array<number>} size - The size of the rectangle as an array of width and height.
-    //      * @returns {Rect} A new `Rect` object.
-    //      */
-    //     static fromCenterPoint(center, size) {
-    //         const halfWidth = size[0] / 2
-    //         const halfHeight = size[1] / 2
-    //         const pos = [center[0] - halfWidth, center[1] - halfHeight]
-    //         return new Rectangle(pos, size)
-    //     }
+    /**
+     * Represents a Geo object.
+     * @constructor
+     * @param {Object} pos - The position of the Geo object.
+     * @param {Object} size - The size of the Geo object.
+     */
+    constructor(pos, size, attribs = {}) {
+        this.pos = pos
+        this.size = size
+        this.attribs = attribs
+    }
+
+    /**
+     * Creates a new `Rect` object from a center point and size.
+     *
+     * @param {Array<number>} center - The center point of the rectangle.
+     * @param {Array<number>} size - The size of the rectangle as an array of width and height.
+     * @returns {Rect} A new `Rect` object.
+     */
+    static fromCenterPoint(center, size, attribs = {}) {
+        const halfWidth = size[0] / 2
+        const halfHeight = size[1] / 2
+        const pos = [center[0] - halfWidth, center[1] - halfHeight]
+        return new Rectangle(pos, size, attribs)
+    }
+
+    /**
+     * Returns the maximum coordinates of the shape.
+     * @returns {number[]} An array containing the maximum coordinates [x, y].
+     */
+    max() {
+        return [this.pos[0] + this.size[0], this.pos[1] + this.size[1]]
+    }
+
     //     static fromBounds(bounds) {
     //         const [topLeft, bottomRight] = bounds
     //         const pos = topLeft

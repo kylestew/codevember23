@@ -1,15 +1,17 @@
-import { Arc, Circle, Ellipse, Line, Polygon, Polyline, Rectangle } from './types'
+import { Arc, Circle, Ellipse, Line, Polygon, Polyline, Rectangle } from './shapes'
+import { random, randomPoint } from '../random'
+
 /*
-export function operation(geo) {
-    if (geo instanceof Arc) {
-    } else if (geo instanceof Circle) {
-    } else if (geo instanceof Ellipse) {
-    } else if (geo instanceof Line) {
-    } else if (geo instanceof Polygon) {
-    } else if (geo instanceof Polyline) {
-    } else if (geo instanceof Rectangle) {
+export function operation(shape) {
+    if (shape instanceof Arc) {
+    } else if (shape instanceof Circle) {
+    } else if (shape instanceof Ellipse) {
+    } else if (shape instanceof Line) {
+    } else if (shape instanceof Polygon) {
+    } else if (shape instanceof Polyline) {
+    } else if (shape instanceof Rectangle) {
     }
-    throw new Error(`Method not implemented on ${geo.constructor.name}`)
+    throw new Error(`Method not implemented on ${shape.constructor.name}`)
 }
 */
 
@@ -17,40 +19,40 @@ export function operation(geo) {
  * Computes the surface area of given `shape`.
  * For curves, lines, point clouds and rays the function returns 0.
  *
- * @param geo - shape to operate on
+ * @param shape - shape to operate on
  */
-export function area(geo) {
-    if (geo instanceof Arc) {
-    } else if (geo instanceof Circle) {
-        return Math.PI * geo.radius * geo.radius
-    } else if (geo instanceof Ellipse) {
-    } else if (geo instanceof Line) {
+export function area(shape) {
+    if (shape instanceof Arc) {
+    } else if (shape instanceof Circle) {
+        return Math.PI * shape.radius * shape.radius
+    } else if (shape instanceof Ellipse) {
+    } else if (shape instanceof Line) {
         return 0
-    } else if (geo instanceof Polygon) {
-    } else if (geo instanceof Polyline) {
+    } else if (shape instanceof Polygon) {
+    } else if (shape instanceof Polyline) {
         return 0
-    } else if (geo instanceof Rectangle) {
-        return geo.size[0] * geo.size[1]
+    } else if (shape instanceof Rectangle) {
+        return shape.size[0] * shape.size[1]
     }
-    throw new Error(`Method not implemented on ${geo.constructor.name}`)
+    throw new Error(`Method not implemented on ${shape.constructor.name}`)
 }
 
 /**
  * Converts a geometric object to a Path2D object.
  *
- * @param {Object} geo - The geometric object to convert.
+ * @param shape
  *
  * @returns {Path2D} - The converted Path2D object.
  * @throws {Error} - If the conversion method is not implemented for the given geometric object.
  */
-export function asPath(geo) {
+export function asPath(shape) {
     let path = new Path2D()
-    const typeName = geo.constructor.name
+    const typeName = shape.constructor.name
 
     switch (typeName) {
         case 'Arc': {
-            const [x, y] = geo.pos
-            path.arc(x, y, geo.r, geo.start, geo.end, geo.clockwise)
+            const [x, y] = shape.pos
+            path.arc(x, y, shape.r, shape.start, shape.end, shape.clockwise)
             break
         }
 
@@ -58,18 +60,18 @@ export function asPath(geo) {
         // case 'Polyline':
 
         case 'Circle': {
-            const [x, y] = geo.pos
-            path.arc(x, y, geo.r, 0, Math.PI * 2)
+            const [x, y] = shape.pos
+            path.arc(x, y, shape.r, 0, Math.PI * 2)
             break
         }
 
         case 'Line':
-            path.moveTo(geo.pts[0][0], geo.pts[0][1])
-            path.lineTo(geo.pts[1][0], geo.pts[1][1])
+            path.moveTo(shape.pts[0][0], shape.pts[0][1])
+            path.lineTo(shape.pts[1][0], shape.pts[1][1])
             break
 
         case 'Polygon':
-            geo.pts.forEach((pt, idx) => {
+            shape.pts.forEach((pt, idx) => {
                 const [x, y] = pt
                 if (idx === 0) {
                     path.moveTo(x, y)
@@ -81,7 +83,7 @@ export function asPath(geo) {
             break
 
         case 'Rectangle':
-            path.rect(geo.pos[0], geo.pos[1], geo.size[0], geo.size[1])
+            path.rect(shape.pos[0], shape.pos[1], shape.size[0], shape.size[1])
             break
 
         default:
@@ -94,9 +96,24 @@ export function asPath(geo) {
 //     throw new Error(`Method not implemented on ${geo.constructor.name}`)
 // }
 
-// export function bounds(geo) {
-//     throw new Error(`Method not implemented on ${geo.constructor.name}`)
-// }
+/**
+ * Computes and returns bounding rect/box for the given shape.
+ *
+ * @param shape
+ */
+export function bounds(shape) {
+    /* https://github.com/thi-ng/umbrella/blob/41bd769068da804eeace622ec7db50e4d48f1dc9/packages/geom/src/bounds.ts#L65 */
+    if (shape instanceof Arc) {
+    } else if (shape instanceof Circle) {
+    } else if (shape instanceof Ellipse) {
+    } else if (shape instanceof Line) {
+    } else if (shape instanceof Polygon) {
+    } else if (shape instanceof Polyline) {
+    } else if (shape instanceof Rectangle) {
+        return new Rectangle(shape.pos, shape.size, shape.attribs)
+    }
+    throw new Error(`Method not implemented on ${shape.constructor.name}`)
+}
 
 // export function center(geo) {
 //     throw new Error(`Method not implemented on ${geo.constructor.name}`)
@@ -159,11 +176,60 @@ export function asPath(geo) {
 //     }
 // }
 
-// // + pointInside() - check if point inside shape
-// // + resample() - resample/convert shape
-// // + rotate() - rotate shape
-// // + scale() - scale shape
-// // + scatter() - create random points inside a shape boundary
+/**
+ * Returns true if point `pt` is inside the given shape.
+ *
+ * @param shape
+ * @param pt
+ */
+export function pointInside(shape, pt) {
+    if (shape instanceof Arc) {
+    } else if (shape instanceof Circle) {
+    } else if (shape instanceof Ellipse) {
+    } else if (shape instanceof Line) {
+    } else if (shape instanceof Polygon) {
+    } else if (shape instanceof Polyline) {
+    } else if (shape instanceof Rectangle) {
+        const [x, y] = pt
+        const [x0, y0] = shape.pos
+        const [x1, y1] = shape.max()
+
+        return x >= x0 && x <= x1 && y >= y0 && y <= y1
+    }
+    throw new Error(`Method not implemented on ${shape.constructor.name}`)
+}
+
+// + resample() - resample/convert shape
+// + rotate() - rotate shape
+// + scale() - scale shape
+
+/**
+ * Produces `num` random points for which {@link pointInside} succeeds for the
+ * given `shape`. Shape must implement `pointInside` and `bounds` methods.
+ *
+ * @param shape
+ * @param num
+ */
+export function scatter(shape, num) {
+    const b = bounds(shape)
+    if (!b) return
+
+    const mi = b.pos
+    const mx = b.max()
+
+    let out = []
+    while (num-- > 0) {
+        while (true) {
+            const p = randomPoint(mi, mx)
+            if (pointInside(shape, p)) {
+                out.push(p)
+                break
+            }
+        }
+    }
+    return out
+}
+
 // // + splitAt() - split shape/boundary at parametric position
 
 // /**

@@ -10,7 +10,7 @@
 + Polyline
 + Rectangle
 */
-export { Circle, Line, Polygon } from './types'
+export { Circle, Line, Polygon, Rectangle } from './shapes'
 
 /*
 === OPS ===
@@ -36,4 +36,4 @@ export { Circle, Line, Polygon } from './types'
 */
 
 /* https://github.com/thi-ng/umbrella/tree/develop/packages/geom */
-export { asPath, vertices } from './ops'
+export { asPath, bounds, pointInside, scatter, vertices } from './ops'

@@ -1,10 +1,17 @@
-import { asPath } from '../geo'
+import { Circle, asPath } from '../geo'
 
 export function draw(ctx, geo, attribs = {}) {
     ctx.save()
 
     // if an array, run draw on each element
     if (Array.isArray(geo)) {
+        // if an array of two numbers, assume it's a point and draw as a circle
+        if (geo.length === 2 && typeof geo[0] === 'number' && typeof geo[1] === 'number') {
+            const rad = attribs.weight || 0.01
+            draw(ctx, new Circle(geo, rad), attribs)
+            return
+        }
+
         geo.forEach((g) => draw(ctx, g, attribs))
         return
     }
