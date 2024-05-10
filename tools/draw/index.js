@@ -22,6 +22,9 @@ export function draw(ctx, geo, attribs = {}) {
     if (attribs.weight) {
         ctx.lineWidth = attribs.weight
     }
+    if (attribs.lineCap) {
+        ctx.lineCap = attribs.lineCap
+    }
 
     // geo attribs override
     if (geo.attribs.fill && geo.attribs.fill !== 'none') {
@@ -34,6 +37,9 @@ export function draw(ctx, geo, attribs = {}) {
     }
     if (geo.attribs.weight) {
         ctx.lineWidth = geo.attribs.weight
+    }
+    if (geo.attribs.lineCap) {
+        ctx.lineCap = geo.attribs.lineCap
     }
 
     // perform drawing

@@ -10,7 +10,7 @@
 + Polyline
 + Rectangle
 */
-export { Circle, Polygon } from './types'
+export { Circle, Line, Polygon } from './types'
 
 /*
 === OPS ===

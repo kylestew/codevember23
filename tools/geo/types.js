@@ -32,14 +32,25 @@ export class Circle {
         this.r = r
         this.attribs = attribs
     }
+
+    from2Points(p1, p2, attribs = {}) {}
 }
 
 export class Ellipse {}
 
 export class Line {
-    //     constructor(start, end) {
-    //         this.pts = [start, end] // Store start and end points as an array
-    //     }
+    /**
+     * Represents a line segment in a geometric space.
+     *
+     * @constructor
+     * @param {Point} start - The starting point of the line segment.
+     * @param {Point} end - The ending point of the line segment.
+     */
+    constructor(start, end, attribs = {}) {
+        this.pts = [start, end] // Store start and end points as an array
+        this.attribs = attribs
+    }
+
     //     static fromMidpointAndAngle(pt, angle, length) {
     //         const dx = Math.cos(angle)
     //         const dy = Math.sin(angle)
