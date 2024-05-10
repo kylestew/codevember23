@@ -1,11 +1,15 @@
 import { createCanvas, setCanvasRange } from './tools/canvas-utils'
 import { Circle, Polygon, Line, Rectangle } from './tools/geo/shapes'
-import { vertices, bounds, scatter } from './tools/geo/ops'
-import { partition, range2d } from './tools/array'
+import { asPath, vertices, bounds, scatter } from './tools/geo/ops'
+import { partition, range2d, shuffle } from './tools/array'
+import { random } from './tools/random'
 import { draw } from './tools/draw'
 
+const palette = shuffle(['#ff616b', '#faed8f', '#0f261f'])
+const [bg, primary, secondary] = palette
+
 const ctx = createCanvas(800, 800)
-ctx.background('#333344')
+ctx.background(bg)
 setCanvasRange(ctx, -1.1, 1.1)
 
 /* https://generativeartistry.com/tutorials */
@@ -37,6 +41,9 @@ function tut02_joy_division() {
 /* https://generativeartistry.com/tutorials/cubic-disarray/ */
 function tut03_cubic_disarray() {}
 
+/* https://generativeartistry.com/tutorials/triangular-mesh/ */
+function tut04_triangular_mesh() {}
+
 function drawColorWheel() {
     // circle -> vertices -> partition into pairs -> map to polygons using center point
     const WEDGE_COUNT = 24
@@ -51,21 +58,17 @@ function drawColorWheel() {
     draw(ctx, circ, { stroke: '#ffffff', weight: 0.05 })
 }
 
-function randomRects() {
-    // fill the canvas mostly with random rects
-    // TODO: clip to bounds
+function randomRectsFill() {
     const boundingRect = new Rectangle([-1, -1], [2, 2], { fill: '#333344' })
+    const pts = scatter(boundingRect, 28)
+    const rects = pts.map((pt) => Rectangle.fromCenterPoint(pt, [random(0.8, 2.0), random(0.1, 0.6)]))
 
-    // const bnd = bounds(boundingRect)
-    // bnd.attribs.fill = 'red'
+    // clip to bounds
+    ctx.clip(asPath(boundingRect))
 
-    const pts = scatter(boundingRect, 100000)
-
-    // console.log(boundingRect, bnd)
-
-    draw(ctx, boundingRect, { stroke: '#8899ee', weight: 0.01 })
-    draw(ctx, pts, { stroke: '#ffffff99', weight: 0.002 })
+    // draw(ctx, boundingRect, { stroke: '#8899ee', weight: 0.01 })
+    draw(ctx, rects, { fill: primary })
 }
 
 // tut02_joy_division()
-randomRects()
+randomRectsFill()

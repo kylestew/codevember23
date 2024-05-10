@@ -120,3 +120,21 @@ export function partition(data, size, step, partial) {
     }
     return res
 }
+
+/**
+ * Shuffles the elements of an array in place.
+ *
+ * Shuffling an array in JavaScript can be effectively achieved using the Fisher-Yates (or Knuth) shuffle algorithm. This method ensures each permutation of the array is equally likely, making it a good choice for a fair and unbiased shuffle.
+ *
+ * @param {Array} array - The array to be shuffled.
+ * @returns {Array} - The shuffled array.
+ */
+export function shuffle(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        // Generate a random index from 0 to i
+        const j = Math.floor(Math.random() * (i + 1))
+        // Swap elements at indices i and j
+        ;[array[i], array[j]] = [array[j], array[i]]
+    }
+    return array
+}
