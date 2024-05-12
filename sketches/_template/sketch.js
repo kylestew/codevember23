@@ -15,6 +15,7 @@ import { partition, range2d, shuffle, interleave } from './tools/array'
 import { random } from './tools/random'
 import { neg } from './tools/math/vectors'
 import { draw } from './tools/draw'
+import { range2d as _range2d } from './nodes'
 
 const palette = shuffle(['#ff616b', '#faed8f', '#0f261f'])
 const [bg, primary, secondary] = palette
@@ -37,6 +38,32 @@ function tut01_tiled_lines() {
     })
 
     draw(ctx, lines, { stroke: '#ffffff', lineCap: 'round', weight: 0.01 })
+}
+
+function tut01_tiled_lines_nodes() {
+    const cellSize = 0.5
+
+    // range2d -> copy to points
+    // random array, ???
+    let data_stream_0 =
+        // let data_stream_0
+        _range2d({ pts: [], geo: [] }, [-1, 1], [-1, 1], cellSize, cellSize)
+    console.log(data_stream_0)
+
+    // let data_stream_1 = _line(data_stream_0, [0, 0], [cellSize, cellSize])
+    // console.log(data_stream_1)
+
+    // data = _copyToPoints(data, data.pts)
+
+    // const forwardSlash = (pt) => new Line([pt[0], pt[1]], [pt[0] + cellSize, pt[1] + cellSize])
+    // const backSlash = (pt) => new Line([pt[0], pt[1] + cellSize], [pt[0] + cellSize, pt[1]])
+
+    // // grid pts -> lines
+    // const lines = pts.map((pt) => {
+    //     return Math.random() <= 0.5 ? forwardSlash(pt) : backSlash(pt)
+    // })
+
+    // draw(ctx, lines, { stroke: '#ffffff', lineCap: 'round', weight: 0.01 })
 }
 
 /* https://generativeartistry.com/tutorials/joy-division/ */
@@ -107,6 +134,5 @@ function randomRectsFill() {
     draw(ctx, interleave(rects0, rects1))
 }
 
-// randomRectsFill()
-// tut02_joy_division()
-tut03_cubic_disarray()
+// tut01_tiled_lines()
+tut01_tiled_lines_nodes()

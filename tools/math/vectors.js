@@ -13,6 +13,8 @@
  * neg - Negate a vector
  */
 
+export const add = (v1, v2) => v1.map((x, i) => x + v2[i])
+
 export const mulN = (v, n) => v.map((x) => x * n)
 
 export const neg = (v) => mulN(v, -1)
