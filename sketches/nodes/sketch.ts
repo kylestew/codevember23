@@ -1,22 +1,8 @@
-// import { createCanvas, setCanvasRange } from './tools/canvas-utils'
-// import { Circle, Polygon, Line, Rectangle } from './tools/geo/shapes'
-// import {
-//     centroid,
-//     asPath,
-//     asPolygon,
-//     vertices,
-//     bounds,
-//     scatter,
-//     translate,
-//     rotate,
-//     centerRotate,
-// } from './tools/geo/ops'
-import { shuffle } from './tools/array'
-// import { neg } from './tools/math/vectors'
-// import { draw } from './tools/draw'
-
 import { range2d, line, copyToPoints } from './nodes/geo'
+import { createCanvas } from './nodes/tex'
+import { displayData } from './nodes'
 
+import { shuffle } from './tools/array'
 const palette = shuffle(['#ff616b', '#faed8f', '#0f261f'])
 const [bg, primary, secondary] = palette
 
@@ -33,8 +19,11 @@ function ex01_goto_10() {
     console.log(streamPts)
     let streamGrid = copyToPoints(streamGeo, streamPts)
     console.log(streamGrid) // TODO: not sure if this is correct, did they copy to the right locations
+    let canvasStream = createCanvas(800, 600, bg)
+    console.log(canvasStream)
 
-    // let canvasStream = createCanvas(800, 600, clearColor)
+    displayData(canvasStream)
+
     // renderToCanvas(canvasStream, streamGrid)
     // TODO:
     // - draw lines

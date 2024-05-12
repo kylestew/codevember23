@@ -8,12 +8,13 @@ interface Geometry {
     // EXTRA attrs for things like circles: radius, etc
 }
 
-interface GeoContextData {
+export type GeoContextData = {
+    kind: 'geo'
     readonly pts: Point[]
     readonly geo: Geometry[]
 }
 
-const emptyDataStream: GeoContextData = { pts: [], geo: [] }
+const emptyDataStream: GeoContextData = { kind: 'geo', pts: [], geo: [] }
 function prepDataStream(data: GeoContextData | null): GeoContextData {
     return JSON.parse(JSON.stringify(data ?? emptyDataStream))
 }

@@ -1,23 +1,17 @@
-// import { add } from '../../tools/math/vectors'
-
-// type Point = [number, number]
-
-// interface Geometry {
-//     pt_indices: number[]
-//     closed: boolean
-//     // EXTRA attrs for things like circles: radius, etc
-// }
-
-interface TexContextData {
-    // readonly pts: Point[]
-    // readonly geo: Geometry[]
+export type TexContextData = {
+    kind: 'tex'
+    readonly ctx: OffscreenCanvasRenderingContext2D
 }
 
-// const emptyDataStream: DataStream = { pts: [], geo: [] }
-// function prepDataStream(data: DataStream | null): DataStream {
-//     return JSON.parse(JSON.stringify(data ?? emptyDataStream))
-// }
-
 export function createCanvas(width: number, height: number, clearColor: string): TexContextData {
-    return {}
+    const offscreenCanvas = new OffscreenCanvas(width, height)
+    const offCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true })
+    if (!offCtx) {
+        throw new Error('Could not create OffscreenCanvasRenderingContext2D')
+    }
+
+    offCtx.fillStyle = clearColor
+    offCtx.fillRect(0, 0, width, height)
+
+    return { kind: 'tex', ctx: offCtx }
 }
