@@ -1,11 +1,22 @@
 import { add } from '../../tools/math/vectors'
 
-type Point = [number, number]
+type GeoAttrs = {
+    color?: string
+    // scale?: number
+    // stroke?: string
+    // fill?: string
+    // lineCap?: string
+    // weight?: number
+}
 
-interface Geometry {
+export type Point = GeoAttrs & {
+    x: number
+    y: number
+}
+
+type Geometry = GeoAttrs & {
     pt_indices: number[]
     closed: boolean
-    // EXTRA attrs for things like circles: radius, etc
 }
 
 export type GeoContextData = {
@@ -39,7 +50,7 @@ export function range2d(
     return _data
 }
 
-export function line(data: GeoContextData | null, pt1, pt2): GeoContextData {
+export function line(data: GeoContextData | null, pt1: Point, pt2: Point): GeoContextData {
     let _data = prepDataStream(data)
 
     _data.pts.push(pt1)
@@ -49,6 +60,21 @@ export function line(data: GeoContextData | null, pt1, pt2): GeoContextData {
         closed: false,
     })
 
+    return _data
+}
+
+export function setPointAttr(data: GeoContextData, attr: string, value: any): GeoContextData {
+    let _data = prepDataStream(data)
+    for (let pt of _data.pts) {
+        pt[attr] = value
+    }
+    return _data
+}
+export function setGeoAttr(data: GeoContextData, attr: string, value: any): GeoContextData {
+    let _data = prepDataStream(data)
+    for (let pt of _data.geo) {
+        pt[attr] = value
+    }
     return _data
 }
 

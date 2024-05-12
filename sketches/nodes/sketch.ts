@@ -1,30 +1,31 @@
-import { range2d, line, copyToPoints } from './nodes/geo'
-import { createCanvas } from './nodes/tex'
+import { range2d, line, copyToPoints, setPointAttr, setGeoAttr } from './nodes/geo'
+import { createCanvas, geoToTex } from './nodes/tex'
 import { displayData } from './nodes'
 
 import { shuffle } from './tools/array'
 const palette = shuffle(['#ff616b', '#faed8f', '#0f261f'])
 const [bg, primary, secondary] = palette
 
-// const ctx = createCanvas(800, 800)
-// ctx.background(bg)
-// setCanvasRange(ctx, -1.1, 1.1)
-
 function ex01_goto_10() {
     const cellSize = 0.25
 
-    let streamGeo = line(null, [0, 0], [cellSize, cellSize])
+    let streamGeo = line(null, { x: 100, y: 100 }, { x: 400, y: 400 })
+    // let streamGeo = line(null, [0, 0], [cellSize, cellSize])
     console.log(streamGeo)
-    let streamPts = range2d(null, [-1, 1], [-1, 1], cellSize, cellSize)
-    console.log(streamPts)
-    let streamGrid = copyToPoints(streamGeo, streamPts)
-    console.log(streamGrid) // TODO: not sure if this is correct, did they copy to the right locations
+    // streamGeo = setPointAttr(streamGeo, 'color', '#ff0000')
+    streamGeo = setGeoAttr(streamGeo, 'color', primary)
+    console.log(streamGeo.geo[0])
+    // let streamPts = range2d(null, [-1, 1], [-1, 1], cellSize, cellSize)
+    // console.log(streamPts)
+    // let streamGrid = copyToPoints(streamGeo, streamPts)
+    // console.log(streamGrid) // TODO: not sure if this is correct, did they copy to the right locations
     let canvasStream = createCanvas(800, 600, bg)
+    // setCanvasRange(ctx, -1.1, 1.1)
     console.log(canvasStream)
-
+    // geometry -> draw to texture
+    canvasStream = geoToTex(streamGeo, canvasStream)
     displayData(canvasStream)
 
-    // renderToCanvas(canvasStream, streamGrid)
     // TODO:
     // - draw lines
     // - rotate, scale lines
