@@ -9,18 +9,18 @@ const [bg, primary, secondary] = palette
 function ex01_goto_10() {
     const cellSize = 0.25
 
-    let streamGeo = line(null, { x: 100, y: 100 }, { x: 400, y: 400 })
-    // let streamGeo = line(null, [0, 0], [cellSize, cellSize])
-    console.log(streamGeo)
-    // streamGeo = setPointAttr(streamGeo, 'color', '#ff0000')
+    let streamGeo = line(null, { x: 0, y: 0 }, { x: cellSize, y: cellSize })
     streamGeo = setGeoAttr(streamGeo, 'color', primary)
-    console.log(streamGeo.geo[0])
-    // let streamPts = range2d(null, [-1, 1], [-1, 1], cellSize, cellSize)
-    // console.log(streamPts)
+    console.log('Geo stream:', streamGeo)
+
+    let streamPts = range2d(null, [-1, 1], [-1, 1], cellSize, cellSize)
+    streamPts = setPointAttr(streamPts, 'scale', cellSize)
+    console.log('Point stream:', streamPts)
+
     // let streamGrid = copyToPoints(streamGeo, streamPts)
     // console.log(streamGrid) // TODO: not sure if this is correct, did they copy to the right locations
-    let canvasStream = createCanvas(800, 600, bg)
-    // setCanvasRange(ctx, -1.1, 1.1)
+
+    let canvasStream = createCanvas(800, 600, [-1.1, 1.1], bg)
     console.log(canvasStream)
     // geometry -> draw to texture
     canvasStream = geoToTex(streamGeo, canvasStream)

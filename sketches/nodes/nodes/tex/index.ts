@@ -12,7 +12,12 @@ export type TexContextData = {
     readonly ctx: OffscreenCanvasRenderingContext2D
 }
 
-export function createCanvas(width: number, height: number, clearColor: string): TexContextData {
+export function createCanvas(
+    width: number,
+    height: number,
+    range: [number, number],
+    clearColor: string
+): TexContextData {
     const offscreenCanvas = new OffscreenCanvas(width, height)
     const offCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true })
     if (!offCtx) {
@@ -21,6 +26,8 @@ export function createCanvas(width: number, height: number, clearColor: string):
 
     offCtx.fillStyle = clearColor
     offCtx.fillRect(0, 0, width, height)
+
+    setCanvasRange(offCtx, range[0], range[1])
 
     return { kind: 'tex', ctx: offCtx }
 }
@@ -58,4 +65,63 @@ export function geoToTex(geo_data: GeoContextData, tex_data: TexContextData): Te
     }
 
     return tex_data
+}
+
+function setCanvasRange(
+    ctx: OffscreenCanvasRenderingContext2D,
+    min: number,
+    max: number
+): { min: [number, number]; max: [number, number] } {
+    // Retrieve the canvas dimensions from the context
+    const width = ctx.canvas.width
+    const height = ctx.canvas.height
+
+    // Determine the shortest side
+    const size = Math.min(width, height)
+
+    // Calculate the scale factor to fit [min, max] into the shortest side
+    const scaleFactor = size / (max - min)
+
+    // Reset transformations to default
+    ctx.resetTransform()
+
+    // Set up scaling
+    ctx.scale(scaleFactor, scaleFactor)
+
+    // Initialize translation values
+    let translateX = 0
+    let translateY = 0
+
+    let excessWidth = 0
+    let excessHeight = 0
+
+    let xRange: [number, number] = [min, max]
+    let yRange: [number, number] = [min, max]
+
+    // Determine if width or height is the shortest dimension and calculate translation
+    if (size === width) {
+        // Width is the shortest, center vertically
+        excessHeight = height - width
+        translateY = excessHeight / (2 * scaleFactor)
+        ctx.translate(-min, -min + translateY)
+
+        // Update yRange to reflect the actual range being displayed
+        const rescaleFactor = height / (max - min) / scaleFactor
+        yRange = [min * rescaleFactor, max * rescaleFactor]
+    } else {
+        // Height is the shortest, center horizontally
+        excessWidth = width - height
+        translateX = excessWidth / (2 * scaleFactor)
+        ctx.translate(-min + translateX, -min)
+
+        // Update yRange to reflect the actual range being displayed
+        const rescaleFactor = width / (max - min) / scaleFactor
+        xRange = [min * rescaleFactor, max * rescaleFactor]
+    }
+
+    // Return new ranges describing how the canvas area is being used
+    return {
+        min: [xRange[0], yRange[0]],
+        max: [xRange[1], yRange[1]],
+    }
 }
