@@ -160,6 +160,7 @@ export function centroid(shape) {
         return shape.centerPT
     } else if (shape instanceof Ellipse) {
     } else if (shape instanceof Line) {
+        return pointAt(shape, 0.5)
     } else if (shape instanceof Polygon) {
     } else if (shape instanceof Polyline) {
     } else if (shape instanceof Rectangle) {
@@ -191,20 +192,32 @@ export function centroid(shape) {
 //     throw new Error(`Method not implemented on ${geo.constructor.name}`)
 // }
 
-// export function pointAt(geo, t) {
-//     if (geo instanceof Line) {
-//         //     const x = this.pts[0][0] + t * (this.pts[1][0] - this.pts[0][0])
-//         //     const y = this.pts[0][1] + t * (this.pts[1][1] - this.pts[0][1])
-//         //     return [x, y]
-//     } else if (geo instanceof Circle) {
-//         //     const theta = t * Math.PI * 2
-//         //     const x = Math.cos(theta) * this.radius + this.centerPT[0]
-//         //     const y = Math.sin(theta) * this.radius + this.centerPT[1]
-//         //     return [x, y]
-//     } else {
-//         throw new Error(`Method not implemented on ${geo.constructor.name}`)
-//     }
-// }
+/**
+ * Samples and returns point on the boundary of given 2D shape at normalized
+ * parametric distance `t`. If the shape is closed, t=0 and t=1 yield the same
+ * result.
+ *
+ * @param shape
+ * @param t
+ */
+export function pointAt(shape, t) {
+    if (shape instanceof Arc) {
+    } else if (shape instanceof Circle) {
+        //         //     const theta = t * Math.PI * 2
+        //         //     const x = Math.cos(theta) * this.radius + this.centerPT[0]
+        //         //     const y = Math.sin(theta) * this.radius + this.centerPT[1]
+        //         //     return [x, y]
+    } else if (shape instanceof Ellipse) {
+    } else if (shape instanceof Line) {
+        const x = shape.pts[0][0] + t * (shape.pts[1][0] - shape.pts[0][0])
+        const y = shape.pts[0][1] + t * (shape.pts[1][1] - shape.pts[0][1])
+        return [x, y]
+    } else if (shape instanceof Polygon) {
+    } else if (shape instanceof Polyline) {
+    } else if (shape instanceof Rectangle) {
+    }
+    throw new Error(`Method not implemented on ${shape.constructor.name}`)
+}
 
 /**
  * Returns true if point `pt` is inside the given shape.
@@ -240,8 +253,21 @@ export function pointInside(shape, pt) {
 export function rotate(shape, theta) {
     if (shape instanceof Arc) {
     } else if (shape instanceof Circle) {
+        // Circles remain unchanged when rotated about their center.
+        return new Circle(shape.center, shape.radius, shape.attribs)
     } else if (shape instanceof Ellipse) {
     } else if (shape instanceof Line) {
+        // Rotating both endpoints of the line
+        const [start, end] = shape.pts
+        const newStart = [
+            start[0] * Math.cos(theta) - start[1] * Math.sin(theta),
+            start[0] * Math.sin(theta) + start[1] * Math.cos(theta),
+        ]
+        const newEnd = [
+            end[0] * Math.cos(theta) - end[1] * Math.sin(theta),
+            end[0] * Math.sin(theta) + end[1] * Math.cos(theta),
+        ]
+        return new Line(newStart, newEnd, shape.attribs)
     } else if (shape instanceof Polygon) {
         // rotate all points and make new polygon
         const newPts = shape.pts.map((pt) => [
@@ -251,7 +277,7 @@ export function rotate(shape, theta) {
         return new Polygon(newPts, shape.attribs)
     } else if (shape instanceof Polyline) {
     } else if (shape instanceof Rectangle) {
-        // for a rectangle I really just want to corner points
+        // For a rectangle, rotate its corner points
         return rotate(new Polygon(shape.points(), shape.attribs), theta)
     }
     throw new Error(`Method not implemented on ${shape.constructor.name}`)
@@ -316,6 +342,8 @@ export function translate(shape, offset) {
     } else if (shape instanceof Circle) {
     } else if (shape instanceof Ellipse) {
     } else if (shape instanceof Line) {
+        const newPts = shape.pts.map((pt) => [pt[0] + offset[0], pt[1] + offset[1]])
+        return new Line(newPts[0], newPts[1], shape.attribs)
     } else if (shape instanceof Polygon) {
         // move all points
         const newPts = shape.pts.map((pt) => [pt[0] + offset[0], pt[1] + offset[1]])

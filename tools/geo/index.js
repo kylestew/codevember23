@@ -23,7 +23,7 @@ export {
     centroid, // computer shape centroid
     // fitIntoBounds() - rescale/reposition shapes into a destination boundary
     // offset() - shape/path offsetting
-    // pointAt() - compute point on shape boundary at parametric position
+    pointAt, // compute point on shape boundary at parametric position
     pointInside, // check if point inside shape
     // resample() - resample/convert shape
     rotate,
