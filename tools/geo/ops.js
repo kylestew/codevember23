@@ -58,7 +58,17 @@ export function asPath(shape) {
         }
 
         // case 'Ellipse':
-        // case 'Polyline':
+
+        case 'Polyline':
+            shape.pts.forEach((pt, idx) => {
+                const [x, y] = pt
+                if (idx === 0) {
+                    path.moveTo(x, y)
+                } else {
+                    path.lineTo(x, y)
+                }
+            })
+            break
 
         case 'Circle': {
             const [x, y] = shape.pos
@@ -94,6 +104,42 @@ export function asPath(shape) {
 }
 
 /**
+ * Extracts/samples vertices from given shape's boundary and returns them as array.
+ *
+ * @example
+ * ```ts
+ * import { circle, vertices } from "@thi.ng/geom";
+ *
+ * // using default
+ * asPoints(circle(100))
+ *
+ * // specify resolution only
+ * asPoints(circle(100), 6)
+ *
+ * // specify more advanced options
+ * asPoints(circle(100), { dist: 10 })
+ * ```
+ *
+ * @param geo
+ * @param num - number of vertices to sample (if not specified, uses default resolution per shape)
+ */
+export function asPoints(geo, num) {
+    if (geo instanceof Arc) {
+    } else if (geo instanceof Circle) {
+        return resample(geo, num || 12).pts
+    } else if (geo instanceof Ellipse) {
+    } else if (geo instanceof Line || geo instanceof Polyline || geo instanceof Polygon || geo instanceof Rectangle) {
+        if (num === undefined) {
+            // just return the underlying points
+            return geo.pts
+        } else {
+            return resample(geo, num).pts
+        }
+    }
+    throw new Error(`Method not implemented on ${geo.constructor.name}`)
+}
+
+/**
  * Converts given shape into an array of {@link Polygon}s, using provided `num` parameter
  * to determine the number of vertices for each polygon.
  *
@@ -110,7 +156,7 @@ export function asPolygon(shape, num) {
         // for a rectangle I really just want to corner points
         pts = shape.points()
     } else {
-        pts = vertices(shape, num)
+        pts = asPoints(shape, num)
     }
     return new Polygon(pts, shape.attribs)
 }
@@ -242,7 +288,38 @@ export function pointInside(shape, pt) {
     throw new Error(`Method not implemented on ${shape.constructor.name}`)
 }
 
-// + resample() - resample/convert shape
+/**
+ * Resamples given 2D shape with given options and returns result as polygon (if
+ * closed) or polyline (if open).
+ *
+ * @param shape
+ * @param num
+ */
+export function resample(shape, num) {
+    if (shape instanceof Arc) {
+    } else if (shape instanceof Circle) {
+        const pos = geo.pos
+        const r = geo.r
+        const delta = (Math.PI * 2.0) / num
+        let pts = []
+        for (let i = 0; i < num; i++) {
+            pts.push([r * Math.cos(i * delta) + pos[0], r * Math.sin(i * delta) + pos[1]])
+        }
+        return new Polyline(pts, shape.attribs)
+    } else if (shape instanceof Ellipse) {
+    } else if (shape instanceof Line) {
+        let pts = []
+        for (let i = 0; i <= num; i++) {
+            const t = i / num
+            pts.push(pointAt(shape, t))
+        }
+        return new Polyline(pts, shape.attribs)
+    } else if (shape instanceof Polygon) {
+    } else if (shape instanceof Polyline) {
+    } else if (shape instanceof Rectangle) {
+    }
+    throw new Error(`Method not implemented on ${shape.constructor.name}`)
+}
 
 /**
  * Rotates given 2D shape by `theta` (in radians).
@@ -353,45 +430,4 @@ export function translate(shape, offset) {
         return new Rectangle([shape.pos[0] + offset[0], shape.pos[1] + offset[1]], shape.size, shape.attribs)
     }
     throw new Error(`Method not implemented on ${shape.constructor.name}`)
-}
-
-/**
- * Extracts/samples vertices from given shape's boundary and returns them as
- * array.
- *
- * @example
- * ```ts
- * import { circle, vertices } from "@thi.ng/geom";
- *
- * // using default
- * vertices(circle(100))
- *
- * // specify resolution only
- * vertices(circle(100), 6)
- *
- * // specify more advanced options
- * vertices(circle(100), { dist: 10 })
- * ```
- *
- * @param geo
- * @param opts
- */
-export function vertices(geo, num) {
-    if (geo instanceof Arc) {
-    } else if (geo instanceof Circle) {
-        const pos = geo.pos
-        const r = geo.r
-        const delta = (Math.PI * 2.0) / num
-        let xys = []
-        for (let i = 0; i < num; i++) {
-            xys.push([r * Math.cos(i * delta) + pos[0], r * Math.sin(i * delta) + pos[1]])
-        }
-        return xys
-    } else if (geo instanceof Ellipse) {
-    } else if (geo instanceof Line) {
-    } else if (geo instanceof Polygon) {
-    } else if (geo instanceof Polyline) {
-    } else if (geo instanceof Rectangle) {
-    }
-    throw new Error(`Method not implemented on ${geo.constructor.name}`)
 }

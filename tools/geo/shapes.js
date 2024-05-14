@@ -79,7 +79,18 @@ export class Polygon {
     }
 }
 
-export class Polyline {}
+export class Polyline {
+    /**
+     * Construct a Polyline object
+     *
+     * @constructor
+     * @param {Array} pts - The points of the Polyline object.
+     */
+    constructor(pts, attribs = {}) {
+        this.pts = pts
+        this.attribs = attribs
+    }
+}
 
 export class Rectangle {
     /**
@@ -92,6 +103,17 @@ export class Rectangle {
         this.pos = pos
         this.size = size
         this.attribs = attribs
+    }
+
+    get pts() {
+        const [x0, y0] = this.pos
+        const [x1, y1] = this.max()
+        return [
+            [x0, y0],
+            [x1, y0],
+            [x1, y1],
+            [x0, y1],
+        ]
     }
 
     /**
@@ -114,22 +136,6 @@ export class Rectangle {
      */
     max() {
         return [this.pos[0] + this.size[0], this.pos[1] + this.size[1]]
-    }
-
-    /**
-     * Returns an array of points representing the shape's bounding box.
-     *
-     * @returns {Array<Array<number>>} An array of points in the format [x, y].
-     */
-    points() {
-        const [x0, y0] = this.pos
-        const [x1, y1] = this.max()
-        return [
-            [x0, y0],
-            [x1, y0],
-            [x1, y1],
-            [x0, y1],
-        ]
     }
 
     //     static fromBounds(bounds) {

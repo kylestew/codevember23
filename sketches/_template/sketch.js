@@ -1,19 +1,22 @@
 import { createCanvas, setCanvasRange } from './tools/canvas-utils'
-import { Circle, Polygon, Line, Rectangle } from './tools/geo/shapes'
+import { Circle, Polygon, Polyline, Line, Rectangle } from './tools/geo/shapes'
 import {
     centroid,
     asPath,
+    asPoints,
     asPolygon,
-    vertices,
     bounds,
     scatter,
     translate,
+    resample,
     rotate,
     centerRotate,
 } from './tools/geo/ops'
-import { partition, range2d, shuffle, interleave } from './tools/array'
+import { partition, zip, range, range2d, shuffle, interleave } from './tools/array'
 import { random } from './tools/random'
+import { mapRange } from './tools/math'
 import { neg } from './tools/math/vectors'
+import { chaikinCurve } from './tools/geo/special'
 import { draw } from './tools/draw'
 
 const palette = shuffle(['#ff616b', '#faed8f', '#0f261f'])
@@ -34,7 +37,7 @@ function tut01_tiled_lines() {
     const backSlash = (pt) =>
         new Line([pt[0] - cellSize / 2.0, pt[1] - cellSize / 2.0], [pt[0] + cellSize / 2.0, pt[1] + cellSize / 2.0])
 
-    // copy line to points with random rotation
+    // copy line to points applying attributes
     const lines = pts.map((pt) => {
         let line = backSlash(pt)
         return Math.random() <= 0.5 ? line : centerRotate(line, Math.PI / 2)
@@ -45,35 +48,80 @@ function tut01_tiled_lines() {
 
 /* https://generativeartistry.com/tutorials/joy-division/ */
 function tut02_joy_division() {
-    // make a list of horizontal lines
-    // convert to points
-    // randomly distrub those points
-    // shaope the distrubed points to apply mostly in the middle
-    // chaickin curve the points
-    // convert to polyline and draw
+    // make 2 vertical control lines
+    const lineA = new Line([-1, -1], [-1, 1])
+    const lineB = new Line([1, -1], [1, 1])
+    // turn each line into the same # of points (which will define the number of horizontal lines)
+    const numLines = 12
+    const ptsA = asPoints(lineA, numLines)
+    const ptsB = asPoints(lineB, numLines)
+    // zip up the points on both sides into start and end point pairs
+    const ptPairs = zip(ptsA, ptsB)
+    // connect the point pairs as new lines
+    const lines = ptPairs.map(([ptA, ptB]) => new Line(ptA, ptB))
+    // convert the new lines into N points we can move around
+    const numPoints = 30
+    const linePoints = lines.map((line) => asPoints(line, numPoints))
+    // randomly move the points (only on the positive Y axis)
+    const randomness = 0.12
+    const linePointsMoved = linePoints.map((pts) =>
+        pts.map((pt) => {
+            // (TRICKY BIT)
+            // random tappered on ends [-1, 1]
+
+            // TODO: more advanced tapering
+            // var distanceToCenter = Math.abs(j - size / 2);
+            // var variance = Math.max(size / 2 - 50 - distanceToCenter, 0);
+            // var random = Math.random() * variance / 2 * -1;
+
+            const x = Math.abs(pt[0])
+            const shaper = mapRange(x, 0, 1, 1, 0)
+            return [pt[0], pt[1] - shaper * random(0, randomness)]
+        })
+    )
+    // smooth points using the chaikin curve algo
+    const smoothPoints = linePointsMoved.map((pts) => chaikinCurve(pts, 3))
+    // convert points into polyline and draw
+    const polylines = smoothPoints.map((pts) => new Polyline(pts, { stroke: secondary, weight: 0.01 }))
+    draw(ctx, polylines)
 }
 
 /* https://generativeartistry.com/tutorials/cubic-disarray/ */
 function tut03_cubic_disarray() {
-    const rect = new Rectangle([-0.5, -0.5], [1, 1], { fill: primary })
-
-    // create a grid of rectangles
+    // create a grid of points
     const tileSize = 0.25
-    let rects = range2d([-1, 1], [-1, 1], tileSize, tileSize).map(
-        (pt) => new Rectangle(pt, [tileSize, tileSize], { stroke: primary, fill: secondary, weight: 0.01 })
-    )
-    // distort the rectangles more and more based on index
-    rects = rects.map((rect, idx) => {
-        const pct = idx / rects.length
+    let pts = range2d([-1, 1], [-1, 1], tileSize, tileSize)
+
+    // add attributes to the points (size, random rotation)
+    pts = pts.map((pt, idx) => {
+        const pct = mapRange(idx, 0, pts.length, 0, 1)
         const theta = pct * random(-Math.PI / 3, Math.PI / 3)
-        return centerRotate(rect, theta)
+        return {
+            pt,
+            size: tileSize,
+            theta,
+        }
     })
+
+    // create rects from the points and attribute data
+    let rects = pts.map(({ pt, size, theta }) =>
+        centerRotate(new Rectangle(pt, [size, size], { stroke: primary, fill: secondary, weight: 0.01 }), theta)
+    )
 
     draw(ctx, rects)
 }
 
 /* https://generativeartistry.com/tutorials/triangular-mesh/ */
 function tut04_triangular_mesh() {}
+
+/* https://generativeartistry.com/tutorials/hypnotic-squares/ */
+function tut07_hypnotic_squares() {
+    // for each point in a grid
+    // (1) create a cell rect
+    // (2) find a point inside the cell (center point)
+    // (3) create N incresingly smaller rects that lerp their position towards the center point
+    // TODO: how do you do for/each in a node system?
+}
 
 function drawColorWheel() {
     // circle -> vertices -> partition into pairs -> map to polygons using center point
@@ -111,4 +159,7 @@ function randomRectsFill() {
     draw(ctx, interleave(rects0, rects1))
 }
 
-tut01_tiled_lines()
+// tut01_tiled_lines()
+tut02_joy_division()
+// tut03_cubic_disarray()
+// tut07_hypnotic_squares()

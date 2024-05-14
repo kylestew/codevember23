@@ -170,3 +170,21 @@ export function interleave(array1, array2) {
 
     return result
 }
+
+/**
+ * Zips two arrays together, creating an array of pairs.
+ *
+ * @param {Array} arr1 - The first array.
+ * @param {Array} arr2 - The second array.
+ * @returns {Array} - The zipped array.
+ */
+export function zip(arr1, arr2) {
+    const maxLength = Math.max(arr1.length, arr2.length)
+    const zipped = []
+
+    for (let i = 0; i < maxLength; i++) {
+        zipped.push([arr1[i], arr2[i]])
+    }
+
+    return zipped
+}

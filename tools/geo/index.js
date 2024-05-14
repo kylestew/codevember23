@@ -7,7 +7,7 @@ export {
     // (Group)
     Line,
     Polygon,
-    // Polyline
+    Polyline,
     Rectangle,
 } from './shapes'
 
@@ -15,6 +15,7 @@ export {
 export {
     area,
     asPath, // convert shape to Path2D
+    asPoints, // convert shape to its vertices
     asPolygon,
     bounds,
     // center() - center shape around origin or point
@@ -25,11 +26,10 @@ export {
     // offset() - shape/path offsetting
     pointAt, // compute point on shape boundary at parametric position
     pointInside, // check if point inside shape
-    // resample() - resample/convert shape
+    resample, // resample/convert shape
     rotate,
     // scale() - scale shape
     scatter,
     // transform() - apply transformation matrix
     translate,
-    vertices,
 } from './ops'
