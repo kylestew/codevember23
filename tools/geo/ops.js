@@ -355,7 +355,7 @@ export function rotate(shape, theta) {
     } else if (shape instanceof Polyline) {
     } else if (shape instanceof Rectangle) {
         // For a rectangle, rotate its corner points
-        return rotate(new Polygon(shape.points(), shape.attribs), theta)
+        return rotate(new Polygon(asPoints(shape), shape.attribs), theta)
     }
     throw new Error(`Method not implemented on ${shape.constructor.name}`)
 }
@@ -419,11 +419,11 @@ export function translate(shape, offset) {
     } else if (shape instanceof Circle) {
     } else if (shape instanceof Ellipse) {
     } else if (shape instanceof Line) {
-        const newPts = shape.pts.map((pt) => [pt[0] + offset[0], pt[1] + offset[1]])
+        const newPts = asPoints(shape).map((pt) => [pt[0] + offset[0], pt[1] + offset[1]])
         return new Line(newPts[0], newPts[1], shape.attribs)
     } else if (shape instanceof Polygon) {
         // move all points
-        const newPts = shape.pts.map((pt) => [pt[0] + offset[0], pt[1] + offset[1]])
+        const newPts = asPoints(shape).map((pt) => [pt[0] + offset[0], pt[1] + offset[1]])
         return new Polygon(newPts, shape.attribs)
     } else if (shape instanceof Polyline) {
     } else if (shape instanceof Rectangle) {

@@ -68,8 +68,8 @@ export function range2d(xRange, yRange, stepX = 1, stepY = 1) {
 
     // Generate the 2D range array
     const result = []
-    for (let y = startY; y < endY; y += stepY) {
-        for (let x = startX; x < endX; x += stepX) {
+    for (let y = startY; y <= endY; y += stepY) {
+        for (let x = startX; x <= endX; x += stepX) {
             result.push([x, y])
         }
     }

@@ -1,3 +1,5 @@
+import { Rectangle, Polygon } from './shapes.js'
+
 /**
  * Generates a Chaikin curve based on the given points and number of iterations.
  *
@@ -18,28 +20,114 @@ export function chaikinCurve(points, iterations) {
  * @param points - The input points to subdivide.
  * @returns The subdivided points.
  */
-function chaikinSubdivide(points: Vec[]): Vec[] {
-    return [
-        ...iterator(
-            comp(
-                // read array in pairs
-                partition(2, 1),
-                // chop corners off by taking only the inner points (0.25, 0.75)
-                map(([a, b]) => {
-                    return [
-                        [0.75 * a[0] + 0.25 * b[0], 0.75 * a[1] + 0.25 * b[1]],
-                        [0.25 * a[0] + 0.75 * b[0], 0.25 * a[1] + 0.75 * b[1]],
-                    ]
-                }),
-                flatten1()
-                // trace()
-            ),
-            points
-        ),
-    ]
+function chaikinSubdivide(points) {
+    const result = []
+
+    for (let i = 0; i < points.length - 1; i++) {
+        const a = points[i]
+        const b = points[i + 1]
+
+        const p1 = [0.75 * a[0] + 0.25 * b[0], 0.75 * a[1] + 0.25 * b[1]]
+        const p2 = [0.25 * a[0] + 0.75 * b[0], 0.25 * a[1] + 0.75 * b[1]]
+
+        result.push(p1, p2)
+    }
+
+    return result
 }
 
-// == SPECIAL ================O
+export class Grid {
+    constructor(pos, size, rows, cols) {
+        this.pos = pos
+        this.size = size
+        this.rows = rows
+        this.cols = cols
+    }
+
+    get cellSize() {
+        return [this.size[0] / this.cols, this.size[1] / this.rows]
+    }
+
+    rects() {
+        let [cellWidth, cellHeight] = this.cellSize
+
+        let grid = []
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                grid.push(this.#generateCell(i, j, cellWidth, cellHeight))
+            }
+        }
+        return grid
+    }
+
+    triangles() {
+        let triangles = []
+        let [cellWidth, cellHeight] = this.cellSize
+
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                let [x, y] = [this.pos[0] + j * cellWidth, this.pos[1] + i * cellHeight]
+
+                // Define two triangles within each cell
+                let tri1 = new Polygon([
+                    [x, y],
+                    [x + cellWidth, y],
+                    [x, y + cellHeight],
+                ])
+                let tri2 = new Polygon([
+                    [x + cellWidth, y],
+                    [x + cellWidth, y + cellHeight],
+                    [x, y + cellHeight],
+                ])
+
+                triangles.push(tri1, tri2)
+            }
+        }
+        return triangles
+    }
+
+    staggeredTriangles() {
+        let triangles = []
+        let [cellWidth, cellHeight] = this.cellSize
+        let halfWidth = cellWidth / 2
+        let halfHeight = cellHeight / 2
+
+        for (let i = 0; i < this.rows; i++) {
+            for (let j = 0; j < this.cols; j++) {
+                let baseX = this.pos[0] + j * halfWidth
+                let baseY = this.pos[1] + i * cellHeight
+
+                if ((i + j) % 2 === 0) {
+                    // Triangle pointing upwards
+                    let tri = new Polygon([
+                        [baseX, baseY + cellHeight],
+                        [baseX + halfWidth, baseY],
+                        [baseX + cellWidth, baseY + cellHeight],
+                    ])
+                    triangles.push(tri)
+                } else {
+                    // Triangle pointing downwards
+                    let tri = new Polygon([
+                        [baseX, baseY],
+                        [baseX + halfWidth, baseY + cellHeight],
+                        [baseX + cellWidth, baseY],
+                    ])
+                    triangles.push(tri)
+                }
+            }
+        }
+        return triangles
+    }
+
+    #generateCell(row, col, cellWidth, cellHeight) {
+        let x = this.pos[0] + col * cellWidth
+        let y = this.pos[1] + row * cellHeight
+        return new Rectangle([x, y], [cellWidth, cellHeight])
+    }
+}
+
+/*
+
 export class Beziers {
     /// pts loaded in need to be in groups of 3 and represent the control
     /// handles for the beziers
@@ -58,41 +146,6 @@ export class Beziers {
         return path
     }
 }
-
-export class Grid {
-    constructor(pos, size) {
-        this.pos = pos
-        this.size = size
-
-        // convert position and size to cornver points
-        this.pts = [
-            [this.pos[0], this.pos[1]], // Top-left corner
-            [this.pos[0] + this.size[0], this.pos[1]], // Top-right corner
-            [this.pos[0] + this.size[0], this.pos[1] + this.size[1]], // Bottom-right corner
-            [this.pos[0], this.pos[1] + this.size[1]], // Bottom-left corner
-        ]
-    }
-
-    static fromRect(bounds) {
-        const [topLeft, bottomRight] = bounds
-        const pos = topLeft
-        const size = [bottomRight[0] - topLeft[0], bottomRight[1] - topLeft[1]]
-        return new Rect(pos, size)
-    }
-
-    area() {
-        return this.size[0] * this.size[1]
-    }
-
-    path() {
-        let path = new Path2D()
-        path.rect(this.pos[0], this.pos[1], this.size[0], this.size[1])
-        return path
-    }
-}
-// ===========================
-
-/*
 
 
     blobbyBeziers(perturbation = 10) {

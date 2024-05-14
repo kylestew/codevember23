@@ -16,6 +16,9 @@ export function draw(ctx, geo, attribs = {}) {
         return
     }
 
+    ctx.fillStyle = 'none'
+    ctx.strokeStyle = 'none'
+
     let hasStroke = false
     let hasFill = false
     if (attribs.fill && attribs.fill !== 'none') {
