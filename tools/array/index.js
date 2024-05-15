@@ -5,6 +5,7 @@
  * range(from, to, step) - Generates an array of numbers within a specified range.
  * range2d(xRange, yRange, stepX, stepY) - Generates a 2D range array based on the given x and y ranges.
  * partition(data, size, step, partial) - Creates overlapping and non-overlapping sliding windows of inputs.
+ * wrapSides(data, left, right) - Wraps elements from the start and end of an array to the other side.
  * shuffle(array) - Shuffles the elements of an array in place.
  * interleave(array1, array2) - Interleaves two arrays by alternating their elements.
  * zip(arr1, arr2) - Zips two arrays together, creating an array of pairs.
@@ -168,6 +169,41 @@ export function partition(data, size, step, partial) {
         res.push(data.slice(max))
     }
     return res
+}
+
+/**
+ * Wraps elements from the start and end of an array to the other side.
+ * @param {Array} src - The source array.
+ * @param {number} numLeft - Number of elements to wrap from the right end to the start.
+ * @param {number} numRight - Number of elements to wrap from the left end to the end.
+ * @returns {Array} - The new array with wrapped elements.
+ */
+export function wrapSides(src, numLeft = 1, numRight = 0) {
+    if (!Array.isArray(src)) {
+        throw new Error('src must be an array')
+    }
+
+    const len = src.length
+    if (numLeft < 0 || numRight < 0 || numLeft > len || numRight > len) {
+        throw new Error(`allowed wrap range: [0..${len}]`)
+    }
+
+    const result = []
+
+    // Add elements from the end to the start
+    for (let i = len - numLeft; i < len; i++) {
+        result.push(src[i])
+    }
+
+    // Add the original elements
+    result.push(...src)
+
+    // Add elements from the start to the end
+    for (let i = 0; i < numRight; i++) {
+        result.push(src[i])
+    }
+
+    return result
 }
 
 /**

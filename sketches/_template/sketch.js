@@ -5,6 +5,7 @@ import {
     asPath,
     asPoints,
     asPolygon,
+    edges,
     bounds,
     offset,
     scatter,
@@ -14,7 +15,7 @@ import {
     centerRotate,
 } from './tools/geo/ops'
 import { Grid, chaikinCurve } from './tools/geo/extended'
-import { linspace, full, partition, zip, range, range2d, shuffle, interleave } from './tools/array'
+import { linspace, full, wrapSides, partition, zip, range, range2d, shuffle, interleave } from './tools/array'
 import { random, randomPoint, randomOffset } from './tools/random'
 import { mapRange, lerpPt } from './tools/math'
 import { neg as vNeg, add as vAdd } from './tools/math/vectors'
@@ -163,31 +164,33 @@ function randomRectsFill() {
 
     // 1st layer
     let pts = scatter(boundingRect, 24)
-    const rects0 = pts.map((pt) =>
-        Rectangle.fromCenterPoint(pt, [random(0.8, 2.0), random(0.1, 0.6)], { fill: primary })
-    )
+    const rects0 = pts.map((pt) => Rectangle.withCenter(pt, [random(0.8, 2.0), random(0.1, 0.6)], { fill: primary }))
 
-    // // 2nd layer
+    // 2nd layer
     pts = scatter(boundingRect, 24)
-    const rects1 = pts.map((pt) =>
-        Rectangle.fromCenterPoint(pt, [random(0.8, 2.0), random(0.1, 0.6)], { fill: secondary })
-    )
+    const rects1 = pts.map((pt) => Rectangle.withCenter(pt, [random(0.8, 2.0), random(0.1, 0.6)], { fill: secondary }))
 
     draw(ctx, interleave(rects0, rects1))
 }
 
 function flags() {
-    // generate a grid
+    // create a grid of flag positions
     const grid = new Grid([-1, -1], [2, 2], 2, 2)
+    grid.rects().map((rect) => {
+        // take each square in grid and decide an orientation
+        const flip = Math.random() < 0.5
+        // split into edges based on orientation
+        console.log(edges(rect))
 
-    // take each square in grid and decide an orientation
-    // split into edges based on orientation
+        draw(ctx, rect)
+    })
+
     // resample edges as points
     // connect the points as lines
     // overlay secondary lines as PCTs
     // draw all LINEs
 
-    draw(ctx, grid.rects(), { stroke: '#ffffff', weight: 0.01 })
+    // draw(ctx, grid.rects(), { stroke: '#ffffff', weight: 0.01 })
 }
 
 // tut01_tiled_lines()
@@ -195,8 +198,8 @@ function flags() {
 // tut03_cubic_disarray()
 // tut04_triangular_mesh()
 // tut05_un_deux_trois()
-tut07_hypnotic_squares()
+// tut07_hypnotic_squares()
 
 // drawColorWheel()
 // randomRectsFill()
-// flags()
+flags()

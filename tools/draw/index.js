@@ -60,5 +60,12 @@ export function draw(ctx, geo, attribs = {}) {
         ctx.stroke(asPath(geo))
     }
 
+    if (!(hasFill || hasStroke)) {
+        // default for debug
+        ctx.strokeStyle = 'black'
+        ctx.lineWidth = 0.01
+        ctx.stroke(asPath(geo))
+    }
+
     ctx.restore()
 }

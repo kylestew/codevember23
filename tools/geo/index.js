@@ -22,7 +22,7 @@ export {
     // center() - center shape around origin or point
     centerRotate, // center shape around origin point
     centroid, // computer shape centroid
-    // edges() - extract edges
+    edges, // extract edges
     // fitIntoBounds() - rescale/reposition shapes into a destination boundary
     offset, // shape/path offsetting
     pointAt, // compute point on shape boundary at parametric position
