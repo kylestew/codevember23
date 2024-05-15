@@ -6,17 +6,18 @@ import {
     asPoints,
     asPolygon,
     bounds,
+    offset,
     scatter,
     translate,
     resample,
     rotate,
     centerRotate,
 } from './tools/geo/ops'
-import { partition, zip, range, range2d, shuffle, interleave } from './tools/array'
-import { random } from './tools/random'
-import { mapRange } from './tools/math'
-import { neg } from './tools/math/vectors'
-import { Grid, chaikinCurve } from './tools/geo/special'
+import { Grid, chaikinCurve } from './tools/geo/extended'
+import { linspace, full, partition, zip, range, range2d, shuffle, interleave } from './tools/array'
+import { random, randomPoint, randomOffset } from './tools/random'
+import { mapRange, lerpPt } from './tools/math'
+import { neg as vNeg, add as vAdd } from './tools/math/vectors'
 import { draw } from './tools/draw'
 
 const palette = shuffle(['#ff616b', '#faed8f', '#0f261f'])
@@ -98,11 +99,10 @@ function tut03_cubic_disarray() {
     // rotate and translate randomly scaled by index
     const rects = grid.rects().map((rect, idx) => {
         const pct = mapRange(idx, 0, columnCount * columnCount, 0, 1)
-        const theta = pct * random(-Math.PI / 5, Math.PI / 5)
-
-         random translation
-
-        return centerRotate(rect, theta)
+        const theta = pct * random(-Math.PI / 6, Math.PI / 6)
+        const sz = grid.cellSize
+        const tx = [pct * sz[0] * random(0.0, 0.5), pct * sz[1] * random(0.0, 0.2)]
+        return translate(centerRotate(rect, theta), tx)
     })
 
     draw(ctx, rects, { fill: primary, stroke: secondary, weight: 0.01 })
@@ -111,22 +111,43 @@ function tut03_cubic_disarray() {
 /* https://generativeartistry.com/tutorials/triangular-mesh/ */
 function tut04_triangular_mesh() {}
 
+/* https://generativeartistry.com/tutorials/un-deux-trois/ */
+function tut05_un_deux_trois() {
+    // make a grid of points
+    // find centers of each grid point (make helper)
+    // draw a line through the center of each point with even ends from it at a given rotations
+    // how do draw dual lines?
+}
+
 /* https://generativeartistry.com/tutorials/hypnotic-squares/ */
 function tut07_hypnotic_squares() {
-    // for each point in a grid
-    // (1) create a cell rect
-    // (2) find a point inside the cell (center point)
-    // (3) create N increasingly smaller rects that lerp their position towards the center point
-    // TODO: how do you do for/each in a node system?
+    // create a grid
+    const grid = new Grid([-1, -1], [2, 2], 8, 8)
+    // generate a list off offsets for each smallest square
+    const cellSize = grid.cellSize
+    const randomizedOffsets = full(grid.cellCount, randomOffset(cellSize[0] / 4.0, cellSize[1] / 4.0))
+    // lerp squares from grid rect towards center point
+    const squareCount = 4
+    const smallSquarePct = 0.333
+    const squares = zip(grid.rects(), randomizedOffsets).map(([rect, randOffset]) =>
+        linspace(0, 1, squareCount).map((pct) => {
+            const size = mapRange(pct, 0, 1, 0, cellSize[0] * smallSquarePct)
+            const trx = lerpPt([0, 0], randOffset, pct)
+            // rect inset by size and translated by lerped offset
+            return translate(offset(rect, -size), trx)
+        })
+    )
+
+    draw(ctx, squares, { stroke: '#ffffff', weight: 0.01 })
 }
 
 function drawColorWheel() {
     // circle -> vertices -> partition into pairs -> map to polygons using center point
     const WEDGE_COUNT = 24
     const circ = new Circle([0, 0], 1)
-    const verts = vertices(circ, WEDGE_COUNT)
-    verts.push(verts[0]) // loop back to the start
-    const polys = partition(verts, 2, 1, false).map(
+    const pts = asPoints(circ, WEDGE_COUNT)
+    pts.push(pts[0]) // loop back to the start
+    const polys = partition(pts, 2, 1, false).map(
         (pair, idx) => new Polygon([pair[0], pair[1], [0, 0]], { fill: `hsl(${(idx / WEDGE_COUNT) * 360}, 100%, 50%)` })
     )
 
@@ -136,7 +157,6 @@ function drawColorWheel() {
 
 function randomRectsFill() {
     const boundingRect = new Rectangle([-1, -1], [2, 2], { fill: '#333344' })
-    // draw(ctx, boundingRect, { stroke: '#8899ee', weight: 0.01 })
 
     // clip to bounds
     ctx.clip(asPath(boundingRect))
@@ -147,7 +167,7 @@ function randomRectsFill() {
         Rectangle.fromCenterPoint(pt, [random(0.8, 2.0), random(0.1, 0.6)], { fill: primary })
     )
 
-    // 2nd layer
+    // // 2nd layer
     pts = scatter(boundingRect, 24)
     const rects1 = pts.map((pt) =>
         Rectangle.fromCenterPoint(pt, [random(0.8, 2.0), random(0.1, 0.6)], { fill: secondary })
@@ -156,7 +176,27 @@ function randomRectsFill() {
     draw(ctx, interleave(rects0, rects1))
 }
 
+function flags() {
+    // generate a grid
+    const grid = new Grid([-1, -1], [2, 2], 2, 2)
+
+    // take each square in grid and decide an orientation
+    // split into edges based on orientation
+    // resample edges as points
+    // connect the points as lines
+    // overlay secondary lines as PCTs
+    // draw all LINEs
+
+    draw(ctx, grid.rects(), { stroke: '#ffffff', weight: 0.01 })
+}
+
 // tut01_tiled_lines()
 // tut02_joy_division()
 tut03_cubic_disarray()
+// tut04_triangular_mesh()
+// tut05_un_deux_trois()
 // tut07_hypnotic_squares()
+
+// drawColorWheel()
+// randomRectsFill()
+// flags()

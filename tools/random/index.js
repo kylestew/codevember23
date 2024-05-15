@@ -57,3 +57,17 @@ export function randomPoint(min = [0, 0], max = [1, 1]) {
     const y = Math.random() * (max[1] - min[1]) + min[1]
     return [x, y]
 }
+
+/**
+ * Generates a random offset within the specified range.
+ *
+ * @param {number} maxX - The maximum value for the X-axis.
+ * @param {number} [maxY=maxX] - The maximum value for the Y-axis. If not provided, it defaults to the value of maxX.
+ * @returns {number[]} An array containing the random X and Y offsets.
+ */
+export function randomOffset(maxX, maxY) {
+    if (arguments.length === 1) {
+        maxY = maxX
+    }
+    return [random(-maxX, maxX), random(-maxY, maxY)]
+}

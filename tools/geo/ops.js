@@ -227,16 +227,24 @@ export function centroid(shape) {
 //     throw new Error(`Method not implemented on ${geo.constructor.name}`)
 // }
 
-// /**
-//  * Computes an offset shape (as in "path offsetting") of given shape and offset
-//  * distance `dist`.
-//  *
-//  * @param geo
-//  * @param dist
-//  */
-// export function offset(geo, dist) {
-//     throw new Error(`Method not implemented on ${geo.constructor.name}`)
-// }
+/**
+ * Computes an offset shape (as in "path offsetting") of given shape and offset
+ * distance `dist`.
+ *
+ * @param shape
+ * @param dist
+ */
+export function offset(shape) {
+    if (shape instanceof Arc) {
+    } else if (shape instanceof Circle) {
+    } else if (shape instanceof Ellipse) {
+    } else if (shape instanceof Line) {
+    } else if (shape instanceof Polygon) {
+    } else if (shape instanceof Polyline) {
+    } else if (shape instanceof Rectangle) {
+    }
+    throw new Error(`Method not implemented on ${shape.constructor.name}`)
+}
 
 /**
  * Samples and returns point on the boundary of given 2D shape at normalized
@@ -298,8 +306,8 @@ export function pointInside(shape, pt) {
 export function resample(shape, num) {
     if (shape instanceof Arc) {
     } else if (shape instanceof Circle) {
-        const pos = geo.pos
-        const r = geo.r
+        const pos = shape.pos
+        const r = shape.r
         const delta = (Math.PI * 2.0) / num
         let pts = []
         for (let i = 0; i < num; i++) {

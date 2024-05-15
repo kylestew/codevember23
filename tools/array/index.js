@@ -1,21 +1,60 @@
 /**
  * === Array Utils ===
  *
+ * full(count, callbackOrValue) - Prefills a new array with values returned by a callback function or a provided value.
  * range(from, to, step) - Generates an array of numbers within a specified range.
  * range2d(xRange, yRange, stepX, stepY) - Generates a 2D range array based on the given x and y ranges.
  * partition(data, size, step, partial) - Creates overlapping and non-overlapping sliding windows of inputs.
  * shuffle(array) - Shuffles the elements of an array in place.
  * interleave(array1, array2) - Interleaves two arrays by alternating their elements.
+ * zip(arr1, arr2) - Zips two arrays together, creating an array of pairs.
  */
 
 /**
- * Generates an array of numbers within a specified range [from, to)
+ * Prefills a new array with values returned by a callback function or a provided value.
+ *
+ * @param {number} count - The number of elements to prefill the array with.
+ * @param {Function|any} callbackOrValue - The callback function or value that returns the value for each element.
+ * @returns {Array} - The prefilled array.
+ */
+export function full(count, callbackOrValue) {
+    const result = []
+    for (let i = 0; i < count; i++) {
+        if (typeof callbackOrValue === 'function') {
+            result.push(callbackOrValue())
+        } else {
+            result.push(callbackOrValue)
+        }
+    }
+    return result
+}
+
+/**
+ * Generates an array of numbers within a specified range.
+ *
+ * @param {number} start - The starting value of the range.
+ * @param {number} stop - The ending value of the range.
+ * @param {number} num - The number of elements in the range.
+ * @param {boolean} [endpoint=true] - Whether or not to include the endpoint in the range.
+ * @returns {Array} - The generated range array.
+ */
+export function linspace(start, stop, num, endpoint = true) {
+    const step = (stop - start) / (num - (endpoint ? 1 : 0))
+    const result = []
+    for (let i = 0; i < num; i++) {
+        result.push(start + i * step)
+    }
+    return result
+}
+
+/**
+ * Generates an array of numbers within a specified range.
  *
  * @param {number} from - The starting number of the range.
- * @param {number} to - The ending number of the range. (exclusive)
- * @param {number} [step=1] - The increment between numbers in the range.
+ * @param {number} to - The ending number of the range.
+ * @param {number} [step=1] - The increment value between numbers in the range.
  * @returns {number[]} - An array of numbers within the specified range.
- * @throws {Error} - If the step is not a positive number.
+ * @throws {Error} - If the step size is not positive.
  */
 export function range(from, to, step = 1) {
     // overload arguments
@@ -24,7 +63,7 @@ export function range(from, to, step = 1) {
         from = 0
     }
     if (step <= 0) {
-        throw new Error('Step must be a positive number')
+        throw new Error('Step size must be positive')
     }
 
     var res = []
