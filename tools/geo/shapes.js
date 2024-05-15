@@ -123,11 +123,28 @@ export class Rectangle {
      * @param {Array<number>} size - The size of the rectangle as an array of width and height.
      * @returns {Rect} A new `Rect` object.
      */
-    static fromCenterPoint(center, size, attribs = {}) {
+    static withCenter(center, size, attribs = {}) {
         const halfWidth = size[0] / 2
         const halfHeight = size[1] / 2
         const pos = [center[0] - halfWidth, center[1] - halfHeight]
         return new Rectangle(pos, size, attribs)
+    }
+
+    /**
+     * Creates a rectangle with a specified center, size, inset, and attributes.
+     *
+     * @param {Array<number>} center - The center coordinates of the rectangle.
+     * @param {Array<number>} size - The size of the rectangle (width and height).
+     * @param {number} inset - The inset value for the rectangle (how much to shrink)
+     * @param {Object} attribs - Additional attributes for the rectangle (optional).
+     * @returns {Rectangle} The created rectangle object.
+     */
+    static withCenterAndInset(center, size, inset, attribs = {}) {
+        const newSize = [size[0] - 2 * inset, size[1] - 2 * inset]
+        const halfWidth = newSize[0] / 2
+        const halfHeight = newSize[1] / 2
+        const pos = [center[0] - halfWidth, center[1] - halfHeight]
+        return new Rectangle(pos, newSize, attribs)
     }
 
     /**

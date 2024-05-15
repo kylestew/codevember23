@@ -125,10 +125,10 @@ function tut07_hypnotic_squares() {
     const grid = new Grid([-1, -1], [2, 2], 8, 8)
     // generate a list off offsets for each smallest square
     const cellSize = grid.cellSize
-    const randomizedOffsets = full(grid.cellCount, randomOffset(cellSize[0] / 4.0, cellSize[1] / 4.0))
+    const randomizedOffsets = full(grid.cellCount, () => randomOffset(cellSize[0] / 4.0, cellSize[1] / 4.0))
     // lerp squares from grid rect towards center point
-    const squareCount = 4
-    const smallSquarePct = 0.333
+    const squareCount = 5
+    const smallSquarePct = 0.45
     const squares = zip(grid.rects(), randomizedOffsets).map(([rect, randOffset]) =>
         linspace(0, 1, squareCount).map((pct) => {
             const size = mapRange(pct, 0, 1, 0, cellSize[0] * smallSquarePct)
@@ -138,7 +138,7 @@ function tut07_hypnotic_squares() {
         })
     )
 
-    draw(ctx, squares, { stroke: '#ffffff', weight: 0.01 })
+    draw(ctx, squares, { stroke: primary, weight: 0.01 })
 }
 
 function drawColorWheel() {
@@ -192,10 +192,10 @@ function flags() {
 
 // tut01_tiled_lines()
 // tut02_joy_division()
-tut03_cubic_disarray()
+// tut03_cubic_disarray()
 // tut04_triangular_mesh()
 // tut05_un_deux_trois()
-// tut07_hypnotic_squares()
+tut07_hypnotic_squares()
 
 // drawColorWheel()
 // randomRectsFill()

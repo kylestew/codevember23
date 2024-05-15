@@ -234,7 +234,7 @@ export function centroid(shape) {
  * @param shape
  * @param dist
  */
-export function offset(shape) {
+export function offset(shape, dist) {
     if (shape instanceof Arc) {
     } else if (shape instanceof Circle) {
     } else if (shape instanceof Ellipse) {
@@ -242,6 +242,7 @@ export function offset(shape) {
     } else if (shape instanceof Polygon) {
     } else if (shape instanceof Polyline) {
     } else if (shape instanceof Rectangle) {
+        return Rectangle.withCenterAndInset(centroid(shape), shape.size, -dist, shape.attribs)
     }
     throw new Error(`Method not implemented on ${shape.constructor.name}`)
 }
