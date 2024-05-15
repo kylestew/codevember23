@@ -1,2 +1,2 @@
 export { chaikinCurve } from './chaikin.js'
-export { Grid } from './grid.js'
+export { Grid, grid } from './grid.js'

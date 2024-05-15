@@ -330,8 +330,8 @@ export function resample(shape, num) {
     } else if (shape instanceof Ellipse) {
     } else if (shape instanceof Line) {
         let pts = []
-        for (let i = 0; i <= num; i++) {
-            const t = i / num
+        for (let i = 0; i < num; i++) {
+            const t = i / (num - 1)
             pts.push(pointAt(shape, t))
         }
         return new Polyline(pts, shape.attribs)

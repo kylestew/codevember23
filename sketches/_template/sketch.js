@@ -14,7 +14,7 @@ import {
     rotate,
     centerRotate,
 } from './tools/geo/ops'
-import { Grid, chaikinCurve } from './tools/geo/extended'
+import { Grid, grid, chaikinCurve } from './tools/geo/extended'
 import { linspace, full, wrapSides, partition, zip, range, range2d, shuffle, interleave } from './tools/array'
 import { random, randomPoint, randomOffset } from './tools/random'
 import { mapRange, lerpPt } from './tools/math'
@@ -173,24 +173,131 @@ function randomRectsFill() {
     draw(ctx, interleave(rects0, rects1))
 }
 
+// TODO: this becomes a transformers lib
+function transfomer(transformations, initialData) {
+    return transformations.reduce((data, transformFn) => {
+        return data.flatMap((item) => {
+            const transformed = transformFn(item)
+            // Flatten if requested
+            if (transformFn.flatten) {
+                return transformed
+            }
+            return [transformed]
+        })
+    }, initialData)
+}
+
+function partial(func, ...fixedArgs) {
+    return function (threadedArg) {
+        if (Array.isArray(threadedArg)) {
+            return threadedArg.map((arg) => func(arg, ...fixedArgs))
+        } else {
+            return func(threadedArg, ...fixedArgs)
+        }
+    }
+}
+
+function trace() {
+    return (input) => {
+        console.log(input)
+        return input
+    }
+}
+
+function _offset(...args) {
+    return partial(offset, ...args)
+}
+function _edges(...args) {
+    return partial(edges, ...args)
+}
+function line(...args) {
+    return new Line(...args)
+}
+function _line(...args) {
+    return partial(line, ...args)
+}
+function _zip() {
+    return (input) => zip(input[0], input[1])
+}
+function flatten() {
+    const fn = (input) => {
+        return input
+    }
+    fn.flatten = true
+    return fn
+}
+function _debugDraw(ctx) {
+    return (input) => {
+        draw(ctx, input)
+        return input
+    }
+}
+
 function flags() {
-    // create a grid of flag positions
-    const grid = new Grid([-1, -1], [2, 2], 2, 2)
-    grid.rects().map((rect) => {
-        // take each square in grid and decide an orientation
-        const flip = Math.random() < 0.5
-        // split into edges based on orientation
-        console.log(edges(rect))
+    const rowsCols = 3
+    const innerLines = 9
+    const output = transfomer(
+        [
+            // shrink each grid
+            _offset(-0.05),
+            // split into edges
+            _edges(),
+            // pick random edge pairs (opposites)
+            // TODO: pick random evens odds FN
+            (edges) => (Math.random() < 0.5 ? [edges[3], edges[1].reverse()] : [edges[0], edges[2].reverse()]),
+            // edges become lines
+            _line(),
+            // resample lines as points
+            partial(asPoints, innerLines),
+            // connect points as new set of lines
+            _zip(),
+            _line({ stroke: primary, weight: 0.01 }),
+            // TODO: simplify some of the map operations
+            trace(),
+            _debugDraw(ctx),
+        ],
+        grid([-1, -1], [2, 2], rowsCols, rowsCols).rects()
+    )
 
-        draw(ctx, rect)
-    })
+    const rect = new Rectangle([-1, -1], [2, 2])
 
-    // resample edges as points
-    // connect the points as lines
-    // overlay secondary lines as PCTs
-    // draw all LINEs
+    // draw(ctx, output, { stroke: primary, weight: 0.01 })
 
-    // draw(ctx, grid.rects(), { stroke: '#ffffff', weight: 0.01 })
+    // // create a grid of flag positions
+    // const lines = grid([-1, -1], [2, 2], rowsCols, rowsCols)
+    //     .rects()
+    //     .map((rect) => {
+    //         const inRect = offset(rect, -0.05)
+
+    //         // take each square in grid and decide an orientation
+    //         const flip = Math.random() < 0.5
+    //         // split into edges based on orientation
+    //         const sides = edges(inRect)
+    //         const leftEdge = flip ? sides[3] : sides[0]
+    //         const rightEdge = flip ? sides[1] : sides[2]
+    //         // edges become lines
+    //         const line1 = new Line(leftEdge[0], leftEdge[1])
+    //         const line2 = new Line(rightEdge[0], rightEdge[1])
+    //         // resample lines as points
+    //         const pts0 = asPoints(line1, innerLines)
+    //         const pts1 = asPoints(line2, innerLines)
+    //         // connect points as new set of lines
+    //         const lines = zip(pts0, pts1.reverse()).map(([pt0, pt1]) => new Line(pt0, pt1))
+
+    //         // TODO: orig lines get primary
+    //         // { stroke: primary, weight: 0.01 })
+
+    //         // add secondary lines overlaid on first in interesting ways
+    //         const overLines = lines.map((line, idx) => {
+    //             const [a, b] = asPoints(line)
+    //             pointLerp
+    //             return new Line()
+    //             // new lines get secondary
+    //         })
+
+    //         return [lines, newLines]
+    //     })
+    // draw(ctx, lines)
 }
 
 // tut01_tiled_lines()

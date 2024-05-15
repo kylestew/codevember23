@@ -43,14 +43,23 @@ export class Line {
      * Represents a line segment in a geometric space.
      *
      * @constructor
-     * @param {Point} start - The starting point of the line segment.
-     * @param {Point} end - The ending point of the line segment.
+     * @param {Array|Array[]} pt1 - The starting point of the line segment or an array containing both points.
+     * @param {Array|Object} [pt2] - The ending point of the line segment or attributes.
+     * @param {Object} [attribs={}] - Optional attributes for the line.
      */
-    constructor(start, end, attribs = {}) {
-        this.pts = [start, end] // Store start and end points as an array
-        this.attribs = attribs
+    constructor(pt1, pt2, attribs = {}) {
+        if (Array.isArray(pt1) && Array.isArray(pt2)) {
+            // If pt1 and pt2 are both arrays, they are the points
+            this.pts = [pt1, pt2]
+            this.attribs = attribs
+        } else if (Array.isArray(pt1) && pt1.length === 2 && Array.isArray(pt1[0]) && Array.isArray(pt1[1])) {
+            // If pt1 is an array containing two points
+            this.pts = pt1
+            this.attribs = pt2 || {}
+        } else {
+            throw new Error('Invalid arguments for Line constructor')
+        }
     }
-
     //     static fromMidpointAndAngle(pt, angle, length) {
     //         const dx = Math.cos(angle)
     //         const dy = Math.sin(angle)

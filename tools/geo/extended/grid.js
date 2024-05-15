@@ -107,3 +107,7 @@ export class Grid {
         return new Rectangle([x, y], [cellWidth, cellHeight])
     }
 }
+
+export function grid(pos, size, rows, cols) {
+    return new Grid(pos, size, rows, cols)
+}
