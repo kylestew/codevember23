@@ -35,7 +35,7 @@ export {
     rotate,
     // scale() - scale shape
     scatter,
-    // splitAt() - split shape/boundary at parametric position
+    splitAt, // split shape/boundary at parametric position
     // tangentAt() - compute tangent at parametric position
     // transform() - apply transformation matrix
     translate,

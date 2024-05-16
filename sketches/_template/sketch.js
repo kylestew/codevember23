@@ -8,6 +8,7 @@ import {
     edges,
     bounds,
     offset,
+    splitAt,
     scatter,
     translate,
     resample,
@@ -27,7 +28,7 @@ const [bg, primary, secondary] = palette
 
 const ctx = createCanvas(800, 800)
 ctx.background(bg)
-setCanvasRange(ctx, -1.1, 1.1)
+setCanvasRange(ctx, -1.0, 1.0)
 
 /* https://generativeartistry.com/tutorials */
 function tut01_tiled_lines() {
@@ -174,56 +175,55 @@ function randomRectsFill() {
     draw(ctx, interleave(rects0, rects1))
 }
 
-function _debugDraw(ctx) {
-    return (input) => {
-        draw(ctx, input)
-        return input
-    }
-}
-
 function flags() {
-    const rowsCols = 14
-    const innerLines = 8
+    const inset = -0.01
+    const rowsCols = 12
+    const innerLines = 16
+    const lineWeight = 0.015
 
     // create a grid of flag positions
     const lines = grid([-1, -1], [2, 2], rowsCols, rowsCols)
         .rects()
         .map((rect) => {
-            // const rect = rectangle([-1, -1], [2, 2])
-            // const inRect = offset(rect, -0.014)
-            const inRect = rect
-            console.log('offset() ->', inRect)
-            // take each square in grid and decide an orientation
-            const flip = Math.random() < 0.5
+            // inset each rect to give padding between
+            const inRect = offset(rect, inset)
             // split into edges based on orientation
             const sides = edges(inRect)
-            console.log('FORK')
-            console.log('edges() ->', sides)
-
-            const [leftEdge, rightEdge] = pickRandom(sides, 2)
-            // randomIn
-
-            // const leftEdge = flip ? sides[3] : sides[0]
-            // const rightEdge = flip ? sides[2] : sides[3]
-            console.log('select 2', leftEdge, rightEdge)
+            // take each square in grid and decide an orientation
+            const flip = Math.random() < 0.5
+            const selectedEdges = [flip ? sides[0].reverse() : sides[1].reverse(), flip ? sides[2] : sides[3]]
+            // ALT: pick 2 distinct random edges
+            // const selectedEdges = pickRandom(sides, 2)
             // edges become lines
-            const line1 = new Line(leftEdge[0], leftEdge[1])
-            const line2 = new Line(rightEdge[0], rightEdge[1])
-            console.log('make into lines', line1, line2)
+            const edgeLines = selectedEdges.map((edge) => line(edge))
             // resample lines as points
-            const pts0 = asPoints(line1, innerLines)
-            const pts1 = asPoints(line2, innerLines)
-            console.log('make lines into points', pts0, pts1)
-            // zip points into pairs
-            const ptPairs = zip(pts0, pts1.reverse())
-            console.log('JOIN')
-            console.log(ptPairs)
-            // connect points as new set of lines
-            const lines = ptPairs.map(([pt0, pt1]) => new Line(pt0, pt1))
-            console.log(lines)
+            const pts = edgeLines.map((line) => asPoints(line, innerLines))
+            // zip points into pairs (1 at a time)
+            // const zippedPointPairs = pts.map((pt_pair) => zip(pt_pair[0], pt_pair[1]))
+            const zippedPointPairs = zip(pts[0], pts[1])
+            // join pairs into lines
+            const lines = zippedPointPairs.map((pt_pair) => line(pt_pair))
+
+            // EXP: draw lines over lines
+            // or line in lines, split PCT and overlay another line
+
+            const flipOneOrTwo = Math.random() < 0.5
+            const overLines = lines.map((line, idx) => {
+                const flip = Math.random() < 0.5
+                let pct = idx / innerLines
+                if (flip) {
+                    pct = 1.0 - pct
+                }
+                // return splitAt(line, pct)[Math.random() < 0.5 ? 0 : 1]
+                return splitAt(line, pct)[1]
+            })
 
             ctx.lineCap = 'round'
-            draw(ctx, lines, { stroke: primary, weight: 0.008 })
+            // TODO: draw interleaved
+            draw(ctx, lines, { stroke: primary + '44', weight: lineWeight })
+            draw(ctx, overLines, { stroke: secondary + '22', weight: lineWeight })
+            // draw(ctx, lines, { stroke: primary + '22', weight: lineWeight })
+            // draw(ctx, overLines, { stroke: secondary + '22', weight: lineWeight })
         })
 }
 

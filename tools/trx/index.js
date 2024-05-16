@@ -41,6 +41,13 @@ export function trace() {
     }
 }
 
+function _debugDraw(ctx) {
+    return (input) => {
+        draw(ctx, input)
+        return input
+    }
+}
+
 // TODO: use this workflow but automatically partial the function
 // const output = transformer(
 //     [

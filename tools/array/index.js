@@ -263,3 +263,24 @@ export function zip(arr1, arr2) {
 
     return zipped
 }
+
+/**
+ * Rotates an array by a given number of positions.
+ *
+ * @param {Array} array - The array to be rotated.
+ * @param {number} positions - The number of positions to rotate the array. Positive values rotate to the right, negative values rotate to the left.
+ * @returns {Array} - The rotated array.
+ */
+export function rotate(array, positions) {
+    const length = array.length
+    const normalizedPositions = positions % length
+    if (normalizedPositions === 0) {
+        return array
+    }
+    const rotatedArray = []
+    for (let i = 0; i < length; i++) {
+        const newIndex = (i + normalizedPositions + length) % length
+        rotatedArray[newIndex] = array[i]
+    }
+    return rotatedArray
+}

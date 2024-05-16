@@ -52,6 +52,10 @@ export function pickRandom(arr, num = 1) {
         const pickedIndex = availableIndices.splice(randomIndex, 1)[0] // Remove the picked index from availableIndices and get its value
         pickedElements.push(arr[pickedIndex])
     }
+
+    if (num === 1) {
+        return pickedElements[0]
+    }
     return pickedElements
 }
 
@@ -87,4 +91,25 @@ export function randomOffset(maxX, maxY) {
         maxY = maxX
     }
     return [random(-maxX, maxX), random(-maxY, maxY)]
+}
+
+/**
+ * Generates a random index from an array of weights.
+ *
+ * @param {Array<number>} weights - The array of weights.
+ * @returns {number} - The index of the selected weight.
+ */
+export function weightedRandom(weights) {
+    const totalWeight = weights.reduce((sum, weight) => sum + weight, 0)
+    const randomValue = Math.random() * totalWeight
+    let cumulativeWeight = 0
+
+    for (let i = 0; i < weights.length; i++) {
+        cumulativeWeight += weights[i]
+        if (randomValue < cumulativeWeight) {
+            return i
+        }
+    }
+
+    throw new Error('Unable to determine weighted random index')
 }
