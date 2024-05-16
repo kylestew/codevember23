@@ -35,6 +35,9 @@ export class Circle {
 
     from2Points(p1, p2, attribs = {}) {}
 }
+export function circle(pos, r, attribs = {}) {
+    return new Circle(pos, r, attribs)
+}
 
 export class Ellipse {}
 
@@ -73,6 +76,9 @@ export class Line {
     //     //     const dy = this.pts[1].y - this.pts[0].y
     //     //     return Math.sqrt(dx * dx + dy * dy)
     //     // }
+}
+export function line(pt1, pt2, attribs = {}) {
+    return new Line(pt1, pt2, attribs)
 }
 
 export class Polygon {
@@ -227,4 +233,7 @@ export class Rectangle {
     //         // ]
     //     }
     //     */
+}
+export function rectangle(pos, size, attribs = {}) {
+    return new Rectangle(pos, size, attribs)
 }

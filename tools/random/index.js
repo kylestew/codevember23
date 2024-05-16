@@ -31,11 +31,28 @@ export function randomInt(min, max) {
     return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled) // The maximum is exclusive and the minimum is inclusive
 }
 
-export function pickRandom(arr) {
+/**
+ * Picks a random unique element or elements from an array.
+ *
+ * @param {Array} arr - The array to pick elements from.
+ * @param {number} [num=1] - The number of elements to pick. Defaults to 1 if not provided.
+ * @returns {Array} - An array containing the randomly picked unique element(s).
+ */
+export function pickRandom(arr, num = 1) {
     if (arr.length === 0) {
         throw new Error('Array is empty')
     }
-    return arr[Math.floor(Math.random() * arr.length)]
+    if (num > arr.length) {
+        throw new Error('Number of elements to pick exceeds array length')
+    }
+    const pickedElements = []
+    const availableIndices = Array.from(Array(arr.length).keys()) // Create an array of indices from 0 to arr.length - 1
+    for (let i = 0; i < num; i++) {
+        const randomIndex = Math.floor(Math.random() * availableIndices.length)
+        const pickedIndex = availableIndices.splice(randomIndex, 1)[0] // Remove the picked index from availableIndices and get its value
+        pickedElements.push(arr[pickedIndex])
+    }
+    return pickedElements
 }
 
 /**

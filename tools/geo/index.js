@@ -2,16 +2,20 @@
 export {
     // Arc
     Circle,
+    circle,
     // (Cubic)
     // Ellipse
     // (Group)
     Line,
+    line,
     Polygon,
     Polyline,
     Rectangle,
+    rectangle,
 } from './shapes'
 
 /* === OPS === */
+// all ops take geo data as the first argument and are threadable
 export {
     area,
     asPath, // convert shape to Path2D
