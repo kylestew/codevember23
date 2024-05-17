@@ -42,7 +42,7 @@ export class Grid {
         return centers
     }
 
-    triangles() {
+    rectTriangles() {
         let triangles = []
         let [cellWidth, cellHeight] = this.cellSize
 
@@ -63,39 +63,6 @@ export class Grid {
                 ])
 
                 triangles.push(tri1, tri2)
-            }
-        }
-        return triangles
-    }
-
-    staggeredTriangles() {
-        let triangles = []
-        let [cellWidth, cellHeight] = this.cellSize
-        let halfWidth = cellWidth / 2
-        let halfHeight = cellHeight / 2
-
-        for (let i = 0; i < this.rows; i++) {
-            for (let j = 0; j < this.cols; j++) {
-                let baseX = this.pos[0] + j * halfWidth
-                let baseY = this.pos[1] + i * cellHeight
-
-                if ((i + j) % 2 === 0) {
-                    // Triangle pointing upwards
-                    let tri = new Polygon([
-                        [baseX, baseY + cellHeight],
-                        [baseX + halfWidth, baseY],
-                        [baseX + cellWidth, baseY + cellHeight],
-                    ])
-                    triangles.push(tri)
-                } else {
-                    // Triangle pointing downwards
-                    let tri = new Polygon([
-                        [baseX, baseY],
-                        [baseX + halfWidth, baseY + cellHeight],
-                        [baseX + cellWidth, baseY],
-                    ])
-                    triangles.push(tri)
-                }
             }
         }
         return triangles
