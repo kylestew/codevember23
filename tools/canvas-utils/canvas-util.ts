@@ -69,7 +69,7 @@ export function setCanvasRange(
     ctx: CanvasRenderingContext2D,
     min: number,
     max: number
-): { min: [number, number]; max: [number, number] } {
+): { min: [number, number]; max: [number, number]; clear: Function } {
     // Retrieve the canvas dimensions from the context
     const width = ctx.canvas.width
     const height = ctx.canvas.height
@@ -117,9 +117,28 @@ export function setCanvasRange(
         xRange = [min * rescaleFactor, max * rescaleFactor]
     }
 
+    // Define the clear function
+    function clear(clearColor: string) {
+        // Save the current transformation matrix
+        ctx.save()
+
+        // Reset the transformation matrix to the default state
+        ctx.resetTransform()
+
+        // Set the fill style to the clear color
+        ctx.fillStyle = clearColor
+
+        // Clear the canvas with the given color
+        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+
+        // Restore the previous transformation matrix
+        ctx.restore()
+    }
+
     // Return new ranges describing how the canvas area is being used
     return {
         min: [xRange[0], yRange[0]],
         max: [xRange[1], yRange[1]],
+        clearCanvas: clear,
     }
 }
