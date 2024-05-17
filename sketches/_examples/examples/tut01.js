@@ -1,26 +1,22 @@
 import { Line } from '../tools/geo/'
-import { centerRotate } from '../tools/geo/ops'
+import { asPoints } from '../tools/geo/ops'
 import { Grid } from '../tools/geo/extended'
 import { draw } from '../tools/draw'
 
 export function tiled_lines(ctx, palette) {
     const [bg, primary, secondary] = palette
 
+    const probability = 0.3
+
+    // generate grid cells
     const cellCount = 12
-
-    // generate grid points
     const grid = new Grid([-1, -1], [2, 2], cellCount, cellCount)
-    const pts = grid.centers()
 
-    // create template line (centered at grid point)
-    const cellSize = grid.cellSize[0]
-    const backSlash = (pt) =>
-        new Line([pt[0] - cellSize / 2.0, pt[1] - cellSize / 2.0], [pt[0] + cellSize / 2.0, pt[1] + cellSize / 2.0])
-
-    // copy line to points applying attributes
-    const lines = pts.map((pt) => {
-        let line = backSlash(pt)
-        return Math.random() <= 0.5 ? line : centerRotate(line, Math.PI / 2)
+    // for each grid cell, randomly pick a diagonal line across it
+    const lines = grid.rects().map((rect) => {
+        let pts = asPoints(rect)
+        pts = Math.random() <= probability ? [pts[0], pts[2]] : [pts[1], pts[3]]
+        return new Line(pts)
     })
 
     draw(ctx, lines, { stroke: primary, lineCap: 'round', weight: 0.01 })
