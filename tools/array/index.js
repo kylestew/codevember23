@@ -2,13 +2,15 @@
  * === Array Utils ===
  *
  * full(count, callbackOrValue) - Prefills a new array with values returned by a callback function or a provided value.
+ * linspace(start, stop, num, endpoint) - Generates an array of numbers within a specified range.
  * range(from, to, step) - Generates an array of numbers within a specified range.
  * range2d(xRange, yRange, stepX, stepY) - Generates a 2D range array based on the given x and y ranges.
  * partition(data, size, step, partial) - Creates overlapping and non-overlapping sliding windows of inputs.
- * wrapSides(data, left, right) - Wraps elements from the start and end of an array to the other side.
+ * wrapSides(src, numLeft, numRight) - Wraps elements from the start and end of an array to the other side.
  * shuffle(array) - Shuffles the elements of an array in place.
  * interleave(array1, array2) - Interleaves two arrays by alternating their elements.
  * zip(arr1, arr2) - Zips two arrays together, creating an array of pairs.
+ * rotate(array, positions) - Rotates an array by a given number of positions.
  */
 
 /**
@@ -283,4 +285,19 @@ export function rotate(array, positions) {
         rotatedArray[newIndex] = array[i]
     }
     return rotatedArray
+}
+
+/**
+ * Takes every nth element from an array and returns a new array.
+ *
+ * @param {Array} array - The input array.
+ * @param {number} n - The number of elements to skip between each selected element.
+ * @returns {Array} - A new array containing every nth element from the input array.
+ */
+export function takeEvery(array, n) {
+    const result = []
+    for (let i = 0; i < array.length; i += n) {
+        result.push(array[i])
+    }
+    return result
 }
