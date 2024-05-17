@@ -1,10 +1,52 @@
-import { interleave, takeEvery, rotate, shuffle, full } from './tools/array'
-import { pickRandom } from './tools/random'
+import { interleave, takeEvery, rotate, shuffle, full, splitArray } from './tools/array'
+import { pickRandom, random, randomInt } from './tools/random'
 
+/// Returns two paired edges that line up as slats
+function horizOrVerts(edges, vertical) {
+    if (vertical === undefined) {
+        vertical = Math.random() < 0.5
+    }
+    return [vertical ? edges[0].reverse() : edges[1].reverse(), vertical ? edges[2] : edges[3]]
+}
+function diagonals(edges, flipped) {
+    if (flipped === undefined) {
+        flipped = Math.random() < 0.5
+    }
+    let [edge0, edge1, edge2, edge3] = edges
+    if (flipped) {
+        edge0 = edge0.slice().reverse()
+        edge3 = edge3.slice().reverse()
+        return [edge0.concat(edge2), edge1.concat(edge3)]
+    } else {
+        edge1 = edge1.slice().reverse()
+        edge0 = edge0.slice().reverse()
+        return [edge1.concat(edge3), edge2.concat(edge0)]
+    }
+}
+function curveHalf(edges, which) {
+    return [edges[which], edges[(which + 1) % edges.length]]
+}
+/// returns the middle half of the array
 function middle(array) {
-    const middleIndex = Math.floor(array.length / 2)
-    const quarterCount = Math.floor((array.length - 1) / 4)
-    return array.slice(middleIndex - quarterCount, middleIndex + quarterCount)
+    const sectionLength = Math.floor(array.length / 3)
+    const parts = splitArray(array, sectionLength)
+    return parts[1]
+}
+/// returns the second half of the array
+function half(array, firstHalf = true) {
+    const sectionLength = Math.floor(array.length / 2)
+    const parts = splitArray(array, sectionLength)
+    if (firstHalf) {
+        return parts[0]
+    } else {
+        return parts[1]
+    }
+}
+/// returns the first quarter and last quarter of the array
+function ends(array) {
+    const sectionLength = Math.floor(array.length / 3)
+    const parts = splitArray(array, sectionLength)
+    return parts[0].concat(parts[parts.length - 1])
 }
 
 /*
@@ -12,173 +54,170 @@ function middle(array) {
  * + Takes incoming list of 4 edges of evenly spaced points (all same length)
  * + Spits out 2 edges of the same length that define connecting lines
  */
-function empty(edges) {
+function empty(_) {
     return [[], []]
 }
 
 function slats(edges) {
-    const flip = Math.random() < 0.5
-    return [flip ? edges[0].reverse() : edges[1].reverse(), flip ? edges[2] : edges[3]]
+    return horizOrVerts(edges)
 }
 function slatsHalf(edges) {
-    const flip = Math.random() < 0.5
-    const edge0 = flip ? edges[0].reverse() : edges[1].reverse()
-    const edge1 = flip ? edges[2] : edges[3]
-    const size = Math.floor(edge0.length / 2)
-    return [edge0.slice(size), edge1.slice(size)]
+    const [edge0, edge1] = horizOrVerts(edges)
+    const whichHalf = Math.random() < 0.5
+    return [half(edge0, whichHalf), half(edge1, whichHalf)]
 }
 function slatsMiddle(edges) {
+    const [edge0, edge1] = horizOrVerts(edges)
+    return [middle(edge0), middle(edge1)]
+}
+function slatsEnds(edges) {
+    const [edge0, edge1] = horizOrVerts(edges)
+    return [ends(edge0), ends(edge1)]
+}
+
+function vertHorizFull(edges) {
     const flip = Math.random() < 0.5
-    let edge0 = flip ? edges[0].reverse() : edges[1].reverse()
-    let edge1 = flip ? edges[2] : edges[3]
+    let [edge0, edge1] = horizOrVerts(edges, flip)
+    let [edge2, edge3] = horizOrVerts(edges, !flip)
+    return [edge0.concat(edge2), edge1.concat(edge3)]
+}
+function vertHorizHalf(edges) {
+    edges = rotate(edges, randomInt(0, 4))
+    const flip = Math.random() < 0.5
+    let [edge0, edge1] = horizOrVerts(edges, flip)
+    let [edge2, edge3] = horizOrVerts(edges, !flip)
+    // keep middle half
+    edge0 = half(edge0)
+    edge1 = half(edge1)
+    edge2 = half(edge2)
+    edge3 = half(edge3)
+    return [edge0.concat(edge2), edge1.concat(edge3)]
+}
+function vertHorizMiddle(edges) {
+    const flip = Math.random() < 0.5
+    let [edge0, edge1] = horizOrVerts(edges, flip)
+    let [edge2, edge3] = horizOrVerts(edges, !flip)
     // keep middle half
     edge0 = middle(edge0)
     edge1 = middle(edge1)
-    return [edge0, edge1]
+    edge2 = middle(edge2)
+    edge3 = middle(edge3)
+    return [edge0.concat(edge2), edge1.concat(edge3)]
 }
-function slatsSides(edges) {
+function vertHorizEnds(edges) {
     const flip = Math.random() < 0.5
-    let edge0 = flip ? edges[0].reverse() : edges[1].reverse()
-    let edge1 = flip ? edges[2] : edges[3]
-    // remove middle 3rd from each edge
-    edge0.splice(Math.floor(edge0.length / 3), Math.floor(edge0.length / 3))
-    edge1.splice(Math.floor(edge1.length / 3), Math.floor(edge1.length / 3))
-    return [edge0, edge1]
-}
-function slatsPlus(edges) {
-    const flip = Math.random() < 0.5
-    let edge0 = flip ? edges[0].reverse() : edges[1].reverse()
-    let edge1 = flip ? edges[2] : edges[3]
-
-    let edge2 = flip ? edges[1] : edges[2]
-    let edge3 = flip ? edges[3] : edges[4]
-
+    let [edge0, edge1] = horizOrVerts(edges, flip)
+    let [edge2, edge3] = horizOrVerts(edges, !flip)
     // keep middle half
-    edge0 = middle(edge0)
-    edge1 = middle(edge1)
+    edge0 = ends(edge0)
+    edge1 = ends(edge1)
+    edge2 = ends(edge2)
+    edge3 = ends(edge3)
     return [edge0.concat(edge2), edge1.concat(edge3)]
 }
 
-function diagonalsHalf(edges) {
-    const randomIndex = Math.floor(Math.random() * edges.length)
-    const nextIndex = (randomIndex + 1) % edges.length
-    return [edges[randomIndex].reverse(), edges[nextIndex]]
-}
 function diagonalsFull(edges) {
+    return diagonals(edges)
+}
+function diagonalsHalf(edges) {
+    const [edge0, edge1] = diagonals(edges)
+    return [half(edge0), half(edge1)]
+}
+function diagonalsMiddle(edges) {
+    const [edge0, edge1] = diagonals(edges)
+    return [middle(edge0), middle(edge1)]
+}
+function diagonalsEnds(edges) {
+    const [edge0, edge1] = diagonals(edges)
+    return [ends(edge0), ends(edge1)]
+}
+
+function hatchedDiagonal(edges) {
+    const [listA, listB] = diagonals(edges, true)
+    const [listC, listD] = diagonals(edges, false)
+    return [listA.concat(listC), listB.concat(listD)]
+}
+function hatchedV(edges) {
+    edges = rotate(edges, randomInt(0, 4))
+    const [listA, listB] = diagonals(edges, true)
+    const [listC, listD] = diagonals(edges, false)
+    return [half(listA).concat(half(listC)), half(listB).concat(half(listD))]
+}
+function hatchedMiddles(edges) {
+    const [listA, listB] = diagonals(edges, true)
+    const [listC, listD] = diagonals(edges, false)
+    return [middle(listA).concat(middle(listC)), middle(listB).concat(middle(listD))]
+}
+function hatchedEnds(edges) {
+    const [listA, listB] = diagonals(edges, true)
+    const [listC, listD] = diagonals(edges, false)
+    return [ends(listA).concat(ends(listC)), ends(listB).concat(ends(listD))]
+}
+function hatchedCabin(edges) {
     const idx = Math.floor(Math.random() * edges.length)
     let edge0 = edges[idx]
     let edge1 = edges[(idx + 1) % edges.length].reverse()
     let edge2 = edges[(idx + 2) % edges.length]
     let edge3 = edges[(idx + 3) % edges.length].reverse()
-    return [edge0.concat(edge2), edge1.concat(edge3)]
+
+    // keep middle half
+    edge0 = middle(edge0)
+    edge1 = middle(edge1)
+    edge2 = middle(edge2)
+    edge3 = middle(edge3)
+    return [edge0.concat(edge1).concat(edge2).concat(edge3), edge1.concat(edge2).concat(edge3).concat(edge0)]
 }
-function diagonalsMiddle(edges) {
-    const idx = Math.floor(Math.random() * edges.length)
-    const count = Math.floor((edges[idx].length + 2) / 2)
-    let edge0 = edges[idx].reverse().slice(count)
-    let edge1 = edges[(idx + 1) % edges.length].slice(count)
-    let edge2 = edges[(idx + 2) % edges.length].reverse().slice(count)
-    let edge3 = edges[(idx + 3) % edges.length].slice(count)
-    return [edge0.concat(edge2), edge1.concat(edge3)]
-}
-function diagonalsSides(edges) {
-    const idx = Math.floor(Math.random() * edges.length)
-    const count = Math.floor(edges[idx].length / 2) - 1
-    let edge0 = edges[idx].slice(count)
-    let edge1 = edges[(idx + 1) % edges.length].reverse().slice(count)
-    let edge2 = edges[(idx + 2) % edges.length].slice(count)
-    let edge3 = edges[(idx + 3) % edges.length].reverse().slice(count)
-    return [edge0.concat(edge2), edge1.concat(edge3)]
-}
+
+// function hatchedStar(edges) {
+//     const idx = Math.floor(Math.random() * edges.length)
+//     const edge0 = edges[idx]
+//     const edge1 = edges[(idx + 1) % edges.length].reverse()
+//     const edge2 = edges[(idx + 2) % edges.length]
+//     const edge3 = edges[(idx + 3) % edges.length].reverse()
+//     return [edge0.concat(edge1), edge2.concat(edge3)]
+// }
+// function hatchedStarLess(edges) {
+//     const idx = Math.floor(Math.random() * edges.length)
+//     const edge0 = edges[idx]
+//     const edge1 = edges[(idx + 1) % edges.length].reverse()
+//     const edge2 = edges[(idx + 2) % edges.length]
+//     const edge3 = edges[(idx + 3) % edges.length].reverse()
+//     return [takeEvery(edge0.concat(edge1), 2), takeEvery(edge2.concat(edge3), 2)]
+// }
 
 function curve(edges) {
     const idx = Math.floor(Math.random() * edges.length)
-    const edge0 = edges[idx]
-    const edge1 = edges[(idx + 1) % edges.length]
-    return [edge0, edge1]
+    return curveHalf(edges, idx)
 }
 function curve2(edges) {
     const idx = Math.floor(Math.random() * edges.length)
-    const edge0 = edges[idx]
-    const edge1 = edges[(idx + 1) % edges.length]
-    const edge2 = edges[(idx + 2) % edges.length]
+    const [edge0, edge1] = curveHalf(edges, idx)
+    const [_, edge2] = curveHalf(edges, idx + 1)
     return [edge0.concat(edge1), edge1.concat(edge2)]
 }
 function curve3(edges) {
     const idx = Math.floor(Math.random() * edges.length)
-    const edge0 = edges[idx]
-    const edge1 = edges[(idx + 1) % edges.length]
-    const edge2 = edges[(idx + 2) % edges.length]
-    const edge3 = edges[(idx + 3) % edges.length]
+    const [edge0, edge1] = curveHalf(edges, idx)
+    const [_, edge2] = curveHalf(edges, idx + 1)
+    const [__, edge3] = curveHalf(edges, idx + 2)
     return [edge0.concat(edge1).concat(edge2), edge1.concat(edge2).concat(edge3)]
 }
 
 function curveCircle(edges) {
     const idx = Math.floor(Math.random() * edges.length)
-    const edge0 = edges[idx]
-    const edge1 = edges[(idx + 1) % edges.length]
-    const edge2 = edges[(idx + 2) % edges.length]
-    const edge3 = edges[(idx + 3) % edges.length]
-    const edge4 = edges[(idx + 4) % edges.length]
+    const [edge0, edge1] = curveHalf(edges, idx)
+    const [_, edge2] = curveHalf(edges, idx + 1)
+    const [__, edge3] = curveHalf(edges, idx + 2)
+    const [___, edge4] = curveHalf(edges, idx + 3)
     return [edge0.concat(edge1).concat(edge2).concat(edge3), edge1.concat(edge2).concat(edge3).concat(edge4)]
 }
 function curveEye(edges) {
     const idx = Math.floor(Math.random() * edges.length)
-    const edge0 = edges[idx]
-    const edge1 = edges[(idx + 1) % edges.length]
-    const edge2 = edges[(idx + 2) % edges.length]
-    const edge3 = edges[(idx + 3) % edges.length]
+    const [edge0, edge1] = curveHalf(edges, idx)
+    const [_, edge2] = curveHalf(edges, idx + 1)
+    const [__, edge3] = curveHalf(edges, idx + 2)
+    const [___, edge4] = curveHalf(edges, idx + 3)
     return [edge0.concat(edge2), edge1.concat(edge3)]
-}
-
-function hatchedDiagonal(edges) {
-    const idx = Math.floor(Math.random() * edges.length)
-    const edge0 = edges[idx]
-    const edge1 = edges[(idx + 1) % edges.length].reverse()
-    const edge2 = edges[(idx + 2) % edges.length]
-    const edge3 = edges[(idx + 3) % edges.length].reverse()
-    return [edge0.concat(edge1).concat(edge2).concat(edge3), edge1.concat(edge2).concat(edge3).concat(edge0)]
-}
-function hatchedVertHoriz(edges) {
-    const idx = Math.floor(Math.random() * edges.length)
-    const edge0 = edges[idx]
-    const edge1 = edges[(idx + 1) % edges.length]
-    const edge2 = edges[(idx + 2) % edges.length].reverse()
-    const edge3 = edges[(idx + 3) % edges.length].reverse()
-    return [edge0.concat(edge1), edge2.concat(edge3)]
-}
-function hatchedV(edges) {
-    const idx = Math.floor(Math.random() * edges.length)
-    const edge0 = edges[idx]
-    const edge1 = edges[(idx + 1) % edges.length].reverse()
-    const edge2 = edges[(idx + 2) % edges.length]
-    return [edge0.concat(edge1), edge1.concat(edge2)]
-}
-
-function hatchedCenter(edges) {
-    const idx = Math.floor(Math.random() * edges.length)
-    const edge0 = edges[idx]
-    const edge1 = edges[(idx + 1) % edges.length].reverse()
-    const edge2 = edges[(idx + 2) % edges.length]
-    const edge3 = edges[(idx + 3) % edges.length].reverse()
-    return [edge0.concat(edge1).concat(edge2).concat(edge3), edge1.concat(edge2).concat(edge3).concat(edge0)]
-}
-
-function hatchedStar(edges) {
-    const idx = Math.floor(Math.random() * edges.length)
-    const edge0 = edges[idx]
-    const edge1 = edges[(idx + 1) % edges.length].reverse()
-    const edge2 = edges[(idx + 2) % edges.length]
-    const edge3 = edges[(idx + 3) % edges.length].reverse()
-    return [edge0.concat(edge1), edge2.concat(edge3)]
-}
-function hatchedStarLess(edges) {
-    const idx = Math.floor(Math.random() * edges.length)
-    const edge0 = edges[idx]
-    const edge1 = edges[(idx + 1) % edges.length].reverse()
-    const edge2 = edges[(idx + 2) % edges.length]
-    const edge3 = edges[(idx + 3) % edges.length].reverse()
-    return [takeEvery(edge0.concat(edge1), 2), takeEvery(edge2.concat(edge3), 2)]
 }
 
 function starPlus(edges) {
@@ -189,7 +228,6 @@ function starPlus(edges) {
     const edge3 = edges[(idx + 3) % edges.length].reverse()
     return [edge0.concat(edge1), edge2.concat(edge3)]
 }
-// starX
 
 function rotated(edges) {
     const flip = Math.random() < 0.5
@@ -213,6 +251,21 @@ function chords(edges) {
     edge1 = rotate(edge1, -3)
     return [edge0, edge1]
 }
+function bundlesCross(edges) {
+    const flip = Math.random() < 0.5
+    let edge0 = flip ? edges[0] : edges[1]
+    let edge1 = flip ? edges[2] : edges[3]
+
+    let edge2 = flip ? edges[1] : edges[2]
+    let edge3 = flip ? edges[3] : edges[0]
+
+    // keep middle half
+    edge0 = middle(edge0)
+    edge1 = middle(edge1)
+    edge2 = middle(edge2)
+    edge3 = middle(edge3)
+    return [edge0.concat(edge2), edge1.concat(edge3)]
+}
 
 function collapsed(edges) {
     const flip = Math.random() < 0.5
@@ -235,48 +288,57 @@ function shifted(edges) {
 }
 
 export const shapeGrammarFns = [
-    // vert, horiz
+    // vert or horiz
     slats,
     slatsHalf,
     slatsMiddle,
-    slatsSides,
-    // slatsPlus,
+    slatsEnds,
     empty,
 
-    // diagonals
+    // vert and horiz
+    vertHorizFull,
+    vertHorizHalf,
+    vertHorizMiddle,
+    vertHorizEnds,
+    empty,
+
+    // diagonal (one way)
     diagonalsFull,
     diagonalsHalf,
     diagonalsMiddle,
-    diagonalsSides,
-    // diagonalsX
+    diagonalsEnds,
     empty,
 
-    // hatches
-    hatchedVertHoriz,
+    // diagonals
     hatchedDiagonal,
     hatchedV,
-    // hatchedCenter,
-    // hatchedOutsides,
+    hatchedMiddles,
+    hatchedEnds,
+    // hatchedCabin,
     empty,
-    empty,
+
+    // empty,
+    // empty,
+    // empty,
 
     // curves
-    curveEye,
-    curve,
-    curve2,
-    curve3,
-    curveCircle,
+    // curveCircle,
+    // curve,
+    // curve2,
+    // curveEye,
+    // // curve3,
+    // empty,
 
     // odds and ends
-    oppositeFlipped,
-    chords,
-    rotated,
-    collapsed,
-    collapsed_corner,
-    shifted,
-    hatchedStar,
-    hatchedStarLess,
-    // star plus / star X
+    // oppositeFlipped,
+    // chords,
+    // rotated,
+    // collapsed,
+    // collapsed_corner,
+    // shifted,
+    // hatchedStar,
+    // hatchedStarLess,
+    // // star plus / star X
 
-    empty,
+    // empty,
 ]

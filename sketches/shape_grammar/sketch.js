@@ -2,8 +2,8 @@ import { createCanvas, setCanvasRange } from './tools/canvas-utils'
 import { line } from './tools/geo/shapes'
 import { asPoints, edges, offset, splitAt } from './tools/geo/ops'
 import { grid } from './tools/geo/extended'
-import { zip, shuffle, full, rotate } from './tools/array'
-import { pickRandom, weightedRandom, random, randomInt } from './tools/random'
+import { zip, randomRemove } from './tools/array'
+import { random, randomInt } from './tools/random'
 import { draw } from './tools/draw'
 
 // const palette = shuffle(['#ff616b', '#faed8f', '#0f261f'])
@@ -42,7 +42,13 @@ const lines = grid([-1, -1.2], [2, 2.4], 6, 5)
         // const pts_lists = signalFlagFns[weightedRandom(signalFlagWeights)](ptsLists)
 
         // zip points lists into pairs and make lines
-        const lines = zip(shapePts[0], shapePts[1]).map((pt_pair) => line(pt_pair))
+        let lines = zip(shapePts[0], shapePts[1]).map((pt_pair) => line(pt_pair))
+
+        // random removal of some lines
+        // const removeCount = randomInt(0, lines.length / 2)
+        // lines = randomRemove(lines, removeCount)
+        //...
+
         draw(ctx, lines, { stroke: primary, weight: lineWeight })
 
         // TODO: next level drawing

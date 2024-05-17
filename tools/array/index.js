@@ -11,6 +11,7 @@
  * interleave(array1, array2) - Interleaves two arrays by alternating their elements.
  * zip(arr1, arr2) - Zips two arrays together, creating an array of pairs.
  * rotate(array, positions) - Rotates an array by a given number of positions.
+ * takeEvery(array, n) - Takes every nth element from an array and returns a new array.
  */
 
 /**
@@ -299,5 +300,51 @@ export function takeEvery(array, n) {
     for (let i = 0; i < array.length; i += n) {
         result.push(array[i])
     }
+    return result
+}
+
+/**
+ * Splits an array into smaller arrays of size N.
+ *
+ * @param {Array} array - The array to be split.
+ * @param {number} n - The size of each smaller array.
+ * @returns {Array} - An array of smaller arrays.
+ */
+export function splitArray(array, n) {
+    const result = []
+    for (let i = 0; i < array.length; i += n) {
+        result.push(array.slice(i, i + n))
+    }
+    return result
+}
+
+/**
+ * Removes a random number of elements from an array.
+ *
+ * @param {Array} array - The array from which elements will be removed.
+ * @param {number} numToRemove - The number of elements to remove.
+ * @returns {Array} - A new array with the randomly selected elements removed.
+ */
+export function randomRemove(array, numToRemove) {
+    // Make sure not to remove more elements than are in the array
+    if (numToRemove >= array.length) {
+        return []
+    }
+
+    // Create a copy of the array to avoid modifying the original array
+    let arrCopy = array.slice()
+
+    // Keep track of indices that have been removed
+    let removedIndices = new Set()
+
+    // Randomly select indices to remove
+    while (removedIndices.size < numToRemove) {
+        let randomIndex = Math.floor(Math.random() * arrCopy.length)
+        removedIndices.add(randomIndex)
+    }
+
+    // Remove the selected elements by creating a new array
+    let result = arrCopy.filter((_, index) => !removedIndices.has(index))
+
     return result
 }
