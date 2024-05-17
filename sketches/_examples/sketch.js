@@ -1,8 +1,10 @@
 import { createCanvas, setCanvasRange } from './tools/canvas-utils'
 import { shuffle } from './tools/array'
+import { pickRandom } from './tools/random'
 
 import { tiled_lines } from './examples/tut01'
 import { joy_division } from './examples/tut02'
+import { cubic_disarray } from './examples/tut03'
 
 const palette = shuffle(['#ff616b', '#faed8f', '#0f261f'])
 const [bg, primary, secondary] = palette
@@ -11,26 +13,10 @@ const ctx = createCanvas(800, 800)
 ctx.background(bg)
 setCanvasRange(ctx, -1.1, 1.1)
 
-// tiled_lines(ctx, palette)
-joy_division(ctx, palette)
+const examples = [tiled_lines, joy_division, cubic_disarray]
 
-// /* https://generativeartistry.com/tutorials/cubic-disarray/ */
-// function tut03_cubic_disarray() {
-//     // create a grid of rectangles
-//     const columnCount = 8
-//     let grid = new Grid([-1, -1], [2, 2], columnCount, columnCount)
-
-//     // rotate and translate randomly scaled by index
-//     const rects = grid.rects().map((rect, idx) => {
-//         const pct = mapRange(idx, 0, columnCount * columnCount, 0, 1)
-//         const theta = pct * random(-Math.PI / 6, Math.PI / 6)
-//         const sz = grid.cellSize
-//         const tx = [pct * sz[0] * random(0.0, 0.5), pct * sz[1] * random(0.0, 0.2)]
-//         return translate(centerRotate(rect, theta), tx)
-//     })
-
-//     draw(ctx, rects, { fill: primary, stroke: secondary, weight: 0.01 })
-// }
+examples[1](ctx, palette)
+// pickRandom(examples)(ctx, palette)
 
 // /* https://generativeartistry.com/tutorials/triangular-mesh/ */
 // function tut04_triangular_mesh() {
