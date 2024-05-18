@@ -42,7 +42,7 @@ export function createCanvas(width: number, height: number, canvasId: string = '
 export function createOffscreenCanvas(
     width: number,
     height: number,
-    clearColor: string = 'black'
+    clearColor: string = 'white'
 ): OffscreenCanvasRenderingContext2D {
     const offscreenCanvas = new OffscreenCanvas(width, height)
     const offCtx = offscreenCanvas.getContext('2d', { willReadFrequently: true })
@@ -69,7 +69,7 @@ export function setCanvasRange(
     ctx: CanvasRenderingContext2D,
     min: number,
     max: number
-): { min: [number, number]; max: [number, number]; clear: Function } {
+): { min: [number, number]; max: [number, number]; clearCanvas: Function } {
     // Retrieve the canvas dimensions from the context
     const width = ctx.canvas.width
     const height = ctx.canvas.height

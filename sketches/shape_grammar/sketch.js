@@ -3,27 +3,27 @@ import { line } from './tools/geo/shapes'
 import { asPoints, edges, offset, splitAt } from './tools/geo/ops'
 import { grid } from './tools/geo/extended'
 import { zip, randomRemove } from './tools/array'
-import { random, randomInt } from './tools/random'
+import { random, randomInt, weightedRandom } from './tools/random'
 import { draw } from './tools/draw'
 
 // const palette = shuffle(['#ff616b', '#faed8f', '#0f261f'])
-const palette = ['#0f261f', '#faed8f']
+const palette = ['#0f261f', '#faed8f', '#ff616b']
 const [bg, primary, secondary] = palette
 
-const ctx = createCanvas(1200, 1400)
+const ctx = createCanvas(1200, 1200)
 ctx.background(bg)
 setCanvasRange(ctx, -1.05, 1.05)
 
 const inset = 0.05
-const rowsCols = 5
+const rowsCols = 2
 const innerLines = 12
 const lineWeight = 0.005
 ctx.lineCap = 'round'
 
 import { shapeGrammarFns } from './shapes'
-// const shapeGrammerWeights = [1, 1]
+const shapeGrammerWeights = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 
-const lines = grid([-1, -1.2], [2, (2 / 5) * 6], 6, 5)
+const lines = grid([-1, -1], [2, 2], rowsCols, rowsCols)
     .rects()
     .map((rect, idx) => {
         // draw(ctx, rect, { stroke: '#ffffff99', weight: 0.005 })
@@ -36,17 +36,15 @@ const lines = grid([-1, -1.2], [2, (2 / 5) * 6], 6, 5)
         draw(ctx, sides, { fill: '#ffffff22', weight: 0.005 })
 
         // convert edges to shape grammer
-        const shapePts = shapeGrammarFns[idx](sides)
-        // const pts_lists = signalFlagFns[idx % signalFlagFns.length](ptsLists)
-        // TODO: chose function based on weighted random
-        // const pts_lists = signalFlagFns[weightedRandom(signalFlagWeights)](ptsLists)
+        // const shapePts = shapeGrammarFns[idx](sides)
+        const shapePts = shapeGrammarFns[weightedRandom(shapeGrammerWeights)](sides)
 
         // zip points lists into pairs and make lines
         let lines = zip(shapePts[0], shapePts[1]).map((pt_pair) => line(pt_pair))
 
         // random removal of some lines
-        // const removeCount = randomInt(0, lines.length / 2)
-        // lines = randomRemove(lines, removeCount)
+        const removeCount = randomInt(0, lines.length / 2)
+        lines = randomRemove(lines, removeCount)
         //...
 
         draw(ctx, lines, { stroke: primary, weight: lineWeight })

@@ -8,6 +8,8 @@ import { cubic_disarray } from './examples/tut03'
 import { triangular_mesh } from './examples/tut04'
 import { un_deux_trois } from './examples/tut05'
 import { hypnotic_squares } from './examples/tut07'
+import { floodFill } from './examples/flood_fill'
+import { goto20 } from './examples/goto20'
 
 const palette = shuffle(['#ff616b', '#faed8f', '#0f261f'])
 const [bg, primary, secondary] = palette
@@ -16,9 +18,18 @@ const ctx = createCanvas(800, 800)
 const { clearCanvas } = setCanvasRange(ctx, -1.1, 1.1)
 clearCanvas(bg)
 
-const examples = [tiled_lines, joy_division, cubic_disarray, triangular_mesh, un_deux_trois, hypnotic_squares]
+const examples = [
+    tiled_lines,
+    joy_division,
+    cubic_disarray,
+    triangular_mesh,
+    un_deux_trois,
+    hypnotic_squares,
+    floodFill,
+    goto20,
+]
 
-examples[4](ctx, palette)
+examples[7](ctx, palette)
 // pickRandom(examples)(ctx, palette)
 
 // /* https://generativeartistry.com/tutorials/circle-packing/ */
