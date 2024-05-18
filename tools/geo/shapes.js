@@ -33,7 +33,7 @@ export class Circle {
         this.attribs = attribs
     }
 
-    from2Points(p1, p2, attribs = {}) {}
+    with2Points(p1, p2, attribs = {}) {}
 }
 export function circle(pos, r, attribs = {}) {
     return new Circle(pos, r, attribs)
@@ -63,19 +63,30 @@ export class Line {
             throw new Error('Invalid arguments for Line constructor')
         }
     }
-    //     static fromMidpointAndAngle(pt, angle, length) {
-    //         const dx = Math.cos(angle)
-    //         const dy = Math.sin(angle)
-    //         const halfLength = length / 2
-    //         const startPoint = [pt[0] - dx * halfLength, pt[1] - dy * halfLength]
-    //         const endPoint = [pt[0] + dx * halfLength, pt[1] + dy * halfLength]
-    //         return new Line(startPoint, endPoint)
-    //     }
-    //     // length() {
-    //     //     const dx = this.pts[1].x - this.pts[0].x
-    //     //     const dy = this.pts[1].y - this.pts[0].y
-    //     //     return Math.sqrt(dx * dx + dy * dy)
-    //     // }
+
+    /**
+     * Creates a new Line object with the specified center, angle, size, and attributes.
+     * @param {Array<number>} center - The coordinates of the midpoint of the line.
+     * @param {number} angle - The angle of rotation for the line (radians).
+     * @param {number} length - The length of the line.
+     * @param {Object} [attribs={}] - Additional attributes
+     * @returns {Line} A new Line object.
+     */
+    static withCenter(center, angle, length, attribs = {}) {
+        const [cx, cy] = center
+        const halfLength = length / 2
+
+        // Calculate the start and end points of the line
+        const startX = cx - halfLength * Math.cos(angle)
+        const startY = cy - halfLength * Math.sin(angle)
+        const endX = cx + halfLength * Math.cos(angle)
+        const endY = cy + halfLength * Math.sin(angle)
+
+        const start = [startX, startY]
+        const end = [endX, endY]
+
+        return new Line(start, end, attribs)
+    }
 }
 export function line(pt1, pt2, attribs = {}) {
     return new Line(pt1, pt2, attribs)
