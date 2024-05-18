@@ -23,17 +23,17 @@ ctx.lineCap = 'round'
 import { shapeGrammarFns } from './shapes'
 // const shapeGrammerWeights = [1, 1]
 
-const lines = grid([-1, -1.2], [2, 2.4], 6, 5)
+const lines = grid([-1, -1.2], [2, (2 / 5) * 6], 6, 5)
     .rects()
     .map((rect, idx) => {
-        draw(ctx, rect, { stroke: '#ffffff99', weight: 0.005 })
+        // draw(ctx, rect, { stroke: '#ffffff99', weight: 0.005 })
 
         // inset each rect to give padding between
         const inRect = offset(rect, -inset)
 
         // split rect into 4 edges -> lists of evenly spaced points
         const sides = edges(inRect).map((side) => asPoints(line(side), innerLines))
-        draw(ctx, sides, { fill: '#ff0000', weight: 0.005 })
+        draw(ctx, sides, { fill: '#ffffff22', weight: 0.005 })
 
         // convert edges to shape grammer
         const shapePts = shapeGrammarFns[idx](sides)

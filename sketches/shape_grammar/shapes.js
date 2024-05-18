@@ -115,6 +115,26 @@ function vertHorizEnds(edges) {
     edge3 = ends(edge3)
     return [edge0.concat(edge2), edge1.concat(edge3)]
 }
+function flipHalf(array, reverse = false) {
+    const half = Math.floor(array.length / 2)
+    const parts = splitArray(array, half)
+    if (reverse) {
+        return parts[1].concat(parts[0].reverse())
+    } else {
+        return parts[0].concat(parts[1].reverse())
+    }
+}
+
+function vertHorizTwisted(edges) {
+    const flip = Math.random() < 0.5
+    let [edge0, edge1] = horizOrVerts(edges, flip)
+    let [edge2, edge3] = horizOrVerts(edges, !flip)
+
+    return [
+        half(flipHalf(edge0)).concat(half(flipHalf(edge2, true))), //
+        half(flipHalf(edge1, true)).concat(half(flipHalf(edge3))),
+    ]
+}
 
 function diagonalsFull(edges) {
     return diagonals(edges)
@@ -168,22 +188,37 @@ function hatchedCabin(edges) {
     return [edge0.concat(edge1).concat(edge2).concat(edge3), edge1.concat(edge2).concat(edge3).concat(edge0)]
 }
 
-// function hatchedStar(edges) {
-//     const idx = Math.floor(Math.random() * edges.length)
-//     const edge0 = edges[idx]
-//     const edge1 = edges[(idx + 1) % edges.length].reverse()
-//     const edge2 = edges[(idx + 2) % edges.length]
-//     const edge3 = edges[(idx + 3) % edges.length].reverse()
-//     return [edge0.concat(edge1), edge2.concat(edge3)]
-// }
-// function hatchedStarLess(edges) {
-//     const idx = Math.floor(Math.random() * edges.length)
-//     const edge0 = edges[idx]
-//     const edge1 = edges[(idx + 1) % edges.length].reverse()
-//     const edge2 = edges[(idx + 2) % edges.length]
-//     const edge3 = edges[(idx + 3) % edges.length].reverse()
-//     return [takeEvery(edge0.concat(edge1), 2), takeEvery(edge2.concat(edge3), 2)]
-// }
+function star(edges) {
+    const [edge0, edge1, edge2, edge3] = edges
+    return [edge0.concat(edge1), edge2.concat(edge3)]
+}
+function starLess(edges) {
+    const idx = Math.floor(Math.random() * edges.length)
+    const edge0 = edges[idx]
+    const edge1 = edges[(idx + 1) % edges.length].reverse()
+    const edge2 = edges[(idx + 2) % edges.length]
+    const edge3 = edges[(idx + 3) % edges.length].reverse()
+    return [takeEvery(edge0.concat(edge1), 2), takeEvery(edge2.concat(edge3), 2)]
+}
+function starPlus(edges) {
+    const flip = Math.random() < 0.5
+    let edge0 = flip ? edges[0] : edges[1]
+    let edge1 = flip ? edges[2] : edges[3]
+
+    let edge2 = flip ? edges[1] : edges[2]
+    let edge3 = flip ? edges[3] : edges[0]
+
+    // keep middle half
+    edge0 = middle(edge0)
+    edge1 = middle(edge1)
+    edge2 = middle(edge2)
+    edge3 = middle(edge3)
+    return [edge0.concat(edge2), edge1.concat(edge3)]
+}
+function starX(edges) {
+    const [edge0, edge1, edge2, edge3] = edges
+    return [ends(edge0).concat(ends(edge1)), ends(edge2).concat(ends(edge3))]
+}
 
 function curve(edges) {
     const idx = Math.floor(Math.random() * edges.length)
@@ -202,7 +237,6 @@ function curve3(edges) {
     const [__, edge3] = curveHalf(edges, idx + 2)
     return [edge0.concat(edge1).concat(edge2), edge1.concat(edge2).concat(edge3)]
 }
-
 function curveCircle(edges) {
     const idx = Math.floor(Math.random() * edges.length)
     const [edge0, edge1] = curveHalf(edges, idx)
@@ -220,15 +254,6 @@ function curveEye(edges) {
     return [edge0.concat(edge2), edge1.concat(edge3)]
 }
 
-function starPlus(edges) {
-    const idx = Math.floor(Math.random() * edges.length)
-    const edge0 = edges[idx]
-    const edge1 = edges[(idx + 1) % edges.length].reverse()
-    const edge2 = edges[(idx + 2) % edges.length]
-    const edge3 = edges[(idx + 3) % edges.length].reverse()
-    return [edge0.concat(edge1), edge2.concat(edge3)]
-}
-
 function rotated(edges) {
     const flip = Math.random() < 0.5
     const edge0 = flip ? edges[0].reverse() : edges[1].reverse()
@@ -236,48 +261,11 @@ function rotated(edges) {
     const quarter = Math.floor(edge0.length / 4)
     return [rotate(edge0, quarter), rotate(edge1, -quarter)]
 }
-
 function oppositeFlipped(edges) {
     const flip = Math.random() < 0.5
     const edge0 = flip ? edges[0] : edges[1]
     const edge1 = flip ? edges[2] : edges[3]
     return [edge0, edge1]
-}
-function chords(edges) {
-    const flip = Math.random() < 0.5
-    let edge0 = flip ? edges[0] : edges[1]
-    let edge1 = flip ? edges[2] : edges[3]
-    edge0 = rotate(edge0, 3)
-    edge1 = rotate(edge1, -3)
-    return [edge0, edge1]
-}
-function bundlesCross(edges) {
-    const flip = Math.random() < 0.5
-    let edge0 = flip ? edges[0] : edges[1]
-    let edge1 = flip ? edges[2] : edges[3]
-
-    let edge2 = flip ? edges[1] : edges[2]
-    let edge3 = flip ? edges[3] : edges[0]
-
-    // keep middle half
-    edge0 = middle(edge0)
-    edge1 = middle(edge1)
-    edge2 = middle(edge2)
-    edge3 = middle(edge3)
-    return [edge0.concat(edge2), edge1.concat(edge3)]
-}
-
-function collapsed(edges) {
-    const flip = Math.random() < 0.5
-    let sides = shuffle([flip ? edges[0].reverse() : edges[1].reverse(), flip ? edges[2] : edges[3]])
-    sides[0] = full(sides[0].length, pickRandom(sides[0]))
-    return sides
-}
-function collapsed_corner(edges) {
-    const flip = Math.random() < 0.5
-    let sides = shuffle([flip ? edges[0].reverse() : edges[1].reverse(), flip ? edges[2] : edges[3]])
-    sides[0] = full(sides[0].length, sides[0][0]) // always the first point
-    return sides
 }
 function shifted(edges) {
     const flip = Math.random() < 0.5
@@ -293,52 +281,40 @@ export const shapeGrammarFns = [
     slatsHalf,
     slatsMiddle,
     slatsEnds,
-    empty,
+    shifted,
 
     // vert and horiz
     vertHorizFull,
     vertHorizHalf,
     vertHorizMiddle,
     vertHorizEnds,
-    empty,
+    rotated,
 
     // diagonal (one way)
     diagonalsFull,
     diagonalsHalf,
     diagonalsMiddle,
     diagonalsEnds,
-    empty,
+    vertHorizTwisted,
 
     // diagonals
     hatchedDiagonal,
     hatchedV,
     hatchedMiddles,
     hatchedEnds,
-    // hatchedCabin,
-    empty,
+    hatchedCabin,
 
-    // empty,
-    // empty,
-    // empty,
+    // stars
+    star,
+    starLess,
+    starPlus,
+    starX,
+    oppositeFlipped,
 
     // curves
-    // curveCircle,
-    // curve,
-    // curve2,
-    // curveEye,
-    // // curve3,
-    // empty,
-
-    // odds and ends
-    // oppositeFlipped,
-    // chords,
-    // rotated,
-    // collapsed,
-    // collapsed_corner,
-    // shifted,
-    // hatchedStar,
-    // hatchedStarLess,
-    // // star plus / star X
-
-    // empty,
+    curveCircle,
+    curve,
+    curve2,
+    curveEye,
+    curve3,
 ]
