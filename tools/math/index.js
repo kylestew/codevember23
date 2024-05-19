@@ -2,6 +2,8 @@
  * === MATH UTILS ===
  *
  * mapRange - maps a value from one range to another
+ * lerpPt - linearly interpolates between two points
+ * clamp - clamps a value between a minimum and maximum
  */
 
 /**
@@ -34,4 +36,16 @@ export function mapRange(value, low1, high1, low2, high2) {
  */
 export function lerpPt(pt1, pt2, pct) {
     return [pt1[0] + (pt2[0] - pt1[0]) * pct, pt1[1] + (pt2[1] - pt1[1]) * pct]
+}
+
+/**
+ * Clamps a value between a minimum and maximum.
+ *
+ * @param {number} value - The value to be clamped.
+ * @param {number} min - The minimum value.
+ * @param {number} max - The maximum value.
+ * @returns {number} The clamped value.
+ */
+export function clamp(value, min = 0, max = 1) {
+    return Math.min(Math.max(value, min), max)
 }

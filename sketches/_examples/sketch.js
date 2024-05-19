@@ -19,8 +19,8 @@ import { weightedRandomDemo } from './examples/weighted-random'
 const palette = shuffle(['#ff616b', '#faed8f', '#0f261f'])
 const [bg, primary, secondary] = palette
 
-const ctx = createCanvas(800, 800)
-const { clearCanvas } = setCanvasRange(ctx, -1.1, 1.1)
+const ctx = createCanvas(1200, 1920)
+const { clearCanvas } = setCanvasRange(ctx, -1.02, 1.02)
 clearCanvas(bg)
 
 const examples = [
@@ -35,8 +35,8 @@ const examples = [
     goto20, // 8
     glassImpact,
     distros, // 10
-    linesNest,
-    weightedRandomDemo, // 12
+    weightedRandomDemo,
+    linesNest, // 12
 ]
 
 // TODO: drunken wander example

@@ -35,6 +35,9 @@ export function draw(ctx, geo, attribs = {}) {
     if (attribs.lineCap) {
         ctx.lineCap = attribs.lineCap
     }
+    if (attribs.lineJoin) {
+        ctx.lineJoin = attribs.lineJoin
+    }
 
     // geo attribs override
     if (geo.attribs !== undefined && geo.attribs.fill && geo.attribs.fill !== 'none') {

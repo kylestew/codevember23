@@ -2,7 +2,7 @@ import { Line } from '../tools/geo'
 import { bounds, offset } from '../tools/geo'
 import { Grid } from '../tools/geo/extended'
 import { full } from '../tools/array'
-import { mapRange } from '../tools/math'
+import { mapRange, clamp } from '../tools/math'
 import { setCanvasRange } from '../tools/canvas-utils'
 import { draw } from '../tools/draw'
 
@@ -85,7 +85,7 @@ function fillRect(ctx, rect, color, randomFn) {
 export function distros(ctx, palette) {
     const [bg, primary, secondary] = palette
 
-    const grid = new Grid([-1, -1], [2, 2], 3, 3)
+    const grid = new Grid([-1, -1], [2, 2], 3, 2)
     const rects = grid.rects().map((r) => offset(r, -0.02))
 
     // 1) UNIFORM
@@ -121,53 +121,15 @@ export function distros(ctx, palette) {
         ]
     })
     // 6) EASE FN: gaussian
-    fillRect(ctx, rects[4], primary, (x0, y0, x1, y1) => {
+    fillRect(ctx, rects[5], primary, (x0, y0, x1, y1) => {
         return [
             // mapRange(easeInOutCubic(random()), 0, 1, x0, x1), //
-            mapRange(easeOutInCubic(random()), 0, 1, x0, x1), //
+            mapRange(clamp(gaussian(0.5, 0.15)), 0, 1, x0, x1), //
             random(y0, y1),
         ]
     })
 
     draw(ctx, rects, { stroke: '#000', weight: 0.01 })
-
-    // ctx.resetTransform()
-    // setCanvasRange(ctx, -0.1, 1.1)
-
-    // const count = 256
-    // const height = 0.15
-
-    // let lines = []
-    // let yPos = 0.0
-
-    // function lineWithRandomFn(fn) {
-    //     return function () {
-    //         const x = fn()
-    //         return new Line([x, yPos], [x, yPos + height])
-    //     }
-    // }
-
-    // // ## DISTRIBUTIONS (from bottom to top)
-    // // # (1) uniform random (Math.random)
-    // lines.push(full(count, lineWithRandomFn(random)))
-
-    // // # using an easings function
-    // yPos += height * 1.2
-    // lines.push(
-    //     full(
-    //         count,
-    //         lineWithRandomFn(() => gaussian(0.5, 0.1))
-    //     )
-    // )
-
-    // // // # (2) normal (gausian) distribution
-    // // yPos += height * 1.2
-    // // lines.push(
-    // //     full(
-    // //         count,
-    // //         lineWithRandomFn(() => gaussian(0.5, 0.1))
-    // //     )
-    // // )
 
     // // // # (3) beta distribution
     // // yPos += height * 1.2
