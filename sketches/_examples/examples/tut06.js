@@ -7,6 +7,7 @@ export function circle_packing(ctx, palette) {
     // TODO: load in glyph-packer from geo/extended and make it work
     const circ = new Circle([100, 100], 50)
 
+    // TODO: glyph packer will also need to be scaled
     ctx.resetTransform()
 
     // TODO: note you need to offset the bounds by the stroke weight
@@ -15,7 +16,6 @@ export function circle_packing(ctx, palette) {
 
     const packer = new CanvasPacker(ctx.canvas.width, ctx.canvas.height)
 
-    // TODO: canvas is not scaled correctly
     const circleRenderer = (circ) => {
         return (ctx) => {
             draw(ctx, circ, { fill: '#000' })

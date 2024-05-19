@@ -14,6 +14,7 @@ import { goto20 } from './examples/goto20'
 import { glassImpact } from './examples/glass_impact'
 import { distros } from './examples/distros'
 import { linesNest } from './examples/lines_nest'
+import { weightedRandomDemo } from './examples/weighted-random'
 
 const palette = shuffle(['#ff616b', '#faed8f', '#0f261f'])
 const [bg, primary, secondary] = palette
@@ -35,12 +36,15 @@ const examples = [
     glassImpact,
     distros, // 10
     linesNest,
+    weightedRandomDemo, // 12
 ]
 
 // TODO: drunken wander example
+// const fn = pickRandom(examples)
+const fn = examples[12]
 
-examples[10](ctx, palette)
-// pickRandom(examples)(ctx, palette)
+document.getElementById('example-title').textContent = fn.name
+fn(ctx, palette)
 
 // /* https://generativeartistry.com/tutorials/circle-packing/ */
 // function tut06_circle_packing() {

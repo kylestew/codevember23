@@ -177,7 +177,7 @@ export class Rectangle {
      * Returns the maximum coordinates of the shape.
      * @returns {number[]} An array containing the maximum coordinates [x, y].
      */
-    max() {
+    get max() {
         return [this.pos[0] + this.size[0], this.pos[1] + this.size[1]]
     }
 
