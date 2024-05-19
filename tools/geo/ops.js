@@ -1,6 +1,6 @@
 import { Arc, Circle, Ellipse, Line, Polygon, Polyline, Rectangle } from './shapes'
 import { random, randomPoint } from '../random'
-import { neg } from '../math/vectors'
+import { neg, subN, mulN } from '../math/vectors'
 import { wrapSides, partition } from '../array'
 
 /*
@@ -171,12 +171,13 @@ export function bounds(shape) {
     /* https://github.com/thi-ng/umbrella/blob/41bd769068da804eeace622ec7db50e4d48f1dc9/packages/geom/src/bounds.ts#L65 */
     if (shape instanceof Arc) {
     } else if (shape instanceof Circle) {
+        return new Rectangle(subN(shape.pos, shape.r), mulN([2, 2], shape.r))
     } else if (shape instanceof Ellipse) {
     } else if (shape instanceof Line) {
     } else if (shape instanceof Polygon) {
     } else if (shape instanceof Polyline) {
     } else if (shape instanceof Rectangle) {
-        return new Rectangle(shape.pos, shape.size, shape.attribs)
+        return new Rectangle(shape.pos, shape.size)
     }
     throw new Error(`Method not implemented on ${shape.constructor.name}`)
 }

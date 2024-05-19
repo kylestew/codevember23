@@ -7,6 +7,7 @@ import { joy_division } from './examples/tut02'
 import { cubic_disarray } from './examples/tut03'
 import { triangular_mesh } from './examples/tut04'
 import { un_deux_trois } from './examples/tut05'
+import { circle_packing } from './examples/tut06'
 import { hypnotic_squares } from './examples/tut07'
 import { floodFill } from './examples/flood_fill'
 import { goto20 } from './examples/goto20'
@@ -24,12 +25,15 @@ const examples = [
     cubic_disarray,
     triangular_mesh,
     un_deux_trois,
+    circle_packing,
     hypnotic_squares,
     floodFill,
     goto20,
 ]
 
-examples[7](ctx, palette)
+// TODO: drunken wander example
+
+examples[5](ctx, palette)
 // pickRandom(examples)(ctx, palette)
 
 // /* https://generativeartistry.com/tutorials/circle-packing/ */
