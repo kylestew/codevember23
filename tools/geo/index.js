@@ -39,5 +39,5 @@ export {
     // tangentAt() - compute tangent at parametric position
     // transform() - apply transformation matrix
     translate,
-    // withAttribs() - shallow copy of given shape with new attribs assigned
+    withAttribs, // shallow copy of given shape with new attribs assigned
 } from './ops'

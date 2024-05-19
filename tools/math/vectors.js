@@ -14,6 +14,7 @@
  */
 
 export const add = (v1, v2) => v1.map((x, i) => x + v2[i])
+export const sub = (v1, v2) => v1.map((val, i) => val - v2[i])
 export const mul = (v1, v2) => v1.map((x, i) => x * v2[i])
 
 export const subN = (v, n) => v.map((x) => x - n)
@@ -23,3 +24,5 @@ export const neg = (v) => mulN(v, -1)
 
 export const floor = (v) => v.map(Math.floor)
 export const ceil = (v) => v.map(Math.ceil)
+
+export const dist = (v1, v2) => Math.hypot(...sub(v1, v2))

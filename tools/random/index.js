@@ -113,3 +113,24 @@ export function weightedRandom(weights) {
 
     throw new Error('Unable to determine weighted random index')
 }
+
+// Function to generate a normally distributed random number
+function boxMullerTransform() {
+    let u = 0,
+        v = 0
+    while (u === 0) u = Math.random() // Converting [0,1) to (0,1)
+    while (v === 0) v = Math.random()
+    let z = Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v)
+    return z
+}
+
+/**
+ * Calculates a random number from a Gaussian distribution.
+ *
+ * @param {number} mean - The mean value of the distribution.
+ * @param {number} stdDev - The standard deviation of the distribution.
+ * @returns {number} The random number from the Gaussian distribution.
+ */
+export function gaussian(mean, stdDev) {
+    return mean + stdDev * boxMullerTransform()
+}

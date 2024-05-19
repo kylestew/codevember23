@@ -11,6 +11,9 @@ import { circle_packing } from './examples/tut06'
 import { hypnotic_squares } from './examples/tut07'
 import { floodFill } from './examples/flood_fill'
 import { goto20 } from './examples/goto20'
+import { glassImpact } from './examples/glass_impact'
+import { distros } from './examples/distros'
+import { linesNest } from './examples/lines_nest'
 
 const palette = shuffle(['#ff616b', '#faed8f', '#0f261f'])
 const [bg, primary, secondary] = palette
@@ -26,14 +29,17 @@ const examples = [
     triangular_mesh,
     un_deux_trois,
     circle_packing,
-    hypnotic_squares,
+    hypnotic_squares, // 6
     floodFill,
-    goto20,
+    goto20, // 8
+    glassImpact,
+    distros, // 10
+    linesNest,
 ]
 
 // TODO: drunken wander example
 
-examples[5](ctx, palette)
+examples[10](ctx, palette)
 // pickRandom(examples)(ctx, palette)
 
 // /* https://generativeartistry.com/tutorials/circle-packing/ */
