@@ -12,9 +12,14 @@ import { installSaveCanvasCommand } from './canvas-save'
  * @throws {Error} If canvas is not supported in the browser.
  */
 export function createCanvas(width: number, height: number, canvasId: string = 'mainCanvas'): CanvasRenderingContext2D {
-    const canvas = document.createElement('canvas')
-    canvas.id = canvasId
-    document.body.appendChild(canvas)
+    let canvas = document.getElementById(canvasId) as HTMLCanvasElement
+    if (!canvas) {
+        // Create a new canvas element if it doesn't exist
+        const newCanvas = document.createElement('canvas')
+        newCanvas.id = canvasId
+        document.body.appendChild(newCanvas)
+        canvas = newCanvas
+    }
 
     canvas.width = width
     canvas.height = height

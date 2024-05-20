@@ -1,5 +1,5 @@
 // /* https://generativeartistry.com/tutorials/hypnotic-squares/ */
-export function hypnotic_squares() {
+export function hypnotic_squares(ctx, palette) {
     //     // create a grid
     //     const grid = new Grid([-1, -1], [2, 2], 8, 8)
     //     // generate a list off offsets for each smallest square

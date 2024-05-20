@@ -133,7 +133,7 @@ export class Rectangle {
 
     get pts() {
         const [x0, y0] = this.pos
-        const [x1, y1] = this.max()
+        const [x1, y1] = this.max
         return [
             [x0, y0],
             [x1, y0],
