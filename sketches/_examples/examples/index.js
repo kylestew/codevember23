@@ -11,7 +11,7 @@ import { glassImpact } from './glass_impact'
 import { distros } from './distros'
 import { linesNest } from './lines_nest'
 import { weightedRandomDemo } from './weighted-random'
-import { distroShaping } from './ditro_shaping'
+import { distroShaping } from './distro_shaping'
 import { colorWheel } from './color_wheel'
 
 export const examples = [
@@ -28,6 +28,6 @@ export const examples = [
     distros,
     weightedRandomDemo,
     linesNest,
-    // distroShaping,
+    distroShaping,
     colorWheel,
 ]

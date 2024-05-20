@@ -26,20 +26,3 @@ export function weightedRandomDemo(ctx, palette) {
         })
     )
 }
-
-// function randomRectsFill() {
-//     const boundingRect = new Rectangle([-1, -1], [2, 2], { fill: '#333344' })
-
-//     // clip to bounds
-//     ctx.clip(asPath(boundingRect))
-
-//     // 1st layer
-//     let pts = scatter(boundingRect, 24)
-//     const rects0 = pts.map((pt) => Rectangle.withCenter(pt, [random(0.8, 2.0), random(0.1, 0.6)], { fill: primary }))
-
-//     // 2nd layer
-//     pts = scatter(boundingRect, 24)
-//     const rects1 = pts.map((pt) => Rectangle.withCenter(pt, [random(0.8, 2.0), random(0.1, 0.6)], { fill: secondary }))
-
-//     draw(ctx, interleave(rects0, rects1))
-// }

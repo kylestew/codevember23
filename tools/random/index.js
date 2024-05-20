@@ -5,6 +5,9 @@
  * randomInt(min, max) - generates a random integer between the specified minimum and maximum values
  * pickRandom(arr) - picks a random element from an array
  * randomPoint(min, max) - generates a random point within a specified range
+ * randomOffset(maxX, maxY) - generates a random offset within the specified range
+ * weightedRandom(weights) - generates a random index from an array of weights
+ * gaussian(mean, stdDev) - calculates a random number from a Gaussian distribution
  */
 
 /**
