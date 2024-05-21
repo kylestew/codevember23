@@ -13,7 +13,7 @@ import { linesNest } from './lines_nest'
 import { weightedRandomDemo } from './weighted-random'
 import { distroShaping } from './distro_shaping'
 import { colorWheel } from './color_wheel'
-import { convexHull } from './convex_hull'
+import { convexHullDemo } from './convex_hull'
 
 export const examples = [
     tiled_lines,
@@ -31,5 +31,5 @@ export const examples = [
     linesNest,
     distroShaping,
     colorWheel,
-    convexHull,
+    convexHullDemo,
 ]

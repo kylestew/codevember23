@@ -31,11 +31,11 @@ export function distroShaping(ctx, palette) {
         // samples = samples.map((pt) => pointClipLogarithmic(pt, 0.5))
 
         // take N random samples
-        const sampleCount = 50_000
+        const sampleCount = 200_000
         let samples = full(sampleCount, () => {
             const [pt, spread, color] = pickRandom(distroBlobs)
             let centerPt = [gaussian(pt[0], spread), gaussian(pt[1], spread)]
-            centerPt = pointRemapFn(centerPt, 0.75)
+            centerPt = pointRemapFn(centerPt, 0.5)
             return new Circle(centerPt, random(0.001, 0.003), { fill: color + '99' })
         })
 

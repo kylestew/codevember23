@@ -1,8 +1,10 @@
+import { Polygon } from '../tools/geo/'
 import { random, gaussian } from '../tools/random'
 import { full, zip } from '../tools/array'
+import { convexHull } from '../tools/geo/extended/convex-hull'
 import { draw } from '../tools/draw'
 
-export function convexHull(ctx, palette) {
+export function convexHullDemo(ctx, palette) {
     const [bg, primary, secondary] = palette
 
     // generate a list of points scattered randomly using gaussian distribution around the center
@@ -10,6 +12,11 @@ export function convexHull(ctx, palette) {
     const pts = full(pointCount, () => [gaussian(0, 0.35), gaussian(0, 0.35)])
 
     draw(ctx, pts)
+
+    const hull = convexHull(pts)
+
+    const poly = new Polygon(hull)
+    draw(ctx, poly)
 
     // find the convex hull
 
