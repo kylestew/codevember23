@@ -1,41 +1,71 @@
-import {} from '../tools/geo'
-import { full } from '../tools/array'
-import { mapRange, clamp } from '../tools/math'
+import { Circle } from '../tools/geo'
+import { full, zip } from '../tools/array'
+import { random, gaussian, pickRandom } from '../tools/random'
+import { pointClipLogarithmic, pointClipSigmoid, pointClipExponential, pointClipSmooth } from '../tools/math/clipping'
 import { setCanvasRange } from '../tools/canvas-utils'
 import { draw } from '../tools/draw'
-
-import { random, gaussian, pickRandom } from '../tools/random'
-// import { easeInQuad, easeInExpo, easeInOutCubic, easeOutInCubic } from '../tools/math/easings'
 
 export function distroShaping(ctx, palette) {
     const [bg, primary, secondary] = palette
 
     ctx.resetTransform()
-    setCanvasRange(ctx, -1.0, 1.0)
+    const { clearCanvas } = setCanvasRange(ctx, -1.0, 1.0)
 
-    const spread = 0.1
-    const gaussStops = [
-        [-2.0, spread],
-        [-1.5, spread],
-        [-1.0, spread],
-        [-0.5, spread],
-        [-0.0, spread],
-        [0.5, spread],
-        [1.0, spread],
-        [1.5, spread],
-        [2.0, spread],
-    ]
+    // randomly select N seed points in canvas area
+    const n = 9
+    const seedPts = full(n, () => [random(-1, 1), random(-1, 1)])
 
-    const something = () => {
-        const y = random(-1, 1)
-        const [a, b] = pickRandom(gaussStops)
-        const x = gaussian(a, b)
+    // randomly select spreads
+    const spreads = full(n, () => random(0.05, 0.6))
 
-        return [x + Math.sin(y * 1.5), y]
+    // randomly select colors
+    const colors = full(n, () => pickRandom([primary, secondary]))
+
+    const distroBlobs = zip(seedPts, spreads, colors)
+
+    function render() {
+        clearCanvas(bg)
+
+        const pointRemapFn = pointClipSmooth
+        // const pointRemapFn = pointClipExponential
+        // samples = samples.map((pt) => pointClipLogarithmic(pt, 0.5))
+
+        // take N random samples
+        const sampleCount = 50_000
+        let samples = full(sampleCount, () => {
+            const [pt, spread, color] = pickRandom(distroBlobs)
+            let centerPt = [gaussian(pt[0], spread), gaussian(pt[1], spread)]
+            centerPt = pointRemapFn(centerPt, 0.75)
+            return new Circle(centerPt, random(0.001, 0.003), { fill: color + '99' })
+        })
+
+        draw(ctx, samples)
+        // requestAnimationFrame(render)
     }
+    render()
 
-    const sampleCount = 300_000
-    const samples = full(sampleCount, something)
+    // TODO: blow away some of the circles
+    // compress
 
-    draw(ctx, samples, { fill: primary, weight: 0.002 })
+    // // preset list of distributions
+    // const spread = 0.1
+    // const gaussStops = [
+    //     [-2.0, 0.16],
+    //     [-1.5, 0.14],
+    //     [-1.0, 0.12],
+    //     [-0.5, 0.1],
+    //     [-0.0, 0.08],
+    //     [0.5, 0.1],
+    //     [1.0, 0.12],
+    //     [1.5, 0.14],
+    //     [2.0, 0.16],
+    // ]
+
+    // const something = () => {
+    //     const y = random(-1, 1)
+    //     const [a, b] = pickRandom(gaussStops)
+    //     const x = gaussian(a, b)
+
+    //     return [x + Math.sin(y * 1.333), y]
+    // }
 }
