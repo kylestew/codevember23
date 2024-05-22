@@ -36,7 +36,7 @@ def find_exports_in_folder(folder_path):
     return all_exports
 
 
-def print_exports(all_exports):
+def print_exports(all_exports, folder_path):
     if not all_exports:
         print("\nNo exported functions found.")
     else:
@@ -46,7 +46,8 @@ def print_exports(all_exports):
             for export in exports:
                 export_name = export.split()[-1]
                 if export_name and export_name != "None":
-                    print(f"- [`{export}`]({file_path})")
+                    file_url = os.path.join(folder_path, file_path).replace("\\", "/")
+                    print(f"- [`{export}`]({file_url})")
 
 
 def main(target_folder):
@@ -55,7 +56,7 @@ def main(target_folder):
         return
 
     all_exports = find_exports_in_folder(target_folder)
-    print_exports(all_exports)
+    print_exports(all_exports, target_folder)
 
 
 if __name__ == "__main__":
