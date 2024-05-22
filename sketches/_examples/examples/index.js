@@ -14,6 +14,8 @@ import { weightedRandomDemo } from './weighted-random'
 import { distroShaping } from './distro_shaping'
 import { colorWheel } from './color_wheel'
 import { convexHullDemo } from './convex_hull'
+import { nearPointDemo } from './near_point'
+import { pointScatterDemo } from './point_scatter'
 
 export const examples = [
     tiled_lines,
@@ -32,4 +34,6 @@ export const examples = [
     distroShaping,
     colorWheel,
     convexHullDemo,
+    nearPointDemo,
+    pointScatterDemo,
 ]

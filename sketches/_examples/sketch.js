@@ -13,7 +13,7 @@ if (!RUN_ALL) {
     const { clearCanvas } = setCanvasRange(ctx, -1.1, 1.1)
     clearCanvas(bg)
 
-    const fn = examples[11]
+    const fn = examples[12]
     console.log('RUNNING EXAMPLE', fn.name)
     fn(ctx, palette)
 } else {
