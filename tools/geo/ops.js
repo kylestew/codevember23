@@ -58,7 +58,11 @@ export function asPath(shape) {
             break
         }
 
-        // case 'Ellipse':
+        case 'Ellipse':
+            const [x, y] = shape.pos
+            const [radX, radY] = shape.r
+            path.ellipse(x, y, radX, radY, 0, 0, 2.0 * Math.PI)
+            break
 
         case 'Polyline':
             shape.pts.forEach((pt, idx) => {
@@ -173,8 +177,35 @@ export function bounds(shape) {
     } else if (shape instanceof Circle) {
         return new Rectangle(subN(shape.pos, shape.r), mulN([2, 2], shape.r))
     } else if (shape instanceof Ellipse) {
+        const [cx, cy] = shape.pos
+        const [rx, ry] = shape.r
+
+        const minX = cx - rx
+        const minY = cy - ry
+        const maxX = cx + rx
+        const maxY = cy + ry
+
+        return new Rectangle([minX, minY], [maxX - minX, maxY - minY])
     } else if (shape instanceof Line) {
     } else if (shape instanceof Polygon) {
+        const pts = shape.pts
+
+        let minX = pts[0][0]
+        let minY = pts[0][1]
+        let maxX = pts[0][0]
+        let maxY = pts[0][1]
+
+        for (let i = 1; i < pts.length; i++) {
+            let x = pts[i][0]
+            let y = pts[i][1]
+
+            if (x < minX) minX = x
+            if (y < minY) minY = y
+            if (x > maxX) maxX = x
+            if (y > maxY) maxY = y
+        }
+
+        return new Rectangle([minX, minY], [maxX - minX, maxY - minY])
     } else if (shape instanceof Polyline) {
     } else if (shape instanceof Rectangle) {
         return new Rectangle(shape.pos, shape.size)
@@ -296,14 +327,40 @@ export function pointAt(shape, t) {
 export function pointInside(shape, pt) {
     if (shape instanceof Arc) {
     } else if (shape instanceof Circle) {
+        const [x, y] = pt
+        const [cx, cy] = shape.pos
+        const r = shape.r
+
+        return (x - cx) ** 2 + (y - cy) ** 2 <= r ** 2
     } else if (shape instanceof Ellipse) {
+        const [x, y] = pt
+        const [cx, cy] = shape.pos
+        const [rx, ry] = shape.r
+
+        // Check if the point lies within the ellipse using the standard ellipse equation
+        return (x - cx) ** 2 / rx ** 2 + (y - cy) ** 2 / ry ** 2 <= 1
     } else if (shape instanceof Line) {
     } else if (shape instanceof Polygon) {
+        // raycasting algorithm
+        const [x, y] = pt
+        const pts = shape.pts
+
+        var inside = false
+        for (var i = 0, j = pts.length - 1; i < pts.length; j = i++) {
+            var xi = pts[i][0],
+                yi = pts[i][1]
+            var xj = pts[j][0],
+                yj = pts[j][1]
+
+            var intersect = yi > y != yj > y && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi
+            if (intersect) inside = !inside
+        }
+        return inside
     } else if (shape instanceof Polyline) {
     } else if (shape instanceof Rectangle) {
         const [x, y] = pt
         const [x0, y0] = shape.pos
-        const [x1, y1] = shape.max()
+        const [x1, y1] = shape.max
 
         return x >= x0 && x <= x1 && y >= y0 && y <= y1
     }
@@ -396,7 +453,7 @@ export function scatter(shape, num) {
     if (!b) return
 
     const mi = b.pos
-    const mx = b.max()
+    const mx = b.max
 
     let out = []
     while (num-- > 0) {

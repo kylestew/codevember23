@@ -20,6 +20,7 @@ import { wibbledPaths } from './wibbled_paths'
 import { spoolShaders } from './spool_shaders'
 import { jellyfish } from './jellyfish'
 import { noiseExample } from './noise_example'
+import { pointInsideDemo } from './point_inside'
 
 export const examples = [
     tiled_lines,
@@ -44,4 +45,5 @@ export const examples = [
     spoolShaders,
     jellyfish,
     noiseExample,
+    pointInsideDemo,
 ]
