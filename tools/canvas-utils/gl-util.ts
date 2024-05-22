@@ -20,7 +20,7 @@ export function createGLCanvas(width: number, height: number, canvasId: string =
     canvas.height = height
 
     // preserve buffer to CMD+S saving
-    const gl: WebGL2RenderingContext | null = canvas.getContext('webgl', { preserveDrawingBuffer: true })
+    const gl: WebGL2RenderingContext | null = canvas.getContext('webgl2', { preserveDrawingBuffer: true })
     if (!gl) {
         throw new Error('WebGL not supported in this browser!')
     }

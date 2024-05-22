@@ -18,6 +18,7 @@ import { nearPointDemo } from './near_point'
 import { pointScatterDemo } from './point_scatter'
 import { wibbledPaths } from './wibbled_paths'
 import { spoolShaders } from './spool_shaders'
+import { jellyfish } from './jellyfish'
 
 export const examples = [
     tiled_lines,
@@ -40,4 +41,5 @@ export const examples = [
     pointScatterDemo,
     wibbledPaths,
     spoolShaders,
+    jellyfish,
 ]

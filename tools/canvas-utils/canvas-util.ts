@@ -88,7 +88,8 @@ function clear(clearColor: string) {
 
 /**
  * Sets the canvas range for a given CanvasRenderingContext2D.
- * This function scales and translates the canvas to fit the range [min, max] into the canvas dimensions.
+ * This function scales and translates the canvas to fit the range [min, max] into the canvas dimensions,
+ * and flips the Y axis.
  *
  * @param ctx - The CanvasRenderingContext2D to set the range for.
  * @param min - The minimum value of the range.
@@ -111,8 +112,8 @@ export function setCanvasRange(
     // Reset transformations to default
     this.resetTransform()
 
-    // Set up scaling
-    this.scale(scaleFactor, scaleFactor)
+    // Set up scaling, flip the Y axis by using -scaleFactor for Y
+    this.scale(scaleFactor, -scaleFactor)
 
     // Initialize translation values
     let translateX = 0
@@ -129,7 +130,7 @@ export function setCanvasRange(
         // Width is the shortest, center vertically
         excessHeight = height - width
         translateY = excessHeight / (2 * scaleFactor)
-        this.translate(-min, -min + translateY)
+        this.translate(-min, -(max + translateY))
 
         // Update yRange to reflect the actual range being displayed
         const rescaleFactor = height / (max - min) / scaleFactor
@@ -138,7 +139,7 @@ export function setCanvasRange(
         // Height is the shortest, center horizontally
         excessWidth = width - height
         translateX = excessWidth / (2 * scaleFactor)
-        this.translate(-min + translateX, -min)
+        this.translate(-min + translateX, -max)
 
         // Update yRange to reflect the actual range being displayed
         const rescaleFactor = width / (max - min) / scaleFactor

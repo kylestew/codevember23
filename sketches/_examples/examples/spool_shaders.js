@@ -3,11 +3,11 @@ import { color } from '../tools/color'
 import { createGLCanvas, createOffscreenCanvas } from '../tools/canvas-utils'
 import { draw } from '../tools/draw'
 
-const vertShaderSource = `
-attribute vec4 aPosition;
-attribute vec2 aTexCoord;
+const vertShaderSource = `#version 300 es
+in vec4 aPosition;
+in vec2 aTexCoord;
 
-varying vec2 vTexCoord;
+out vec2 vTexCoord;
 
 void main() {
     vTexCoord = aTexCoord;
@@ -32,8 +32,8 @@ export function spoolShaders(ctx, palette) {
     // draw something to an offscreen canvas
     const offCtx = createOffscreenCanvas(w, h)
     offCtx.setRange(-1, 1)
-    offCtx.clear(bg)
-    draw(offCtx, new Circle([0, 0], 0.5), { fill: primary })
+    offCtx.clear('black')
+    draw(offCtx, new Circle([0, 0], 0.5), { fill: 'white' })
 
     gl.clear(color(bg).toGLSL())
     gl.useShader(shader)
