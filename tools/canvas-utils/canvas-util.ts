@@ -24,12 +24,16 @@ export function createCanvas(width: number, height: number, canvasId: string = '
     canvas.width = width
     canvas.height = height
 
-    const ctx = canvas.getContext('2d')
+    // const ctx = canvas.getContext('2d')
+    const ctx = canvas.getContext('2d', { willReadFrequently: true })
     if (!ctx) {
         throw new Error('Canvas not supported in this browser!')
     }
 
     installSaveCanvasCommand(ctx.canvas)
+
+    ctx.setRange = setCanvasRange.bind(ctx)
+    ctx.clear = clear.bind(ctx)
 
     return ctx
 }
@@ -56,10 +60,30 @@ export function createOffscreenCanvas(
         throw new Error('Could not create OffscreenCanvasRenderingContext2D')
     }
 
-    offCtx.fillStyle = clearColor
-    offCtx.fillRect(0, 0, width, height)
+    offCtx.clearRect(0, 0, width, height)
+
+    offCtx.setRange = setCanvasRange.bind(offCtx)
+    offCtx.clear = clear.bind(offCtx)
 
     return offCtx
+}
+
+// Define the clear function
+function clear(clearColor: string) {
+    // Save the current transformation matrix
+    this.save()
+
+    // Reset the transformation matrix to the default state
+    this.resetTransform()
+
+    // Set the fill style to the clear color
+    this.fillStyle = clearColor
+
+    // Clear the canvas with the given color
+    this.fillRect(0, 0, this.canvas.width, this.canvas.height)
+
+    // Restore the previous transformation matrix
+    this.restore()
 }
 
 /**
@@ -71,13 +95,12 @@ export function createOffscreenCanvas(
  * @param max - The maximum value of the range.
  */
 export function setCanvasRange(
-    ctx: CanvasRenderingContext2D,
     min: number,
     max: number
 ): { min: [number, number]; max: [number, number]; clearCanvas: Function } {
     // Retrieve the canvas dimensions from the context
-    const width = ctx.canvas.width
-    const height = ctx.canvas.height
+    const width = this.canvas.width
+    const height = this.canvas.height
 
     // Determine the shortest side
     const size = Math.min(width, height)
@@ -86,10 +109,10 @@ export function setCanvasRange(
     const scaleFactor = size / (max - min)
 
     // Reset transformations to default
-    ctx.resetTransform()
+    this.resetTransform()
 
     // Set up scaling
-    ctx.scale(scaleFactor, scaleFactor)
+    this.scale(scaleFactor, scaleFactor)
 
     // Initialize translation values
     let translateX = 0
@@ -106,7 +129,7 @@ export function setCanvasRange(
         // Width is the shortest, center vertically
         excessHeight = height - width
         translateY = excessHeight / (2 * scaleFactor)
-        ctx.translate(-min, -min + translateY)
+        this.translate(-min, -min + translateY)
 
         // Update yRange to reflect the actual range being displayed
         const rescaleFactor = height / (max - min) / scaleFactor
@@ -115,29 +138,11 @@ export function setCanvasRange(
         // Height is the shortest, center horizontally
         excessWidth = width - height
         translateX = excessWidth / (2 * scaleFactor)
-        ctx.translate(-min + translateX, -min)
+        this.translate(-min + translateX, -min)
 
         // Update yRange to reflect the actual range being displayed
         const rescaleFactor = width / (max - min) / scaleFactor
         xRange = [min * rescaleFactor, max * rescaleFactor]
-    }
-
-    // Define the clear function
-    function clear(clearColor: string) {
-        // Save the current transformation matrix
-        ctx.save()
-
-        // Reset the transformation matrix to the default state
-        ctx.resetTransform()
-
-        // Set the fill style to the clear color
-        ctx.fillStyle = clearColor
-
-        // Clear the canvas with the given color
-        ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height)
-
-        // Restore the previous transformation matrix
-        ctx.restore()
     }
 
     // Return new ranges describing how the canvas area is being used

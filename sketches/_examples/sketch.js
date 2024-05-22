@@ -1,4 +1,4 @@
-import { createCanvas, setCanvasRange } from './tools/canvas-utils'
+import { createCanvas } from './tools/canvas-utils'
 import { shuffle } from './tools/array'
 
 import { examples } from './examples'
@@ -10,10 +10,11 @@ const RUN_ALL = false
 
 if (!RUN_ALL) {
     const ctx = createCanvas(1200, 1200)
-    const { clearCanvas } = setCanvasRange(ctx, -1.1, 1.1)
-    clearCanvas(bg)
+    ctx.setRange(-1.1, 1.1)
+    ctx.clear(bg)
 
-    const fn = examples[12]
+    // const fn = examples[15]
+    const fn = examples[15]
     console.log('RUNNING EXAMPLE', fn.name)
     fn(ctx, palette)
 } else {
@@ -28,8 +29,8 @@ if (!RUN_ALL) {
         container.appendChild(canvas)
 
         const ctx = createCanvas(600, 600, canvas.id)
-        const { clearCanvas } = setCanvasRange(ctx, -1.04, 1.04)
-        clearCanvas(bg)
+        ctx.setRange(-1.04, 1.04)
+        ctx.clear(bg)
 
         title.textContent = fn.name
         fn(ctx, palette)

@@ -1,5 +1,5 @@
 export { createCanvas, createOffscreenCanvas, setCanvasRange } from './canvas-util'
-export { createGLCanvas, glClear, loadShader, useShader, useTexture, drawScreen } from './gl-util'
+export { createGLCanvas } from './gl-util'
 
 // EVIL MONKEY PATCHING IN SOME METHODS
 declare global {

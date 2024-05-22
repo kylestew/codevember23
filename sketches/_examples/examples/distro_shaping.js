@@ -9,7 +9,7 @@ export function distroShaping(ctx, palette) {
     const [bg, primary, secondary] = palette
 
     ctx.resetTransform()
-    const { clearCanvas } = setCanvasRange(ctx, -1.0, 1.0)
+    ctx.setRange(ctx, -1.0, 1.0)
 
     // randomly select N seed points in canvas area
     const n = 9
@@ -24,7 +24,7 @@ export function distroShaping(ctx, palette) {
     const distroBlobs = zip(seedPts, spreads, colors)
 
     function render() {
-        clearCanvas(bg)
+        ctx.clear(bg)
 
         const pointRemapFn = pointClipSmooth
         // const pointRemapFn = pointClipExponential

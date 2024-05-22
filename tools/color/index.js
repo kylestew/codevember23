@@ -67,6 +67,9 @@ export function color(value) {
         toRgba: function () {
             return rgbaToString(colorObj)
         },
+        toGLSL: function () {
+            return [colorObj.r / 255, colorObj.g / 255, colorObj.b / 255, colorObj.a]
+        },
         toArray: function () {
             return [colorObj.r, colorObj.g, colorObj.b, colorObj.a * 255]
         },

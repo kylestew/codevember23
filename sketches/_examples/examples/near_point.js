@@ -20,5 +20,6 @@ export function nearPointDemo(ctx, palette) {
     draw(ctx, pts)
 
     // draw lines from target point to connected point
-    draw(ctx, connectedPts, { fill: 'red' })
+    const lines = connectedPts.map((pt) => new Line(targetPoint, pt))
+    draw(ctx, lines, { stroke: 'red', weight: 0.01 })
 }

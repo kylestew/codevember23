@@ -4,7 +4,7 @@ import { Grid } from '../tools/geo/extended'
 import { random, randomInt } from '../tools/random'
 import { shuffle } from '../tools/array'
 import { color } from '../tools/color'
-import { createOffscreenCanvas, setCanvasRange } from '../tools/canvas-utils'
+import { createOffscreenCanvas } from '../tools/canvas-utils'
 import { floodFillAlgorithm } from '../tools/tex/flood-fill'
 import { draw } from '../tools/draw'
 
@@ -12,12 +12,12 @@ export function goto20(ctx, palette) {
     const [bg, primary, secondary] = palette
 
     const offCtx = createOffscreenCanvas(ctx.canvas.width, ctx.canvas.height)
-    const { clearCanvas } = setCanvasRange(offCtx, -1.1, 1.1)
+    offCtx.setRange(-1.1, 1.1)
 
     const probability = 0.5
     const cellCount = 12
     function doGoto() {
-        clearCanvas('white')
+        offCtx.clear('white')
 
         // generate grid cells
         const grid = new Grid([-1.2, -1.2], [2.4, 2.4], cellCount, cellCount)

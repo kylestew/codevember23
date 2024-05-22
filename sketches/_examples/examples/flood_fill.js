@@ -3,7 +3,7 @@ import { color } from '../tools/color'
 import { full } from '../tools/array'
 import { random } from '../tools/random'
 import { floodFillAlgorithm } from '../tools/tex/flood-fill'
-import { createOffscreenCanvas, setCanvasRange } from '../tools/canvas-utils'
+import { createOffscreenCanvas } from '../tools/canvas-utils'
 import { draw } from '../tools/draw'
 
 export function floodFill(ctx, palette) {
@@ -17,7 +17,7 @@ export function floodFill(ctx, palette) {
 
     // render the rects into offscreen context
     const offCtx = createOffscreenCanvas(ctx.canvas.width, ctx.canvas.height)
-    setCanvasRange(offCtx, -1.1, 1.1)
+    offCtx.setRange(-1.1, 1.1)
     draw(offCtx, rects)
 
     // select a random position to start fill from

@@ -16,6 +16,8 @@ import { colorWheel } from './color_wheel'
 import { convexHullDemo } from './convex_hull'
 import { nearPointDemo } from './near_point'
 import { pointScatterDemo } from './point_scatter'
+import { wibbledPaths } from './wibbled_paths'
+import { spoolShaders } from './spool_shaders'
 
 export const examples = [
     tiled_lines,
@@ -36,4 +38,6 @@ export const examples = [
     convexHullDemo,
     nearPointDemo,
     pointScatterDemo,
+    wibbledPaths,
+    spoolShaders,
 ]
