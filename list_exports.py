@@ -15,10 +15,11 @@ def find_exports_in_file(file_path):
             if match:
                 export_type = match.group(1)
                 export_name = match.group(2) or match.group(3)
-                if export_type == "default":
-                    exports.append(f"export default {export_name or 'anonymous'}")
-                else:
-                    exports.append(f"export {export_type or ''} {export_name}")
+                if export_name:
+                    if export_type == "default":
+                        exports.append(f"export default {export_name or 'anonymous'}")
+                    else:
+                        exports.append(f"export {export_type or ''} {export_name}")
     return exports
 
 
@@ -30,7 +31,8 @@ def find_exports_in_folder(folder_path):
                 file_path = os.path.join(root, file)
                 exports = find_exports_in_file(file_path)
                 if exports:
-                    all_exports[file_path] = exports
+                    relative_path = os.path.relpath(file_path, folder_path)
+                    all_exports[relative_path] = exports
     return all_exports
 
 
@@ -42,7 +44,9 @@ def print_exports(all_exports):
         for file_path, exports in all_exports.items():
             print(f"\n### {file_path}")
             for export in exports:
-                print(f"- `{export}`")
+                export_name = export.split()[-1]
+                if export_name and export_name != "None":
+                    print(f"- [`{export}`]({file_path})")
 
 
 def main(target_folder):

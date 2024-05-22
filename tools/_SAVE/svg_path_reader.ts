@@ -9,7 +9,7 @@ import { parse as parseXML, Type } from '@thi.ng/sax'
  * @param svgData - The SVG data to be converted.
  * @returns An array of Path objects representing the SVG data.
  */
-export function svgToPaths(svgData: string): Path[] {
+function svgToPaths(svgData: string): Path[] {
     return transduce(
         comp(
             // test -> SAX

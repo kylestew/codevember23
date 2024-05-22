@@ -4,7 +4,7 @@ import { circle, rect, polygon, pathBuilder } from '@thi.ng/geom'
  * Shape set reminiscent of a child's block set
  * All shapes are in -1 to 1 space and fill the space
  */
-export const childsBlocks = [
+const childsBlocks = [
     () => {
         // circle
         return new circle([0, 0], 1)
@@ -40,7 +40,7 @@ export const childsBlocks = [
  * From London rental bathroom - April 2024
  * Shapes have variance as if made by hand but with masking tape and paint
  */
-export const aprilBathroom = {
+const aprilBathroom = {
     rectangle: () => {
         // small or large size
         const size = randomCoinToss() ? random(0.4, 0.5) : random(0.74, 0.84)

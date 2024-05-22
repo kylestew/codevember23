@@ -41,7 +41,7 @@ function circleToBlob(circ: Circle, degradation: number): Polygon {
  *
  * @returns An iterable iterator of shapes representing the generated lines.
  */
-export function* genLinesIn(geo: IShape, density: number): IterableIterator<IShape> {
+function* genLinesIn(geo: IShape, density: number): IterableIterator<IShape> {
     const circ = enclosingCircle(bounds(geo)!)
     const count = Math.floor(area(circ) * density)
 
@@ -58,7 +58,7 @@ export function* genLinesIn(geo: IShape, density: number): IterableIterator<ISha
     // ),
 }
 
-export function genBlobsIn(geo: IShape, density: number, size: number, randomness: number): IterableIterator<Polygon> {
+function genBlobsIn(geo: IShape, density: number, size: number, randomness: number): IterableIterator<Polygon> {
     const count = Math.floor(area(geo) * density)
     return iterator(
         comp(

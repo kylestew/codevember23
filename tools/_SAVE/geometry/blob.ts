@@ -2,7 +2,7 @@ import { bounds, edges, Circle, circle, line, scatter, pointAt, group } from '@t
 import { iterator, comp, flatten1, map, trace, partition } from '@thi.ng/transducers'
 import { rotate } from '@thi.ng/arrays'
 
-export function blobFromCircle(circ: Circle, randRadius: number): Path2D {
+function blobFromCircle(circ: Circle, randRadius: number): Path2D {
     // circle -> bounding rect -> edges -> control points
     let pts = [
         ...iterator(
