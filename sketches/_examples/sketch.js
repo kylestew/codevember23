@@ -13,8 +13,7 @@ if (!RUN_ALL) {
     ctx.setRange(-1.1, 1.1)
     ctx.clear(bg)
 
-    const fn = examples[15]
-    // const fn = examples[16]
+    const fn = examples[17]
 
     console.log('RUNNING EXAMPLE', fn.name)
     fn(ctx, palette)

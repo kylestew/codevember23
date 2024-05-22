@@ -19,6 +19,7 @@ import { pointScatterDemo } from './point_scatter'
 import { wibbledPaths } from './wibbled_paths'
 import { spoolShaders } from './spool_shaders'
 import { jellyfish } from './jellyfish'
+import { noiseExample } from './noise_example'
 
 export const examples = [
     tiled_lines,
@@ -42,4 +43,5 @@ export const examples = [
     wibbledPaths,
     spoolShaders,
     jellyfish,
+    noiseExample,
 ]
