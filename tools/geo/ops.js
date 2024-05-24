@@ -86,6 +86,18 @@ export function asPath(shape) {
             path.lineTo(shape.pts[1][0], shape.pts[1][1])
             break
 
+        case 'Ray': {
+            const [x, y] = shape.pos
+            const [dx, dy] = shape.dir
+            // Calculate a point far along the direction to simulate the "infinite" ray
+            const length = 1000 // You can adjust this length as needed
+            const endX = x + dx * length
+            const endY = y + dy * length
+            path.moveTo(x, y)
+            path.lineTo(endX, endY)
+            break
+        }
+
         case 'Polygon':
             shape.pts.forEach((pt, idx) => {
                 const [x, y] = pt
@@ -270,6 +282,34 @@ export function edges(shape) {
 // export function fitIntoBounds(geo) {
 //     throw new Error(`Method not implemented on ${geo.constructor.name}`)
 // }
+
+/**
+ * Performs intersection tests on given 2 shapes and returns
+ * [`IntersectionResult`](https://docs.thi.ng/umbrella/geom-api/interfaces/IntersectionResult.html).
+ *
+ * If {@link IntersectOpts.all} is enabled (default: false) and if the
+ * intersection pair supports it, all possible intersections will be returned
+ * (for some implementations this always the case anyway). Currently, this is
+ * option is only implemented for the following pairings:
+ *
+ * - {@link Ray} / {@link Polygon}
+ * - {@link Ray} / {@link Polyline}
+ *
+ * @param a
+ * @param b
+ * @param opts
+ */
+export function intersects(shape) {
+    if (shape instanceof Arc) {
+    } else if (shape instanceof Circle) {
+    } else if (shape instanceof Ellipse) {
+    } else if (shape instanceof Line) {
+    } else if (shape instanceof Polygon) {
+    } else if (shape instanceof Polyline) {
+    } else if (shape instanceof Rectangle) {
+    }
+    throw new Error(`Method not implemented on ${shape.constructor.name}`)
+}
 
 /**
  * Computes an offset shape (as in "path offsetting") of given shape and offset

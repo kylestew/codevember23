@@ -82,8 +82,8 @@
 //     }
 // }
 
-import { Rectangle } from '../shapes'
-import { mulN, floor, ceil } from '../../math/vectors'
+import { Rectangle } from '../geo/shapes'
+import { mulN, floor, ceil } from '../math/vectors'
 
 /// Uses actual pixel data to determine if a shape can be placed
 /// Manages several canvases to do this (packed, glyph, compare)

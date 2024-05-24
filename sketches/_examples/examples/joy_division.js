@@ -3,7 +3,7 @@ import { asPoints } from '../tools/geo/ops'
 import { zip, interleave } from '../tools/array'
 import { random } from '../tools/random'
 import { draw } from '../tools/draw'
-import { chaikinCurve } from '../tools/geo/extended/chaikin'
+import { chaikinCurve } from '../tools/algos/chaikin'
 
 /* https://generativeartistry.com/tutorials/joy-division/ */
 export function joy_division(ctx, palette) {

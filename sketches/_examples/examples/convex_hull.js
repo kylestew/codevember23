@@ -1,7 +1,7 @@
 import { Polygon } from '../tools/geo/'
 import { random, gaussian } from '../tools/random'
 import { full, zip } from '../tools/array'
-import { convexHull } from '../tools/geo/extended/convex-hull'
+import { convexHull } from '../tools/algos/convex-hull'
 import { draw } from '../tools/draw'
 
 export function convexHullDemo(ctx, palette) {

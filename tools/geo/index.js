@@ -10,6 +10,7 @@ export {
     line,
     Polygon,
     Polyline,
+    Ray,
     Rectangle,
     rectangle,
 } from './shapes'
@@ -28,6 +29,7 @@ export {
     centroid, // computer shape centroid
     edges, // extract edges
     // fitIntoBounds() - rescale/reposition shapes into a destination boundary
+    intersects, // pairwise shape intersection (various types)
     offset, // shape/path offsetting
     pointAt, // compute point on shape boundary at parametric position
     pointInside, // check if point inside shape

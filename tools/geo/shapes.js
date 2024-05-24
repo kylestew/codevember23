@@ -261,3 +261,18 @@ export class Rectangle {
 export function rectangle(pos, size, attribs = {}) {
     return new Rectangle(pos, size, attribs)
 }
+
+export class Ray {
+    /**
+     * Represents a shape object.
+     * @constructor
+     * @param {Vec} pos - The position of the shape.
+     * @param {Vec} dir - The direction of the shape.
+     * @param {Object} [attribs={}] - Additional attributes of the shape.
+     */
+    constructor(pos, dir, attribs = {}) {
+        this.pos = pos
+        this.dir = dir
+        this.attribs = attribs
+    }
+}

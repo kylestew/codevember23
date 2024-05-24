@@ -1,6 +1,6 @@
 import { Circle, circle } from '../tools/geo'
 import { bounds, offset } from '../tools/geo'
-import { CanvasPacker } from '../tools/geo/extended/glyph-packer'
+import { CanvasPacker } from '../tools/algos/glyph-packer'
 import { draw } from '../tools/draw'
 
 export function circle_packing(ctx, palette) {

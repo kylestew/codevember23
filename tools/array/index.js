@@ -120,6 +120,37 @@ export function range2d(xRange, yRange, stepX = 1, stepY = 1) {
 }
 
 /**
+ * Generates an array of numbers within a specified range using a step function.
+ *
+ * @param {number} from - The starting number of the range.
+ * @param {number} to - The ending number of the range.
+ * @param {function(number): number} stepFn - A function that takes the current number and returns the next step increment.
+ *
+ * @returns {number[]} - An array of numbers within the specified range.
+ * @throws {Error} - If the step function does not return a positive increment.
+ */
+export function rangeFn(from, to, stepFn) {
+    // Overload arguments
+    if (arguments.length === 2) {
+        stepFn = to
+        to = from
+        from = 0
+    }
+
+    var res = []
+    var current = from
+    while (current < to) {
+        res.push(current)
+        var step = stepFn(current)
+        if (step <= 0) {
+            throw new Error('Step function must return a positive increment')
+        }
+        current += step
+    }
+    return res
+}
+
+/**
  * Creates overlapping and non-overlapping sliding windows
  * of inputs. Window size and progress speed can be configured via
  * `size` and `step`. By default only full / complete partitions are
