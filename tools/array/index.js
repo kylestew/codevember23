@@ -251,15 +251,16 @@ export function interleave(array1, array2) {
 
 /**
  * Zips multiple arrays together, creating an array of tuples.
+ * Stops at the shortest array length when arrays are uneven.
  *
  * @param {...Array} arrays - The arrays to zip together.
  * @returns {Array} - The zipped array.
  */
 export function zip(...arrays) {
-    const maxLength = Math.max(...arrays.map((arr) => arr.length))
+    const minLength = Math.min(...arrays.map((arr) => arr.length))
     const zipped = []
 
-    for (let i = 0; i < maxLength; i++) {
+    for (let i = 0; i < minLength; i++) {
         zipped.push(arrays.map((arr) => arr[i]))
     }
 

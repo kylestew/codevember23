@@ -281,6 +281,7 @@ export function edges(shape) {
 export function offset(shape, dist) {
     if (shape instanceof Arc) {
     } else if (shape instanceof Circle) {
+        return new Circle(shape.pos, shape.r + dist, shape.attribs)
     } else if (shape instanceof Ellipse) {
     } else if (shape instanceof Line) {
     } else if (shape instanceof Polygon) {
@@ -302,10 +303,10 @@ export function offset(shape, dist) {
 export function pointAt(shape, t) {
     if (shape instanceof Arc) {
     } else if (shape instanceof Circle) {
-        //         //     const theta = t * Math.PI * 2
-        //         //     const x = Math.cos(theta) * this.radius + this.centerPT[0]
-        //         //     const y = Math.sin(theta) * this.radius + this.centerPT[1]
-        //         //     return [x, y]
+        const theta = t * Math.PI * 2
+        const x = Math.cos(theta) * shape.r + shape.pos[0]
+        const y = Math.sin(theta) * shape.r + shape.pos[1]
+        return [x, y]
     } else if (shape instanceof Ellipse) {
     } else if (shape instanceof Line) {
         const x = shape.pts[0][0] + t * (shape.pts[1][0] - shape.pts[0][0])
