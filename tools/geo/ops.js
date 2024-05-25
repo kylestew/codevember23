@@ -28,11 +28,21 @@ export function area(shape) {
     } else if (shape instanceof Circle) {
         return Math.PI * shape.r * shape.r
     } else if (shape instanceof Ellipse) {
+        return Math.PI * shape.r[0] * shape.r[1]
     } else if (shape instanceof Line) {
         return 0
     } else if (shape instanceof Polygon) {
+        let area = 0
+        const n = shape.pts.length
+
+        for (let i = 0; i < n; i++) {
+            const [x1, y1] = shape.pts[i]
+            const [x2, y2] = shape.pts[(i + 1) % n] // Ensure the last point connects to the first
+            area += x1 * y2 - y1 * x2
+        }
+
+        return Math.abs(area) / 2
     } else if (shape instanceof Polyline) {
-        return 0
     } else if (shape instanceof Rectangle) {
         return shape.size[0] * shape.size[1]
     }
@@ -247,12 +257,32 @@ export function centerRotate(shape, theta) {
  */
 export function centroid(shape) {
     if (shape instanceof Arc) {
-    } else if (shape instanceof Circle) {
-        return shape.centerPT
-    } else if (shape instanceof Ellipse) {
+    } else if (shape instanceof Circle || shape instanceof Ellipse) {
+        return shape.pos
     } else if (shape instanceof Line) {
         return pointAt(shape, 0.5)
     } else if (shape instanceof Polygon) {
+        const pts = shape.pts
+
+        let xSum = 0
+        let ySum = 0
+        let areaSum = 0
+        const n = pts.length
+
+        for (let i = 0; i < n; i++) {
+            const [x1, y1] = pts[i]
+            const [x2, y2] = pts[(i + 1) % n] // Ensure the last point connects to the first
+            const crossProduct = x1 * y2 - x2 * y1
+            xSum += (x1 + x2) * crossProduct
+            ySum += (y1 + y2) * crossProduct
+            areaSum += crossProduct
+        }
+
+        const area = areaSum / 2
+        const centroidX = xSum / (6 * area)
+        const centroidY = ySum / (6 * area)
+
+        return [centroidX, centroidY]
     } else if (shape instanceof Polyline) {
     } else if (shape instanceof Rectangle) {
         return [shape.pos[0] + shape.size[0] / 2, shape.pos[1] + shape.size[1] / 2]
@@ -570,8 +600,13 @@ export function translate(shape, offset) {
     }
 
     if (shape instanceof Arc) {
+        // Implementation for Arc
     } else if (shape instanceof Circle) {
+        const newPos = [shape.centerPT[0] + offset[0], shape.centerPT[1] + offset[1]]
+        return new Circle(newPos, shape.radius, shape.attribs)
     } else if (shape instanceof Ellipse) {
+        const newPos = [shape.pos[0] + offset[0], shape.pos[1] + offset[1]]
+        return new Ellipse(newPos, shape.r, shape.rotation, shape.attribs)
     } else if (shape instanceof Line) {
         const newPts = asPoints(shape).map((pt) => [pt[0] + offset[0], pt[1] + offset[1]])
         return new Line(newPts[0], newPts[1], shape.attribs)
@@ -580,6 +615,7 @@ export function translate(shape, offset) {
         const newPts = asPoints(shape).map((pt) => [pt[0] + offset[0], pt[1] + offset[1]])
         return new Polygon(newPts, shape.attribs)
     } else if (shape instanceof Polyline) {
+        // Implementation for Polyline
     } else if (shape instanceof Rectangle) {
         return new Rectangle([shape.pos[0] + offset[0], shape.pos[1] + offset[1]], shape.size, shape.attribs)
     }

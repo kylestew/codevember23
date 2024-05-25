@@ -9,11 +9,11 @@ do {
     palette = combos[Math.floor(Math.random() * combos.length)]
 } while (palette.length < 3)
 
-const RUN_ALL = false
+const [bg, primary, secondary] = palette
+const RUN_ALL = true
 const EXAMPLE = 5
 
 if (!RUN_ALL) {
-    const [bg, primary, secondary] = palette
     const ctx = createCanvas(1200, 1200)
     ctx.setRange(-1.1, 1.1)
     ctx.clear(bg)
