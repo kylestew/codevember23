@@ -1,7 +1,7 @@
-import { Circle } from '../tools/geo'
-import { color } from '../tools/color'
-import { createGLCanvas, createOffscreenCanvas } from '../tools/canvas-utils'
-import { draw } from '../tools/draw'
+import { Circle } from '../../tools/geo'
+import { color } from '../../tools/color'
+import { createGLCanvas, createOffscreenCanvas } from '../../tools/canvas-utils'
+import { draw } from '../../tools/draw'
 
 const vertShaderSource = `#version 300 es
 in vec4 aPosition;

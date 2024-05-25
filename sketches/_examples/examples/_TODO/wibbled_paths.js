@@ -1,4 +1,4 @@
-import { Circle } from '../tools/geo'
+import { Circle } from '../../tools/geo'
 // import { full } from '../tools/array'
 // import { random, weightedRandom } from '../tools/random'
 // import { draw } from '../tools/draw'

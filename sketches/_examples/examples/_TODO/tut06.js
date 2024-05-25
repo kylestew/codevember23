@@ -1,7 +1,7 @@
-import { Circle, circle } from '../tools/geo'
-import { bounds, offset } from '../tools/geo'
-import { CanvasPacker } from '../tools/algos/glyph-packer'
-import { draw } from '../tools/draw'
+import { Circle, circle } from '../../tools/geo'
+import { bounds, offset } from '../../tools/geo'
+import { CanvasPacker } from '../../tools/algos/glyph-packer'
+import { draw } from '../../tools/draw'
 
 export function circle_packing(ctx, palette) {
     // TODO: load in glyph-packer from geo/extended and make it work

@@ -10,8 +10,8 @@ export function joy_division(ctx, palette) {
     const [bg, primary, secondary] = palette
 
     // make 2 vertical control lines
-    const lineA = new Line([-1, -0.8], [-1, 1])
-    const lineB = new Line([1, -0.8], [1, 1])
+    const lineA = new Line([-1, 0.8], [-1, -1.0])
+    const lineB = new Line([1, 0.8], [1, -1.0])
 
     // turn each line into endpoints for horizontal lines
     const numLines = 36
@@ -35,7 +35,7 @@ export function joy_division(ctx, palette) {
             // gaussian shaping function
             const x = pt[0]
             const gaussShape = Math.exp(-8 * x * x)
-            return [pt[0], pt[1] - gaussShape * random(0, randomnessBig)]
+            return [pt[0], pt[1] + gaussShape * random(0, randomnessBig)]
         })
     )
 
@@ -59,8 +59,7 @@ export function joy_division(ctx, palette) {
     smoothPoints = linePointsMoved.map((pts) => chaikinCurve(pts, 2))
 
     // convert to polylines
-    const polylines = smoothPoints.map((pts) => new Polyline(pts, { stroke: secondary, weight: 0.005 }))
-
+    const polylines = smoothPoints.map((pts) => new Polyline(pts, { stroke: secondary, weight: 0.008 }))
     const polys = polylines.map((polyline) => new Polygon(polyline.pts, { fill: bg }))
     draw(ctx, interleave(polys, polylines))
 }

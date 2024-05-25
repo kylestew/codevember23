@@ -1,8 +1,8 @@
-import { Circle, Line } from '../tools/geo/'
-import { asPoints } from '../tools/geo/ops'
-import { zip, rotate } from '../tools/array'
-import { mapRange } from '../tools/math'
-import { draw } from '../tools/draw'
+import { Circle, Line } from '../../tools/geo'
+import { asPoints } from '../../tools/geo/ops'
+import { zip, rotate } from '../../tools/array'
+import { mapRange } from '../../tools/math'
+import { draw } from '../../tools/draw'
 
 function splitArrayInHalf(arr) {
     const middleIndex = Math.ceil(arr.length / 2)

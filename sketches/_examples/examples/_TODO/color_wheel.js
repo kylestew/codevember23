@@ -1,6 +1,6 @@
-import { Circle, Polygon, asPoints } from '../tools/geo'
-import { partition, wrapSides } from '../tools/array'
-import { draw } from '../tools/draw'
+import { Circle, Polygon, asPoints } from '../../tools/geo'
+import { partition, wrapSides } from '../../tools/array'
+import { draw } from '../../tools/draw'
 
 export function colorWheel(ctx, palette) {
     // circle -> vertices -> partition into pairs -> map to polygons using center point

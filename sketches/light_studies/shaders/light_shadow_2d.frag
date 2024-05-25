@@ -3,15 +3,31 @@ precision highp float;
 
 in vec2 vTexCoord;
 
-void drawGrid(vec2 st, inout vec3 pixel) {
-    const float tickWidth = 0.1;
-    vec3 gridColor = vec3(0.5);
-    if (mod(st.x, tickWidth) < 0.002) pixel = gridColor;
-    if (mod(st.y, tickWidth) < 0.002) pixel = gridColor;
+// void drawGrid(vec2 st, inout vec3 pixel) {
+//     const float tickWidth = 0.1;
+//     vec3 gridColor = vec3(0.5);
+//     if (mod(st.x, tickWidth) < 0.002) pixel = gridColor;
+//     if (mod(st.y, tickWidth) < 0.002) pixel = gridColor;
 
-    vec3 axesColor = vec3(1, 1, 1);
-    if (abs(st.x) < 0.004) pixel = axesColor;
-    if (abs(st.y) < 0.004) pixel = axesColor;
+//     vec3 axesColor = vec3(1, 1, 1);
+//     if (abs(st.x) < 0.004) pixel = axesColor;
+//     if (abs(st.y) < 0.004) pixel = axesColor;
+// }
+
+struct ray {
+    vec2 target;
+    vec2 pos;
+    vec2 d;  // step
+}
+
+ray newRay(vec2 origin, vec2 target) {
+    ray r;
+
+    r.target = target;
+    r.pos = origin;
+    r.d = (target - origin) / 100.0;
+
+    return r;
 }
 
 out vec4 fragColor;
@@ -41,8 +57,8 @@ void main() {
     // }
     // accum /= float(uSampleCount);
 
-    vec3 accum = vec3(0.0);
-    drawGrid(st, accum);
+    // vec3 accum = vec3(0.0);
+    // drawGrid(st, accum);
 
     fragColor = vec4(accum, 1.0);
 }

@@ -1,7 +1,7 @@
-import { Circle, Rectangle, Polygon, Ellipse } from '../tools/geo/shapes'
-import { Grid } from '../tools/geo/extended/grid'
-import { asPolygon, scatter, bounds } from '../tools/geo/ops'
-import { draw } from '../tools/draw'
+import { Circle, Rectangle, Polygon, Ellipse } from '../../tools/geo/shapes'
+import { Grid } from '../../tools/geo/extended/grid'
+import { asPolygon, scatter, bounds } from '../../tools/geo/ops'
+import { draw } from '../../tools/draw'
 
 export function pointInsideDemo(ctx, palette) {
     const [bg, primary, secondary] = palette

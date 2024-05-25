@@ -12,13 +12,15 @@ export function cubic_disarray(ctx, palette) {
     const columnCount = 8
     let grid = new Grid([-1, -1], [2, 2], columnCount, columnCount)
 
-    // for each grid cell, rotate and translate randomly scaled by index
-    const rects = grid.rects().map((rect, idx) => {
-        const pct = mapRange(idx, 0, grid.cellCount, 0, 1)
-        const theta = pct * random(-Math.PI / 6, Math.PI / 6)
-        const sz = grid.cellSize
-        const offset = [pct * sz[0] * random(-0.5, 0.5), pct * sz[1] * random(0.0, 0.2)]
-        return translate(centerRotate(rect, theta), offset)
-    })
-    draw(ctx, rects, { fill: primary, stroke: secondary, weight: 0.01 })
+    console.log(grid.centers())
+
+    // // for each grid cell, rotate and translate randomly scaled by index
+    // const rects = grid.rects().map((rect, idx) => {
+    //     const pct = mapRange(idx, 0, grid.cellCount, 0, 1)
+    //     const theta = pct * random(-Math.PI / 6, Math.PI / 6)
+    //     const sz = grid.cellSize
+    //     const offset = [pct * sz[0] * random(-0.5, 0.5), pct * sz[1] * random(0.0, 0.2)]
+    //     return translate(centerRotate(rect, theta), offset)
+    // })
+    // draw(ctx, rects, { fill: primary, stroke: secondary, weight: 0.01 })
 }

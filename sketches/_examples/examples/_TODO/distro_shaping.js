@@ -1,9 +1,14 @@
-import { Circle } from '../tools/geo'
-import { full, zip } from '../tools/array'
-import { random, gaussian, pickRandom } from '../tools/random'
-import { pointClipLogarithmic, pointClipSigmoid, pointClipExponential, pointClipSmooth } from '../tools/math/clipping'
-import { setCanvasRange } from '../tools/canvas-utils'
-import { draw } from '../tools/draw'
+import { Circle } from '../../tools/geo'
+import { full, zip } from '../../tools/array'
+import { random, gaussian, pickRandom } from '../../tools/random'
+import {
+    pointClipLogarithmic,
+    pointClipSigmoid,
+    pointClipExponential,
+    pointClipSmooth,
+} from '../../tools/math/clipping'
+import { setCanvasRange } from '../../tools/canvas-utils'
+import { draw } from '../../tools/draw'
 
 export function distroShaping(ctx, palette) {
     const [bg, primary, secondary] = palette

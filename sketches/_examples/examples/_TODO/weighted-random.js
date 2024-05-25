@@ -1,7 +1,7 @@
-import { Circle } from '../tools/geo'
-import { full } from '../tools/array'
-import { random, weightedRandom } from '../tools/random'
-import { draw } from '../tools/draw'
+import { Circle } from '../../tools/geo'
+import { full } from '../../tools/array'
+import { random, weightedRandom } from '../../tools/random'
+import { draw } from '../../tools/draw'
 
 export function weightedRandomDemo(ctx, palette) {
     const [bg, primary, secondary] = palette

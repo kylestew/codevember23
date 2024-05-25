@@ -1,12 +1,12 @@
-import { Line } from '../tools/geo/'
-import { asPoints } from '../tools/geo/ops'
-import { Grid } from '../tools/geo/extended'
-import { random, randomInt } from '../tools/random'
-import { shuffle } from '../tools/array'
-import { color } from '../tools/color'
-import { createOffscreenCanvas } from '../tools/canvas-utils'
-import { floodFillAlgorithm } from '../tools/tex/flood-fill'
-import { draw } from '../tools/draw'
+import { Line } from '../../tools/geo'
+import { asPoints } from '../../tools/geo/ops'
+import { Grid } from '../../tools/geo/extended'
+import { random, randomInt } from '../../tools/random'
+import { shuffle } from '../../tools/array'
+import { color } from '../../tools/color'
+import { createOffscreenCanvas } from '../../tools/canvas-utils'
+import { floodFillAlgorithm } from '../../tools/tex/flood-fill'
+import { draw } from '../../tools/draw'
 
 export function goto20(ctx, palette) {
     const [bg, primary, secondary] = palette

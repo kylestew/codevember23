@@ -1,8 +1,8 @@
-import { Line } from '../tools/geo/shapes'
-import { Grid } from '../tools/geo/extended/grid'
-import { zip } from '../tools/array'
-import { perlin2, perlin3 } from '../tools/random/noise'
-import { draw } from '../tools/draw'
+import { Line } from '../../tools/geo/shapes'
+import { Grid } from '../../tools/geo/extended/grid'
+import { zip } from '../../tools/array'
+import { perlin2, perlin3 } from '../../tools/random/noise'
+import { draw } from '../../tools/draw'
 
 export function noiseExample(ctx, palette) {
     const [bg, primary, secondary] = palette

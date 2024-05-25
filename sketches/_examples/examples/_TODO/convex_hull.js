@@ -1,8 +1,8 @@
-import { Polygon } from '../tools/geo/'
-import { random, gaussian } from '../tools/random'
-import { full, zip } from '../tools/array'
-import { convexHull } from '../tools/algos/convex-hull'
-import { draw } from '../tools/draw'
+import { Polygon } from '../../tools/geo'
+import { random, gaussian } from '../../tools/random'
+import { full, zip } from '../../tools/array'
+import { convexHull } from '../../tools/algos/convex-hull'
+import { draw } from '../../tools/draw'
 
 export function convexHullDemo(ctx, palette) {
     const [bg, primary, secondary] = palette
