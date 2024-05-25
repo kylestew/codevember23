@@ -22,6 +22,7 @@ import { jellyfish } from './jellyfish'
 import { noiseExample } from './noise_example'
 import { pointInsideDemo } from './point_inside'
 import { raytraceIdea } from './raytrace'
+import { fragShaderSandbox } from './frag_shader_sandbox'
 
 export const examples = [
     tiled_lines,
@@ -48,4 +49,5 @@ export const examples = [
     noiseExample,
     pointInsideDemo,
     raytraceIdea,
+    fragShaderSandbox,
 ]

@@ -12,10 +12,16 @@ import { createShader, createShaderProgram } from './shader-program'
  * @throws Error if WebGL is not supported in the browser.
  */
 export function createGLCanvas(width: number, height: number, canvasId: string = 'mainCanvas'): WebGLRenderingContext {
-    let canvas = document.createElement('canvas')
+    // Create a new canvas element even if it exists (need a new context)
+    const newCanvas = document.createElement('canvas')
+    let existingCanvas = document.getElementById(canvasId) as HTMLCanvasElement
+    if (existingCanvas) {
+        document.body.replaceChild(newCanvas, existingCanvas)
+    } else {
+        document.body.appendChild(newCanvas)
+    }
+    let canvas = newCanvas
     canvas.id = canvasId
-    document.body.appendChild(canvas)
-
     canvas.width = width
     canvas.height = height
 
