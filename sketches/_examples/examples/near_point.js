@@ -1,8 +1,8 @@
-import { Line } from '../../tools/geo'
-import { random, gaussian } from '../../tools/random'
-import { full, zip } from '../../tools/array'
-import { nearPt } from '../../tools/geo/extended/near-point'
-import { draw } from '../../tools/draw'
+import { Line } from '../tools/geo'
+import { random, gaussian } from '../tools/random'
+import { full, zip } from '../tools/array'
+import { nearPt } from '../tools/geo/extended/near-point'
+import { draw } from '../tools/draw'
 
 export function nearPointDemo(ctx, palette) {
     const [bg, primary, secondary] = palette

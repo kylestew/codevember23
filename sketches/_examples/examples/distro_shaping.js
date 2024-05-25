@@ -1,20 +1,15 @@
-import { Circle } from '../../tools/geo'
-import { full, zip } from '../../tools/array'
-import { random, gaussian, pickRandom } from '../../tools/random'
-import {
-    pointClipLogarithmic,
-    pointClipSigmoid,
-    pointClipExponential,
-    pointClipSmooth,
-} from '../../tools/math/clipping'
-import { setCanvasRange } from '../../tools/canvas-utils'
-import { draw } from '../../tools/draw'
+import { Circle } from '../tools/geo'
+import { full, zip } from '../tools/array'
+import { random, gaussian, pickRandom } from '../tools/random'
+import { pointClipLogarithmic, pointClipSigmoid, pointClipExponential, pointClipSmooth } from '../tools/math/clipping'
+import { setCanvasRange } from '../tools/canvas-utils'
+import { draw } from '../tools/draw'
 
 export function distroShaping(ctx, palette) {
     const [bg, primary, secondary] = palette
 
-    ctx.resetTransform()
-    ctx.setRange(ctx, -1.0, 1.0)
+    // ctx.resetTransform()
+    // ctx.setRange(ctx, -1.0, 1.0)
 
     // randomly select N seed points in canvas area
     const n = 9
@@ -29,20 +24,22 @@ export function distroShaping(ctx, palette) {
     const distroBlobs = zip(seedPts, spreads, colors)
 
     function render() {
-        ctx.clear(bg)
+        // ctx.clear(bg)
 
-        const pointRemapFn = pointClipSmooth
-        // const pointRemapFn = pointClipExponential
+        // const pointRemapFn = pointClipSmooth
+        const pointRemapFn = pointClipExponential
         // samples = samples.map((pt) => pointClipLogarithmic(pt, 0.5))
 
         // take N random samples
-        const sampleCount = 200_000
+        const sampleCount = 100_000
         let samples = full(sampleCount, () => {
             const [pt, spread, color] = pickRandom(distroBlobs)
             let centerPt = [gaussian(pt[0], spread), gaussian(pt[1], spread)]
             centerPt = pointRemapFn(centerPt, 0.5)
-            return new Circle(centerPt, random(0.001, 0.003), { fill: color + '99' })
+            return new Circle(centerPt, random(0.001, 0.003), { fill: color })
         })
+
+        const circ = new Circle([0, 0], 0.5)
 
         draw(ctx, samples)
         // requestAnimationFrame(render)

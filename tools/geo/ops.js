@@ -26,7 +26,7 @@ export function operation(shape) {
 export function area(shape) {
     if (shape instanceof Arc) {
     } else if (shape instanceof Circle) {
-        return Math.PI * shape.radius * shape.radius
+        return Math.PI * shape.r * shape.r
     } else if (shape instanceof Ellipse) {
     } else if (shape instanceof Line) {
         return 0

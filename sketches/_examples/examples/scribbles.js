@@ -1,12 +1,12 @@
-import { Polyline } from '../../tools/geo'
-import { full, shuffle } from '../../tools/array'
-import { random, randomInt, gaussian } from '../../tools/random'
-import { mapRange } from '../../tools/math'
-import { easeInOutCubic } from '../../tools/math/easings'
-import { dist } from '../../tools/math/vectors'
-import { draw } from '../../tools/draw'
+import { Polyline } from '../tools/geo'
+import { full, shuffle } from '../tools/array'
+import { random, randomInt, gaussian } from '../tools/random'
+import { mapRange } from '../tools/math'
+import { easeInOutCubic } from '../tools/math/easings'
+import { dist } from '../tools/math/vectors'
+import { draw } from '../tools/draw'
 
-export function linesNest(ctx, palette) {
+export function scribbles(ctx, palette) {
     const [bg, primary, secondary] = palette
 
     // (1) Distribute N random points into an array

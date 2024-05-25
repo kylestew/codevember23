@@ -10,7 +10,7 @@ export function un_deux_trois(ctx, palette) {
 
     // create a grid of positions
     const cellCount = 24
-    const grid = new Grid([-1, -1], [2, 2], cellCount, cellCount)
+    const grid = new Grid([-1, 1], [2, -2], cellCount, cellCount)
 
     // place a line in each rect with a random angle
     const lineLength = grid.cellSize[0]

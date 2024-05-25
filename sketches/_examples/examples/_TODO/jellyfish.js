@@ -9,6 +9,8 @@ function splitArrayInHalf(arr) {
     return [arr.slice(0, middleIndex), arr.slice(middleIndex)]
 }
 
+// https://www.amygoodchild.com/blog/curved-line-jellyfish
+
 /* https://www.amygoodchild.com/blog/curved-line-jellyfish */
 export function jellyfish(ctx, palette) {
     const [bg, primary, secondary] = palette

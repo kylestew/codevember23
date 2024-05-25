@@ -1,13 +1,13 @@
 /**
  * === RANDOM UTILS ===
  *
- * random(min, max) - generates a random number between the specified minimum and maximum values
- * randomInt(min, max) - generates a random integer between the specified minimum and maximum values
- * pickRandom(arr) - picks a random element from an array
- * randomPoint(min, max) - generates a random point within a specified range
- * randomOffset(maxX, maxY) - generates a random offset within the specified range
- * weightedRandom(weights) - generates a random index from an array of weights
- * gaussian(mean, stdDev) - calculates a random number from a Gaussian distribution
+ * random(min, max) - Generates a random number between the specified minimum and maximum values.
+ * randomInt(min, max) - Generates a random integer between the specified minimum and maximum values.
+ * pickRandom(arr, num) - Picks a random unique element or elements from an array.
+ * randomPoint(min, max) - Generates a random point within a specified range.
+ * randomOffset(maxX, maxY) - Generates a random offset within the specified range.
+ * weightedRandom(weights) - Generates a random index from an array of weights.
+ * gaussian(mean, stdDev) - Calculates a random number from a Gaussian distribution.
  */
 
 /**
@@ -32,6 +32,14 @@ export function randomInt(min, max) {
     const minCeiled = Math.ceil(min)
     const maxFloored = Math.floor(max)
     return Math.floor(Math.random() * (maxFloored - minCeiled) + minCeiled) // The maximum is exclusive and the minimum is inclusive
+}
+
+/**
+ * Generates a random boolean value.
+ * @returns {boolean} A random boolean value.
+ */
+export function randomBool() {
+    return Math.random() < 0.5
 }
 
 /**

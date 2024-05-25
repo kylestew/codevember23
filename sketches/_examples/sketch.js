@@ -1,26 +1,30 @@
 import { createCanvas } from './tools/canvas-utils'
-import { shuffle } from './tools/array'
-
+import { colorCombinations } from './tools/color/wada'
 import { examples } from './examples'
 
-const palette = shuffle(['#ff616b', '#faed8f', '#0f261f'])
-const [bg, primary, secondary] = palette
+// select a random color palette
+const combos = colorCombinations()
+let palette
+do {
+    palette = combos[Math.floor(Math.random() * combos.length)]
+} while (palette.length < 3)
 
-const RUN_ALL = true
+const RUN_ALL = false
+const EXAMPLE = 5
 
 if (!RUN_ALL) {
+    const [bg, primary, secondary] = palette
     const ctx = createCanvas(1200, 1200)
     ctx.setRange(-1.1, 1.1)
     ctx.clear(bg)
 
-    const fn = examples[13]
+    const fn = examples[EXAMPLE]
 
     console.log('RUNNING EXAMPLE', fn.name)
     fn(ctx, palette)
 } else {
     let canvasNum = 0
     const gridContainer = document.getElementById('grid-container')
-    console.log('grudContainer', gridContainer)
     function runExample(fn) {
         const container = document.createElement('div')
         container.className = 'grid-item'
