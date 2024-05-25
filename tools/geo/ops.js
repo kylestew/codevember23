@@ -1,4 +1,4 @@
-import { Arc, Circle, Ellipse, Line, Polygon, Polyline, Rectangle } from './shapes'
+import { Arc, Circle, Ellipse, Line, Polygon, Polyline, Rectangle, Ray } from './shapes'
 import { random, randomPoint } from '../random'
 import { neg, subN, mulN } from '../math/vectors'
 import { wrapSides, partition } from '../array'
@@ -284,29 +284,44 @@ export function edges(shape) {
 // }
 
 /**
- * Performs intersection tests on given 2 shapes and returns
- * [`IntersectionResult`](https://docs.thi.ng/umbrella/geom-api/interfaces/IntersectionResult.html).
- *
- * If {@link IntersectOpts.all} is enabled (default: false) and if the
- * intersection pair supports it, all possible intersections will be returned
- * (for some implementations this always the case anyway). Currently, this is
- * option is only implemented for the following pairings:
- *
- * - {@link Ray} / {@link Polygon}
- * - {@link Ray} / {@link Polyline}
+ * Performs intersection tests on given 2 shapes and returns (???)
  *
  * @param a
  * @param b
- * @param opts
  */
-export function intersects(shape) {
-    if (shape instanceof Arc) {
-    } else if (shape instanceof Circle) {
-    } else if (shape instanceof Ellipse) {
-    } else if (shape instanceof Line) {
-    } else if (shape instanceof Polygon) {
-    } else if (shape instanceof Polyline) {
-    } else if (shape instanceof Rectangle) {
+export function intersects(a, b) {
+    if (a instanceof Ray && b instanceof Line) {
+        const [rx, ry] = a.pos
+        const [rdx, rdy] = a.dir
+        const [x1, y1] = b.pts[0]
+        const [x2, y2] = b.pts[1]
+
+        // Calculate the denominator
+        const denom = rdx * (y1 - y2) - rdy * (x1 - x2)
+        if (denom === 0) {
+            return null // Lines are parallel or coincident
+        }
+
+        // Calculate the numerators for the parameters t and u
+        const tNumer = (rx - x1) * (y1 - y2) - (ry - y1) * (x1 - x2)
+        const uNumer = (rx - x1) * rdy - (ry - y1) * rdx
+
+        // Calculate the parameters t and u
+        const t = tNumer / denom
+        const u = -uNumer / denom
+
+        // Check if the intersection is within the ray and line segment
+        if (t >= 0 && u >= 0 && u <= 1) {
+            // Calculate the intersection point
+            const intersectionX = rx + t * rdx
+            const intersectionY = ry + t * rdy
+            return [intersectionX, intersectionY]
+        }
+
+        throw new Error('This should be working for the given example')
+
+        // No valid intersection
+        return null
     }
     throw new Error(`Method not implemented on ${shape.constructor.name}`)
 }
