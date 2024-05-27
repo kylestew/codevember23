@@ -5,14 +5,14 @@ import { un_deux_trois } from './un_deux_trois'
 import { hypnotic_squares } from './hypnotic_squares'
 import { compositionWithLines } from './noll_composition_with_lines'
 import { scribbles } from './scribbles'
+import { nearPointDemo } from './near_point'
+import { convexHullDemo } from './convex_hull'
 import { floodFill } from './flood_fill'
 import { weightedRandomDemo } from './weighted-random'
 import { distros } from './distros'
 import { distroShaping } from './distro_shaping'
 import { noiseExample } from './noise_example'
-// import { nearPointDemo } from './near_point'
-// import { convexHullDemo } from './convex_hull'
-// import { fragShaderSandbox } from './frag_shader_sandbox'
+import { phongLightingExample } from './phong'
 
 export const examples = [
     tiled_lines,
@@ -22,13 +22,12 @@ export const examples = [
     hypnotic_squares,
     compositionWithLines,
     scribbles,
+    nearPointDemo,
     floodFill,
+    convexHullDemo,
     weightedRandomDemo,
     distros,
     distroShaping,
-
     noiseExample,
-
-    // nearPointDemo,
-    // convexHullDemo,
+    phongLightingExample,
 ]

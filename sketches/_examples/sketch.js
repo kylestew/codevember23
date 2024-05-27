@@ -11,7 +11,7 @@ do {
 
 const [bg, primary, secondary] = palette
 const RUN_ALL = true
-const EXAMPLE = 5
+const EXAMPLE = 7
 
 if (!RUN_ALL) {
     const ctx = createCanvas(1200, 1200)
