@@ -8,11 +8,14 @@ import { scribbles } from './scribbles'
 import { nearPointDemo } from './near_point'
 import { convexHullDemo } from './convex_hull'
 import { floodFill } from './flood_fill'
+import { circlePacking } from './circle_packing'
+import { rectDivide } from './rect_divide'
 import { weightedRandomDemo } from './weighted-random'
 import { distros } from './distros'
 import { distroShaping } from './distro_shaping'
 import { noiseExample } from './noise_example'
 import { phongLightingExample } from './phong'
+import { shapeGrammar } from './shapeGrammar'
 
 export const examples = [
     tiled_lines,
@@ -24,10 +27,15 @@ export const examples = [
     scribbles,
     nearPointDemo,
     floodFill,
-    convexHullDemo,
+    rectDivide,
+    circlePacking,
+    convexHullDemo, // 10
     weightedRandomDemo,
     distros,
     distroShaping,
     noiseExample,
+    // poisson Distribution
     phongLightingExample,
+    shapeGrammar, // 15
+    // glyphs
 ]

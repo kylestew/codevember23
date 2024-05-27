@@ -1,5 +1,6 @@
 export { createCanvas, createOffscreenCanvas, setCanvasRange } from './canvas-util'
 export { createGLCanvas } from './gl-util'
+export { animate } from './animate'
 
 // EVIL MONKEY PATCHING IN SOME METHODS
 declare global {

@@ -1,4 +1,4 @@
-import { circle, rect, polygon, pathBuilder } from '@thi.ng/geom'
+import { Circle, Polygon } from '../geo'
 
 /*
  * Shape set reminiscent of a child's block set
@@ -7,28 +7,28 @@ import { circle, rect, polygon, pathBuilder } from '@thi.ng/geom'
 const childsBlocks = [
     () => {
         // circle
-        return new circle([0, 0], 1)
+        return new Circle([0, 0], 1)
     },
     () => {
         // square
-        return new rect([-1, -1], [2, 2])
+        return new Rectangle([-1, -1], [2, 2])
     },
-    () => {
-        // half circle (small)
-        return pathBuilder().moveTo([1, 1]).cubicTo([1, -0.5], [-1, -0.5], [-1, 1]).closePath().current()
-    },
-    () => {
-        // quarter circle
-        return pathBuilder()
-            .moveTo([-1, -1]) // Start at the top left corner
-            .cubicTo([-1, 1], [1, 1], [1, 1]) // Control points and end point to form a quarter circle
-            .lineTo([1, -1])
-            .closePath()
-            .current()
-    },
+    // () => {
+    //     // half circle (small)
+    //     return pathBuilder().moveTo([1, 1]).cubicTo([1, -0.5], [-1, -0.5], [-1, 1]).closePath().current()
+    // },
+    // () => {
+    //     // quarter circle
+    //     return pathBuilder()
+    //         .moveTo([-1, -1]) // Start at the top left corner
+    //         .cubicTo([-1, 1], [1, 1], [1, 1]) // Control points and end point to form a quarter circle
+    //         .lineTo([1, -1])
+    //         .closePath()
+    //         .current()
+    // },
     () => {
         // triangle
-        return polygon([
+        return new Polygon([
             [-1, -1],
             [1, -1],
             [-1, 1],

@@ -1,9 +1,11 @@
-import { createGLCanvas, loadShader, useShader, useTexture, glClear, drawScreen } from './util/gl-util.js'
-import { createOffscreenCanvas } from './util/canvas-util.js'
-import { Rectangle, asPath, centroid } from './tools/geo.js'
-import { randomInArray, truncatedGaussian } from './tools/random.js'
-import { childsBlocks } from './materials/glyphs.js'
+import { Rectangle, asPath, centroid } from '../tools/geo'
+import { draw } from '../tools/draw'
 
+export function rectDivide(ctx, palette) {
+    const [bg, primary, secondary] = palette
+}
+
+/*
 const w = 1200
 const h = 1200
 
@@ -118,3 +120,4 @@ function draw() {
 }
 
 draw()
+*/

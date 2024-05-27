@@ -4,6 +4,7 @@ import { simplex2 } from '../tools/random/noise'
 import { full } from '../tools/array'
 import { nearPt } from '../tools/geo/extended/near-point'
 import { draw } from '../tools/draw'
+import { animate } from '../tools/canvas-utils/animate'
 
 export function nearPointDemo(ctx, palette) {
     const [bg, primary, secondary] = palette
@@ -26,8 +27,7 @@ export function nearPointDemo(ctx, palette) {
             // wrap bounds of screen [-1, 1]
             let newX = x + dx
             let newY = y + dy
-
-            if (newX > 1) newX -= -2
+            if (newX > 1) newX -= 2
             if (newX < -1) newX += 2
             if (newY > 1) newY -= 2
             if (newY < -1) newY += 2
@@ -45,8 +45,6 @@ export function nearPointDemo(ctx, palette) {
         // draw lines from target point to connected point
         const lines = connectedPts.map((pt) => new Line(targetPoint, pt))
         draw(ctx, lines, { stroke: primary, weight: 0.01 })
-
-        requestAnimationFrame(render)
     }
-    requestAnimationFrame(render)
+    animate(10, render)
 }

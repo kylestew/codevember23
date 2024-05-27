@@ -1,5 +1,5 @@
-import { interleave, takeEvery, rotate, shuffle, full, splitArray } from './tools/array'
-import { pickRandom, random, randomInt } from './tools/random'
+import { takeEvery, rotate, splitArray } from '../array'
+import { randomInt } from '../random'
 
 /// Returns two paired edges that line up as slats
 function horizOrVerts(edges, vertical) {
