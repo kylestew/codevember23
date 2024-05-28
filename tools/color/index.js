@@ -56,6 +56,20 @@ export function color(value) {
                 }
             }
         }
+    } else if (Array.isArray(value) && value.length === 3) {
+        colorObj = {
+            r: Math.round(value[0] * 255.0),
+            g: Math.round(value[1] * 255.0),
+            b: Math.round(value[2] * 255.0),
+            a: 1.0,
+        }
+    } else if (Array.isArray(value) && value.length === 4) {
+        colorObj = {
+            r: Math.round(value[0] * 255.0),
+            g: Math.round(value[1] * 255.0),
+            b: Math.round(value[2] * 255.0),
+            a: value[3],
+        }
     } else if (typeof value === 'object') {
         colorObj = value
     }

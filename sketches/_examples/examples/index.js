@@ -16,6 +16,7 @@ import { distroShaping } from './distro_shaping'
 import { noiseExample } from './noise_example'
 import { phongLightingExample } from './phong'
 import { shapeGrammar } from './shapeGrammar'
+import { treeRings } from './tree_rings'
 
 export const examples = [
     tiled_lines,
@@ -33,9 +34,10 @@ export const examples = [
     weightedRandomDemo,
     distros,
     distroShaping,
-    noiseExample,
+    noiseExample, // 15
     // poisson Distribution
     phongLightingExample,
-    shapeGrammar, // 15
+    shapeGrammar,
     // glyphs
+    treeRings,
 ]

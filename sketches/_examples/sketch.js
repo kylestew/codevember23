@@ -18,8 +18,8 @@ const palette = colorCombinations()[paletteIdx - 1]
 console.log('selected palette', paletteIdx, palette)
 
 const [bg, primary, secondary] = palette
-const RUN_ALL = false
-const EXAMPLE = 11
+const RUN_ALL = true
+const EXAMPLE = 16
 
 if (!RUN_ALL) {
     const ctx = createCanvas(1200, 1200)
