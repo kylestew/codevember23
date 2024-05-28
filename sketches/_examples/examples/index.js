@@ -17,6 +17,7 @@ import { noiseExample } from './noise_example'
 import { phongLightingExample } from './phong'
 import { shapeGrammar } from './shapeGrammar'
 import { treeRings } from './tree_rings'
+import { paintSmear } from './paint_smear'
 
 export const examples = [
     tiled_lines,
@@ -40,4 +41,5 @@ export const examples = [
     shapeGrammar,
     // glyphs
     treeRings,
+    paintSmear,
 ]

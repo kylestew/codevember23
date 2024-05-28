@@ -35,7 +35,7 @@ export {
     pointInside, // check if point inside shape
     resample, // resample/convert shape
     rotate,
-    // scale() - scale shape
+    scale, // scale shape
     scatter,
     splitAt, // split shape/boundary at parametric position
     // tangentAt() - compute tangent at parametric position

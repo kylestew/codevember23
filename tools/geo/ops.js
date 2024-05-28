@@ -8,10 +8,11 @@ export function operation(shape) {
     if (shape instanceof Arc) {
     } else if (shape instanceof Circle) {
     } else if (shape instanceof Ellipse) {
-    } else if (shape instanceof Line) {
+} else if (shape instanceof Line) {
     } else if (shape instanceof Polygon) {
     } else if (shape instanceof Polyline) {
     } else if (shape instanceof Rectangle) {
+    } else if (shape instanceof Ray)
     }
     throw new Error(`Method not implemented on ${shape.constructor.name}`)
 }
@@ -525,7 +526,52 @@ export function rotate(shape, theta) {
     throw new Error(`Method not implemented on ${shape.constructor.name}`)
 }
 
-// + scale() - scale shape
+/**
+ * Scales given shape uniformly or non-uniformly by given `factor`.
+ *
+ * @remarks
+ * Scaling non-uniformly might result in different result types, e.g.
+ * {@link Circle} => {@link Ellipse}.
+ *
+ * @param shape
+ * @param factor - single number or [sx, sy] vector
+ */
+export function scale(shape, factor) {
+    if (Array.isArray(factor)) {
+        if (factor.length !== 2) {
+            throw new Error('Factor must be a single number or a 2D vector [sx, sy]')
+        }
+    } else if (typeof factor !== 'number') {
+        throw new Error('Factor must be a single number or a 2D vector [sx, sy]')
+    }
+
+    if (shape instanceof Arc) {
+    } else if (shape instanceof Circle) {
+        let sx, sy
+        if (Array.isArray(factor)) {
+            ;[sx, sy] = factor
+        } else {
+            sx = sy = factor
+        }
+
+        if (sx === sy) {
+            // Uniform scaling
+            const newRadius = shape.r * sx
+            return new Circle(shape.pos, newRadius, shape.attribs)
+        } else {
+            // Non-uniform scaling
+            const newRadii = [shape.r * sx, shape.r * sy]
+            return new Ellipse(shape.pos, newRadii, 0, shape.attribs)
+        }
+    } else if (shape instanceof Ellipse) {
+    } else if (shape instanceof Line) {
+    } else if (shape instanceof Polygon) {
+    } else if (shape instanceof Polyline) {
+    } else if (shape instanceof Rectangle) {
+    } else if (shape instanceof Ray) {
+    }
+    throw new Error(`Method not implemented on ${shape.constructor.name}`)
+}
 
 /**
  * Produces `num` random points for which {@link pointInside} succeeds for the
@@ -602,8 +648,8 @@ export function translate(shape, offset) {
     if (shape instanceof Arc) {
         // Implementation for Arc
     } else if (shape instanceof Circle) {
-        const newPos = [shape.centerPT[0] + offset[0], shape.centerPT[1] + offset[1]]
-        return new Circle(newPos, shape.radius, shape.attribs)
+        const newPos = [shape.pos[0] + offset[0], shape.pos[1] + offset[1]]
+        return new Circle(newPos, shape.r, shape.attribs)
     } else if (shape instanceof Ellipse) {
         const newPos = [shape.pos[0] + offset[0], shape.pos[1] + offset[1]]
         return new Ellipse(newPos, shape.r, shape.rotation, shape.attribs)
