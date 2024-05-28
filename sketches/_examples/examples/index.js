@@ -28,8 +28,8 @@ export const examples = [
     nearPointDemo,
     floodFill,
     rectDivide,
-    circlePacking,
-    convexHullDemo, // 10
+    circlePacking, // 10
+    convexHullDemo,
     weightedRandomDemo,
     distros,
     distroShaping,
