@@ -1,4 +1,4 @@
-import { Arc, Circle, Ellipse, Line, Polygon, Polyline, Rectangle, Ray } from './shapes'
+import { Arc, Circle, Ellipse, Line, Polygon, Polyline, Rectangle, Ray, Quadratic } from './shapes'
 import { random, randomPoint } from '../random'
 import { neg, subN, mulN } from '../math/vectors'
 import { wrapSides, partition } from '../array'
@@ -8,11 +8,11 @@ export function operation(shape) {
     if (shape instanceof Arc) {
     } else if (shape instanceof Circle) {
     } else if (shape instanceof Ellipse) {
-} else if (shape instanceof Line) {
+    } else if (shape instanceof Line) {
     } else if (shape instanceof Polygon) {
     } else if (shape instanceof Polyline) {
+    } else if (shape instanceof Ray) {
     } else if (shape instanceof Rectangle) {
-    } else if (shape instanceof Ray)
     }
     throw new Error(`Method not implemented on ${shape.constructor.name}`)
 }
@@ -69,6 +69,12 @@ export function asPath(shape) {
             break
         }
 
+        case 'Circle': {
+            const [x, y] = shape.pos
+            path.arc(x, y, shape.r, 0, Math.PI * 2)
+            break
+        }
+
         case 'Ellipse':
             const [x, y] = shape.pos
             const [radX, radY] = shape.r
@@ -86,15 +92,27 @@ export function asPath(shape) {
             })
             break
 
-        case 'Circle': {
-            const [x, y] = shape.pos
-            path.arc(x, y, shape.r, 0, Math.PI * 2)
-            break
-        }
-
         case 'Line':
             path.moveTo(shape.pts[0][0], shape.pts[0][1])
             path.lineTo(shape.pts[1][0], shape.pts[1][1])
+            break
+
+        case 'Polygon':
+            shape.pts.forEach((pt, idx) => {
+                const [x, y] = pt
+                if (idx === 0) {
+                    path.moveTo(x, y)
+                } else {
+                    path.lineTo(x, y)
+                }
+            })
+            path.closePath()
+            break
+
+        case 'Quadratic':
+            const [start, ctrl, dest] = shape.pts
+            path.moveTo(start[0], start[1])
+            path.quadraticCurveTo(ctrl[0], ctrl[1], dest[0], dest[1])
             break
 
         case 'Ray': {
@@ -108,18 +126,6 @@ export function asPath(shape) {
             path.lineTo(endX, endY)
             break
         }
-
-        case 'Polygon':
-            shape.pts.forEach((pt, idx) => {
-                const [x, y] = pt
-                if (idx === 0) {
-                    path.moveTo(x, y)
-                } else {
-                    path.lineTo(x, y)
-                }
-            })
-            path.closePath()
-            break
 
         case 'Rectangle':
             path.rect(shape.pos[0], shape.pos[1], shape.size[0], shape.size[1])
@@ -400,6 +406,12 @@ export function pointAt(shape, t) {
         return [x, y]
     } else if (shape instanceof Polygon) {
     } else if (shape instanceof Polyline) {
+    } else if (shape instanceof Quadratic) {
+        const [start, ctrl, end] = shape.pts
+        const t1 = 1 - t
+        const x = t1 * t1 * start[0] + 2 * t1 * t * ctrl[0] + t * t * end[0]
+        const y = t1 * t1 * start[1] + 2 * t1 * t * ctrl[1] + t * t * end[1]
+        return [x, y]
     } else if (shape instanceof Rectangle) {
     }
     throw new Error(`Method not implemented on ${shape.constructor.name}`)

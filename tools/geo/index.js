@@ -4,12 +4,14 @@ export {
     Circle,
     circle,
     // (Cubic)
-    // Ellipse
+    Ellipse,
     // (Group)
     Line,
     line,
+    // Path
     Polygon,
     Polyline,
+    Quadratic,
     Ray,
     Rectangle,
     rectangle,
