@@ -1,7 +1,8 @@
 import { Arc, Circle, Ellipse, Line, Polygon, Polyline, Rectangle, Ray, Quadratic } from './shapes'
 import { random, randomPoint } from '../random'
-import { neg, subN, mulN } from '../math/vectors'
+import { neg, sub, subN, mulN, normalize } from '../math/vectors'
 import { wrapSides, partition } from '../array'
+import { Bezier } from 'bezier-js'
 
 /*
 export function operation(shape) {
@@ -11,6 +12,7 @@ export function operation(shape) {
     } else if (shape instanceof Line) {
     } else if (shape instanceof Polygon) {
     } else if (shape instanceof Polyline) {
+    } else if (shape instanceof Quadratic) {
     } else if (shape instanceof Ray) {
     } else if (shape instanceof Rectangle) {
     }
@@ -236,6 +238,10 @@ export function bounds(shape) {
 
         return new Rectangle([minX, minY], [maxX - minX, maxY - minY])
     } else if (shape instanceof Polyline) {
+    } else if (shape instanceof Quadratic) {
+        const [start, ctrl, end] = shape.pts
+        const bezier = new Bezier(start[0], start[1], ctrl[0], ctrl[1], end[0], end[1])
+        return new Rectangle([bezier.bbox().x.min, bezier.bbox().y.min], [bezier.bbox().x.size, bezier.bbox().y.size])
     } else if (shape instanceof Rectangle) {
         return new Rectangle(shape.pos, shape.size)
     }
@@ -364,6 +370,31 @@ export function intersects(a, b) {
 }
 
 /**
+ * Calculates the normal vector at a given point on a shape.
+ * @param {Shape} shape - The shape to calculate the normal vector for.
+ * @param {number} t - The parameter value representing the point on the shape.
+ * @returns {number[]} The normal vector at the given point on the shape.
+ * @throws {Error} If the method is not implemented for the given shape.
+ */
+export function normalAt(shape, t) {
+    if (shape instanceof Arc) {
+    } else if (shape instanceof Circle) {
+    } else if (shape instanceof Ellipse) {
+    } else if (shape instanceof Line) {
+    } else if (shape instanceof Polygon) {
+    } else if (shape instanceof Polyline) {
+    } else if (shape instanceof Quadratic) {
+        const [start, ctrl, end] = shape.pts
+        const bezier = new Bezier(start[0], start[1], ctrl[0], ctrl[1], end[0], end[1])
+        const norm = bezier.normal(t)
+        return [norm.x, norm.y]
+    } else if (shape instanceof Ray) {
+    } else if (shape instanceof Rectangle) {
+    }
+    throw new Error(`Method not implemented on ${shape.constructor.name}`)
+}
+
+/**
  * Computes an offset shape (as in "path offsetting") of given shape and offset
  * distance `dist`.
  *
@@ -408,10 +439,8 @@ export function pointAt(shape, t) {
     } else if (shape instanceof Polyline) {
     } else if (shape instanceof Quadratic) {
         const [start, ctrl, end] = shape.pts
-        const t1 = 1 - t
-        const x = t1 * t1 * start[0] + 2 * t1 * t * ctrl[0] + t * t * end[0]
-        const y = t1 * t1 * start[1] + 2 * t1 * t * ctrl[1] + t * t * end[1]
-        return [x, y]
+        const bezier = new Bezier(start[0], start[1], ctrl[0], ctrl[1], end[0], end[1])
+        return [bezier.get(t).x, bezier.get(t).y]
     } else if (shape instanceof Rectangle) {
     }
     throw new Error(`Method not implemented on ${shape.constructor.name}`)
@@ -633,16 +662,32 @@ export function splitAt(shape, t) {
     throw new Error(`Method not implemented on ${shape.constructor.name}`)
 }
 
-// /**
-//  * Splits given shape in 2 parts at normalized parametric position `t`.
-//  * Meant for line-like objects
-//  *
-//  * @param shape
-//  * @param t
-//  */
-// export function splitAt(geo, t) {
-//     throw new Error(`Method not implemented on ${geo.constructor.name}`)
-// }
+/**
+ * Computes tangent on shape/boundary at normalized parametric position `t`.
+ *
+ * @param shape
+ * @param t
+ */
+export function tangentAt(shape, t) {
+    if (shape instanceof Arc) {
+    } else if (shape instanceof Circle) {
+        // circle: (_, t) => cossin(TAU * t + HALF_PI),
+    } else if (shape instanceof Ellipse) {
+    } else if (shape instanceof Line) {
+        const [a, b] = shape.pts
+        return normalize(sub(b, a))
+    } else if (shape instanceof Polygon) {
+    } else if (shape instanceof Polyline) {
+    } else if (shape instanceof Quadratic) {
+        const [start, ctrl, end] = shape.pts
+        const bezier = new Bezier(start[0], start[1], ctrl[0], ctrl[1], end[0], end[1])
+        const deriv = bezier.derivative(t)
+        return [deriv.x, deriv.y]
+    } else if (shape instanceof Ray) {
+    } else if (shape instanceof Rectangle) {
+    }
+    throw new Error(`Method not implemented on ${shape.constructor.name}`)
+}
 
 // + transform() - apply transformation matrix
 

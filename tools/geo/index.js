@@ -32,6 +32,7 @@ export {
     edges, // extract edges
     // fitIntoBounds() - rescale/reposition shapes into a destination boundary
     intersects, // pairwise shape intersection (various types)
+    normalAt,
     offset, // shape/path offsetting
     pointAt, // compute point on shape boundary at parametric position
     pointInside, // check if point inside shape
@@ -40,7 +41,7 @@ export {
     scale, // scale shape
     scatter,
     splitAt, // split shape/boundary at parametric position
-    // tangentAt() - compute tangent at parametric position
+    tangentAt, // compute tangent at parametric position
     // transform() - apply transformation matrix
     translate,
     withAttribs, // shallow copy of given shape with new attribs assigned
