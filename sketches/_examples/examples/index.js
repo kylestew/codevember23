@@ -19,6 +19,7 @@ import { phongLightingExample } from './phong'
 import { shapeGrammar } from './shapeGrammar'
 import { treeRings } from './tree_rings'
 import { paintSmear } from './paint_smear'
+import { particlesDemo } from './particles'
 
 export const examples = [
     tiled_lines,
@@ -44,4 +45,5 @@ export const examples = [
     // glyphs
     treeRings,
     paintSmear, // 20
+    particlesDemo,
 ]

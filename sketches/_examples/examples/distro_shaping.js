@@ -15,59 +15,59 @@ export function distroShaping(ctx, palette) {
     const n = 9
     const seedPts = full(n, () => [random(-1, 1), random(-1, 1)])
 
-    // randomly select spreads
-    const spreads = full(n, () => random(0.05, 0.6))
+    // // randomly select spreads
+    // const spreads = full(n, () => random(0.05, 0.6))
 
-    // randomly select colors
-    const colors = full(n, () => pickRandom([primary, secondary]))
+    // // randomly select colors
+    // const colors = full(n, () => pickRandom([primary, secondary]))
 
-    const distroBlobs = zip(seedPts, spreads, colors)
+    // const distroBlobs = zip(seedPts, spreads, colors)
 
-    function render() {
-        // ctx.clear(bg)
+    // function render() {
+    //     // ctx.clear(bg)
 
-        // const pointRemapFn = pointClipSmooth
-        const pointRemapFn = pointClipExponential
-        // samples = samples.map((pt) => pointClipLogarithmic(pt, 0.5))
+    //     // const pointRemapFn = pointClipSmooth
+    //     const pointRemapFn = pointClipExponential
+    //     // samples = samples.map((pt) => pointClipLogarithmic(pt, 0.5))
 
-        // take N random samples
-        const sampleCount = 100_000
-        let samples = full(sampleCount, () => {
-            const [pt, spread, color] = pickRandom(distroBlobs)
-            let centerPt = [gaussian(pt[0], spread), gaussian(pt[1], spread)]
-            centerPt = pointRemapFn(centerPt, 0.5)
-            return new Circle(centerPt, random(0.001, 0.003), { fill: color })
-        })
+    //     // take N random samples
+    //     const sampleCount = 100_000
+    //     let samples = full(sampleCount, () => {
+    //         const [pt, spread, color] = pickRandom(distroBlobs)
+    //         let centerPt = [gaussian(pt[0], spread), gaussian(pt[1], spread)]
+    //         centerPt = pointRemapFn(centerPt, 0.5)
+    //         return new Circle(centerPt, random(0.001, 0.003), { fill: color })
+    //     })
 
-        const circ = new Circle([0, 0], 0.5)
+    //     const circ = new Circle([0, 0], 0.5)
 
-        draw(ctx, samples)
-        // requestAnimationFrame(render)
-    }
-    render()
-
-    // TODO: blow away some of the circles
-    // compress
-
-    // // preset list of distributions
-    // const spread = 0.1
-    // const gaussStops = [
-    //     [-2.0, 0.16],
-    //     [-1.5, 0.14],
-    //     [-1.0, 0.12],
-    //     [-0.5, 0.1],
-    //     [-0.0, 0.08],
-    //     [0.5, 0.1],
-    //     [1.0, 0.12],
-    //     [1.5, 0.14],
-    //     [2.0, 0.16],
-    // ]
-
-    // const something = () => {
-    //     const y = random(-1, 1)
-    //     const [a, b] = pickRandom(gaussStops)
-    //     const x = gaussian(a, b)
-
-    //     return [x + Math.sin(y * 1.333), y]
+    //     draw(ctx, samples)
+    //     // requestAnimationFrame(render)
     // }
+    // render()
+
+    // // TODO: blow away some of the circles
+    // // compress
+
+    // // // preset list of distributions
+    // // const spread = 0.1
+    // // const gaussStops = [
+    // //     [-2.0, 0.16],
+    // //     [-1.5, 0.14],
+    // //     [-1.0, 0.12],
+    // //     [-0.5, 0.1],
+    // //     [-0.0, 0.08],
+    // //     [0.5, 0.1],
+    // //     [1.0, 0.12],
+    // //     [1.5, 0.14],
+    // //     [2.0, 0.16],
+    // // ]
+
+    // // const something = () => {
+    // //     const y = random(-1, 1)
+    // //     const [a, b] = pickRandom(gaussStops)
+    // //     const x = gaussian(a, b)
+
+    // //     return [x + Math.sin(y * 1.333), y]
+    // // }
 }

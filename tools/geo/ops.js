@@ -85,7 +85,12 @@ export function asPath(shape) {
 
         case 'Polyline':
             shape.pts.forEach((pt, idx) => {
-                const [x, y] = pt
+                let x, y
+                if (Array.isArray(pt)) {
+                    ;[x, y] = pt
+                } else {
+                    ;({ x, y } = pt)
+                }
                 if (idx === 0) {
                     path.moveTo(x, y)
                 } else {
@@ -537,8 +542,12 @@ export function resample(shape, num) {
 export function rotate(shape, theta) {
     if (shape instanceof Arc) {
     } else if (shape instanceof Circle) {
-        // Circles remain unchanged when rotated about their center.
-        return new Circle(shape.center, shape.radius, shape.attribs)
+        const pt = shape.pos
+        const newCenter = [
+            pt[0] * Math.cos(theta) - pt[1] * Math.sin(theta),
+            pt[0] * Math.sin(theta) + pt[1] * Math.cos(theta),
+        ]
+        return new Circle(newCenter, shape.r, shape.attribs)
     } else if (shape instanceof Ellipse) {
     } else if (shape instanceof Line) {
         // Rotating both endpoints of the line
@@ -607,6 +616,16 @@ export function scale(shape, factor) {
     } else if (shape instanceof Ellipse) {
     } else if (shape instanceof Line) {
     } else if (shape instanceof Polygon) {
+        let sx, sy
+        if (Array.isArray(factor)) {
+            ;[sx, sy] = factor
+        } else {
+            sx = sy = factor
+        }
+
+        const cent = centroid(shape)
+        const scaledPoints = shape.pts.map(([x, y]) => [cent[0] + (x - cent[0]) * sx, cent[1] + (y - cent[1]) * sy])
+        return new Polygon(scaledPoints, shape.attribs)
     } else if (shape instanceof Polyline) {
     } else if (shape instanceof Rectangle) {
     } else if (shape instanceof Ray) {

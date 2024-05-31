@@ -14,6 +14,12 @@ export function draw(ctx, geo, attribs = {}) {
 
         geo.forEach((g) => draw(ctx, g, attribs))
         return
+    } else if ('x' in geo && 'y' in geo) {
+        // treat as point object
+        const { x, y } = geo
+        const rad = geo.weight || 0.01
+        draw(ctx, new Circle([x, y], rad), attribs)
+        return
     }
 
     ctx.fillStyle = 'none'
