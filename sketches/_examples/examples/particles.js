@@ -3,16 +3,16 @@ import { Polyline } from '../tools/geo'
 import { asPoints } from '../tools/geo'
 import { draw } from '../tools/draw'
 
-function particleToLine(particle, timeSteps) {
-    // Ensure the stepsBack is within the bounds of the history array
-    const index = Math.max(0, particle.history.length - 1 - timeSteps)
+// function particleToLine(particle, timeSteps) {
+//     // Ensure the stepsBack is within the bounds of the history array
+//     const index = Math.max(0, particle.history.length - 1 - timeSteps)
 
-    // Get the historical positions and the current position
-    const pts = [...particle.history.slice(index), particle.pos]
+//     // Get the historical positions and the current position
+//     const pts = [...particle.history.slice(index), particle.pos]
 
-    // Return a new Polyline from the points
-    return new Polyline(pts)
-}
+//     // Return a new Polyline from the points
+//     return new Polyline(pts)
+// }
 
 export function particlesDemo(ctx, palette) {
     const [bg, primary, secondary] = palette

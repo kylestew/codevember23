@@ -1,7 +1,23 @@
-import { bounds, edges, Circle, circle, line, scatter, pointAt, group } from '@thi.ng/geom'
-import { iterator, comp, flatten1, map, trace, partition } from '@thi.ng/transducers'
-import { rotate } from '@thi.ng/arrays'
+import { Rectangle, Polygon, Polyline } from '../tools/geo'
+import { asPoints } from '../tools/geo'
+import { randomOffset } from '../tools/random'
+import { full, zip } from '../tools/array'
+import { add } from '../tools/math/vectors'
+import { chaikinCurve } from '../tools/algos/chaikin'
+import { draw } from '../tools/draw'
 
+export function blobApproaches(ctx, palette) {
+    const [bg, primary, secondary] = palette
+
+    const rect = new Rectangle([-0.5, -0.5], [1, 1])
+    const randRect = new Polygon(asPoints(rect).map((pt) => add(pt, randomOffset(-0.1, 0.1))))
+    const smoothedRandRect = new Polygon(chaikinCurve(asPoints(randRect), 4, true))
+
+    draw(ctx, asPoints(randRect))
+    draw(ctx, smoothedRandRect)
+}
+
+/*
 function blobFromCircle(circ: Circle, randRadius: number): Path2D {
     // circle -> bounding rect -> edges -> control points
     let pts = [
@@ -42,3 +58,4 @@ function blobFromCircle(circ: Circle, randRadius: number): Path2D {
     path.closePath()
     return path
 }
+*/

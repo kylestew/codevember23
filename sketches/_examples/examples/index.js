@@ -9,6 +9,7 @@ import { handDrawnLines } from './hand_drawn_lines'
 import { curveDemos } from './curve_demos'
 import { nearPointDemo } from './near_point'
 import { convexHullDemo } from './convex_hull'
+import { blobApproaches } from './blob'
 import { floodFill } from './flood_fill'
 import { circlePacking } from './circle_packing'
 import { rectDivide } from './rect_divide'
@@ -37,6 +38,7 @@ export const examples = [
     rectDivide,
     circlePacking,
     convexHullDemo,
+    blobApproaches,
     weightedRandomDemo,
     distros, // 15
     distroShaping,
