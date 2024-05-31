@@ -17,21 +17,21 @@ function particleToLine(particle, timeSteps) {
 export function particlesDemo(ctx, palette) {
     const [bg, primary, secondary] = palette
 
-    // Example usage:
-    const pos = { x: 0, y: 0 }
-    const vel = { x: 1, y: 1 }
-    const accel = { x: 0, y: -0.1 } // Simulating gravity
-    const mass = 1.0
-    const lifetime = 5.0 // Particle will live for 5 seconds
+    // // Example usage:
+    // const pos = { x: 0, y: 0 }
+    // const vel = { x: 1, y: 1 }
+    // const accel = { x: 0, y: -0.1 } // Simulating gravity
+    // const mass = 1.0
+    // const lifetime = 5.0 // Particle will live for 5 seconds
 
-    const particle = new Particle(pos, vel, accel, mass, lifetime)
+    // const particle = new Particle(pos, vel, accel, mass, lifetime)
 
-    // Simulate particle updates to fill history
-    const timeStep = 0.016 // 60 fps
-    for (let i = 0; i < 50; i++) {
-        particle.update(timeStep)
-    }
+    // // Simulate particle updates to fill history
+    // const timeStep = 0.016 // 60 fps
+    // for (let i = 0; i < 50; i++) {
+    //     particle.update(timeStep)
+    // }
 
-    const polyline = particleToLine(particle, 10)
-    draw(ctx, polyline, { stroke: primary, weight: 0.01 })
+    // const polyline = particleToLine(particle, 10)
+    // draw(ctx, polyline, { stroke: primary, weight: 0.01 })
 }
