@@ -75,6 +75,10 @@ export function color(value) {
     }
 
     return {
+        alpha: function (newAlpha) {
+            colorObj.a = newAlpha
+            return this
+        },
         toHex: function () {
             return rgbToHex(colorObj)
         },

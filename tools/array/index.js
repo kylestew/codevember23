@@ -350,13 +350,20 @@ export function splitArray(array, n) {
 }
 
 /**
- * Removes a random number of elements from an array.
+ * Removes a percentage of elements from an array.
  *
  * @param {Array} array - The array from which elements will be removed.
- * @param {number} numToRemove - The number of elements to remove.
+ * @param {number} percentToRemove - The percentage of elements to remove. [0, 1]
  * @returns {Array} - A new array with the randomly selected elements removed.
  */
-export function randomRemove(array, numToRemove) {
+export function randomRemove(array, percentToRemove) {
+    if (percentToRemove < 0 || percentToRemove > 1) {
+        throw new Error('Percentage must be between 0 and 1')
+    }
+
+    // Calculate the number of elements to remove based on the percentage
+    const numToRemove = Math.floor(array.length * percentToRemove)
+
     // Make sure not to remove more elements than are in the array
     if (numToRemove >= array.length) {
         return []

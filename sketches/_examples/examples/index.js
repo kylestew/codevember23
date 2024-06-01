@@ -1,3 +1,4 @@
+import { drawingLines } from './drawing_lines'
 import { tiled_lines } from './tiled_lines'
 import { joy_division } from './joy_division'
 import { cubic_disarray } from './cubic_disarray'
@@ -21,33 +22,36 @@ import { phongLightingExample } from './phong'
 import { shapeGrammar } from './shapeGrammar'
 import { treeRings } from './tree_rings'
 import { paintSmear } from './paint_smear'
-import { particlesDemo } from './particles'
+// import { particlesDemo } from './particles'
+import { cropCircles } from './crop_circles'
 
 export const examples = [
-    tiled_lines,
-    joy_division,
-    cubic_disarray,
-    un_deux_trois,
-    hypnotic_squares,
-    compositionWithLines,
-    scribbles,
-    handDrawnLines,
-    curveDemos,
-    nearPointDemo,
-    floodFill, // 10
-    rectDivide,
-    circlePacking,
-    convexHullDemo,
-    blobApproaches,
-    weightedRandomDemo,
-    distros, // 15
-    distroShaping,
-    noiseExample,
-    // poisson Distribution
-    phongLightingExample,
-    shapeGrammar,
-    // glyphs
-    treeRings, // 20
-    paintSmear,
-    particlesDemo,
+    drawingLines,
+    cropCircles,
+    // tiled_lines,
+    // joy_division,
+    // cubic_disarray,
+    // un_deux_trois,
+    // hypnotic_squares,
+    // compositionWithLines,
+    // scribbles,
+    // handDrawnLines,
+    // curveDemos,
+    // nearPointDemo,
+    // floodFill, // 10
+    // rectDivide,
+    // circlePacking,
+    // convexHullDemo,
+    // blobApproaches,
+    // weightedRandomDemo,
+    // distros, // 15
+    // distroShaping,
+    // noiseExample,
+    // // poisson Distribution
+    // phongLightingExample,
+    // shapeGrammar,
+    // // glyphs
+    // treeRings, // 20
+    // paintSmear,
+    // particlesDemo,
 ]

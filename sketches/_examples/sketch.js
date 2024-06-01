@@ -19,7 +19,7 @@ console.log('selected palette', paletteIdx, palette)
 
 const [bg, primary, secondary] = palette
 const RUN_ALL = false
-const EXAMPLE = 14
+const EXAMPLE = 1
 
 if (!RUN_ALL) {
     const ctx = createCanvas(1200, 1200)

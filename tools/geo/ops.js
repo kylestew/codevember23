@@ -113,7 +113,7 @@ export function asPath(shape) {
                     path.lineTo(x, y)
                 }
             })
-            path.closePath()
+            // path.closePath()
             break
 
         case 'Quadratic':
