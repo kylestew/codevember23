@@ -4,16 +4,17 @@ import { MySketch } from './sketch'
 import { SketchParams } from './types'
 import { createUI } from './util/gui'
 
+// TODO: replace with PNGs only
 import { alphaNumericCharacterSet } from './lib/glyph-sets'
 import { loadFontSet } from './lib/font-set'
-import { svgToPaths } from './shared_lib/svg_path_reader'
+import { svgToPaths } from './lib/svg_path_reader'
 
 import SVG from './assets/glyphs.svg?raw'
 
 const fonts = await loadFontSet()
-// const characterSet = 'Speak softly and carry a big stick'.split('')
+const characterSet = 'Speak softly and carry a big stick'.split('')
 // array containing 61-73 ascii characters
-const characterSet = alphaNumericCharacterSet
+// const characterSet = alphaNumericCharacterSet
 const shapeSet = svgToPaths(SVG)
 
 const params: SketchParams = {
@@ -22,8 +23,8 @@ const params: SketchParams = {
     shapeSet,
 
     canvasSize: {
-        width: 1200 / 2,
-        height: 1920 / 2,
+        width: 1920 / 2,
+        height: 1080 / 2,
     },
 
     padding: 2,
